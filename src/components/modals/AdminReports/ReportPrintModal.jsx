@@ -6,7 +6,7 @@ import { getCompanyDetails, getCompanyName } from '../../../utils/session';
 const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data = [], columns = [], totals = null }) => {
     const [orientation, setOrientation] = useState('Portrait');
     const [scaling, setScaling] = useState('Smart page break');
-    const [showHeaders, setShowHeaders] = useState(true);
+    const [showHeaders, setShowHeaders] = useState(false);
     const [showSidebar, setShowSidebar] = useState(true);
     
     // Toolbar state
@@ -87,33 +87,40 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
         return String(val);
     };
 
-    const maxNormalRows = orientation === 'Portrait' ? 30 : 18;
-    const maxLastRows = orientation === 'Portrait' ? 25 : 14;
+    const maxFirstPageRows = orientation === 'Portrait' ? 22 : 12;
+    const maxNormalRows = orientation === 'Portrait' ? (showHeaders ? 22 : 32) : (showHeaders ? 12 : 18);
+    const maxLastRows = orientation === 'Portrait' ? (showHeaders ? 16 : 26) : (showHeaders ? 8 : 12);
 
     const chunks = [];
     if (!data || data.length === 0) {
         chunks.push([]);
     } else {
         let remaining = [...data];
+        let isFirstPage = true;
+        
         while (remaining.length > 0) {
-            if (remaining.length <= maxLastRows) {
+            const currentMax = isFirstPage ? maxFirstPageRows : maxNormalRows;
+            const currentLastMax = isFirstPage ? (maxFirstPageRows - 5) : maxLastRows; // Leave room for footer if it's the last page
+
+            if (remaining.length <= currentLastMax) {
                 chunks.push(remaining);
                 remaining = [];
-            } else if (remaining.length <= maxNormalRows) {
-                const take = remaining.length - 1;
+            } else if (remaining.length <= currentMax) {
+                const take = remaining.length - 1; // leave 1 row for next page so footer isn't alone
                 chunks.push(remaining.slice(0, take));
                 remaining = remaining.slice(take);
             } else {
-                chunks.push(remaining.slice(0, maxNormalRows));
-                remaining = remaining.slice(maxNormalRows);
+                chunks.push(remaining.slice(0, currentMax));
+                remaining = remaining.slice(currentMax);
             }
+            isFirstPage = false;
         }
     }
 
     const compDetails = getCompanyDetails();
     const finalCompanyName = getCompanyName() || companyName || 'ONIMTA INFORMATION TECHNOLOGY';
     const finalTaxId = compDetails?.taxID || compDetails?.Tax_ID || compDetails?.TaxID || compDetails?.regNumber || compDetails?.Reg_Number || 'N/A';
-    const finalAddress = compDetails?.address1 ? `${compDetails.address1}${compDetails.address2 ? `, ${compDetails.address2}` : ''}${compDetails.country ? `, ${compDetails.country}` : ''}` : 'N/A';
+    const finalAddress = (compDetails?.address1 || compDetails?.Address1) ? `${compDetails.address1 || compDetails.Address1}${(compDetails.address2 || compDetails.Address2) ? `, ${compDetails.address2 || compDetails.Address2}` : ''}${(compDetails.country || compDetails.Country) ? `, ${compDetails.country || compDetails.Country}` : ''}` : 'N/A';
 
     const HeaderContent = (
         <div style={{ marginBottom: showHeaders ? '0' : '20px', borderBottom: '2px solid #000', paddingBottom: '10px', paddingLeft: '20px', paddingRight: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -182,8 +189,6 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                         height: orientation === 'Portrait' ? '275mm' : '195mm',
                         pageBreakAfter: pageIndex < chunks.length - 1 ? 'always' : 'auto' 
                     }}>
-                        {(!showHeaders && pageIndex === 0) && HeaderContent}
-                        
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', color: '#000' }}>
                             <thead>
                                 {(showHeaders || pageIndex === 0) && (
@@ -207,7 +212,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                 ) : chunk.map((row, i) => (
                                     <tr key={i} style={{ backgroundColor: i % 2 === 1 ? '#fafafa' : 'white' }}>
                                         {resolvedColumns.map((col, j) => (
-                                            <td key={j} style={{ padding: '4px 6px', textAlign: col.align || 'left', color: '#000', borderBottom: '1px solid #eee' }}>
+                                            <td key={j} style={{ padding: '4px 6px', textAlign: col.align || 'left', color: '#000', borderBottom: '1px solid #eee', whiteSpace: 'nowrap' }}>
                                                 {formatCell(col, row)}
                                             </td>
                                         ))}
@@ -501,7 +506,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                                     {chunk.map((row, i) => (
                                                         <tr key={i} className={`border-b border-gray-200 ${i % 2 === 1 ? 'bg-gray-50' : ''}`}>
                                                             {resolvedColumns.map((col, j) => (
-                                                                <td key={j} className="px-1.5 py-1 text-[11px] text-gray-900" style={{ textAlign: col.align || 'left', wordBreak: 'break-word' }}>
+                                                                <td key={j} className="px-1.5 py-1 text-[11px] text-gray-900 whitespace-nowrap" style={{ textAlign: col.align || 'left' }}>
                                                                     {formatCell(col, row)}
                                                                 </td>
                                                             ))}

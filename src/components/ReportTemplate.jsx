@@ -139,7 +139,8 @@ const allReportsList = [
     "Fixed Expenses",
     "Sales Tax ID List",
     "Products Report",
-    "Sales Order Summary"
+    "Sales Order Summary",
+    "GRN Report"
 ];
 
 
@@ -198,6 +199,7 @@ const ReportTemplate = ({
     companyCode,
     empCode,
     roleId,
+    docNo,
     isStandalone = false
 }) => {
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -209,6 +211,13 @@ const ReportTemplate = ({
     const [selectedQuotationDoc, setSelectedQuotationDoc] = useState(null);
     const [selectedSalesOrderDoc, setSelectedSalesOrderDoc] = useState(null);
     const fileInputRef = useRef(null);
+    const [localDocNo, setLocalDocNo] = useState(docNo || '');
+
+    useEffect(() => {
+        if (docNo !== undefined) {
+            setLocalDocNo(docNo);
+        }
+    }, [docNo]);
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -358,7 +367,6 @@ const ReportTemplate = ({
     const [apiError, setApiError] = useState(null);
 
     const fetchReportData = async () => {
-        if (isStandalone) return;
         
         const endpoint = title.replace(/[^a-zA-Z0-9 ]/g, "").split(' ').map(w => w.toLowerCase()).filter(Boolean).join('-');
 
@@ -412,7 +420,7 @@ const ReportTemplate = ({
                 else if (displayColumnsBy === 'Supplier') backendDisplayColumnsBy = 'Vendor';
                 else if (displayColumnsBy === 'Select') backendDisplayColumnsBy = '';
 
-                const response = await api.get(`/report/${endpoint}?companyId=${companyId}&startDate=${startStr}&endDate=${endStr}&accountingMethod=${accountingMethod}&displayColumnsBy=${backendDisplayColumnsBy}&compareTo=${compareToStr}`);
+                const response = await api.get(`/report/${endpoint}?companyId=${companyId}&docNo=${encodeURIComponent(localDocNo || '')}&startDate=${startStr}&endDate=${endStr}&accountingMethod=${accountingMethod}&displayColumnsBy=${backendDisplayColumnsBy}&compareTo=${compareToStr}`);
                 
                 let processedData = response.data;
                 if (processedData && processedData.length > 0 && processedData.some(r => 'PivotColumn' in r || 'pivotcolumn' in r)) {
@@ -982,6 +990,20 @@ const ReportTemplate = ({
                         </div>
                     </div>
 
+                    {title === 'GRN Report' && (
+                        <div className="flex flex-col gap-1.5 w-[160px]">
+                            <label className="text-[12px] text-gray-600 font-medium">Doc Number</label>
+                            <input
+                                type="text"
+                                value={localDocNo}
+                                onChange={(e) => setLocalDocNo(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && fetchReportData()}
+                                placeholder="Enter Doc No..."
+                                className="w-full h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] font-medium text-gray-800 outline-none focus:border-[#0077c5] bg-white"
+                            />
+                        </div>
+                    )}
+
                     <div className="flex flex-col gap-1.5 w-[130px] relative">
                         <label className="text-[12px] text-gray-600 font-medium">From</label>
                         <button
@@ -1140,6 +1162,9 @@ const ReportTemplate = ({
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <button onClick={fetchReportData} className="h-9 px-6 rounded-[3px] bg-[#0077c5] hover:bg-[#005ca6] text-white text-[13px] font-bold transition-colors">
+                        Run report
+                    </button>
                     <button onClick={() => setShowCustomizeModal(true)} className="h-9 px-4 border border-gray-300 rounded-[3px] bg-white hover:bg-gray-50 flex items-center gap-1.5 text-[13px] font-bold text-[#393a3d] transition-colors">
                         <Settings2 size={14} />
                         Customise Report

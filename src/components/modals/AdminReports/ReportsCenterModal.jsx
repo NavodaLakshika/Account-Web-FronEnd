@@ -49,7 +49,7 @@ export const menuGroups = [
         title: 'Inventory & Products',
         icon: Package,
         items: [
-            "Inventory Valuation Summary", "Inventory Valuation Detail", "Stock Take Worksheet", "Product/Service List", "Products Report"
+            "Inventory Valuation Summary", "Inventory Valuation Detail", "Stock Take Worksheet", "Product/Service List", "Products Report", "GRN Report"
         ]
     },
     {

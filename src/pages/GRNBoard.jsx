@@ -5,17 +5,23 @@ import CalendarModal from '../components/CalendarModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import FeatureLockedModal from '../components/modals/FeatureLockedModal';
 import ColumnSelectionModal from '../components/modals/ColumnSelectionModal';
-import { Search, Calendar, Plus, Trash2, Save, RotateCcw, Loader2, FileText, FileUp, FileDown, CheckCircle } from 'lucide-react';
+import { Search, Calendar, Plus, Trash2, Save, RotateCcw, Loader2, FileText, FileUp, FileDown, CheckCircle, Check, X } from 'lucide-react';
+import ReportTemplate from '../components/ReportTemplate';
 import { grnService } from '../services/grn.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import * as XLSX from 'xlsx';
+import SupplierMasterBoard from '../components/modals/MasterSubModal/SupplierMasterBoard';
+import NewAccountBoard from './NewAccountBoard';
+import { vendorTypeService } from '../services/vendorType.service';
 
 const GRNBoard = ({ isOpen, onClose }) => {
-    const [lookups, setLookups] = useState({ suppliers: [], products: [], pos: [], paymentMethods: [] });
+    const [lookups, setLookups] = useState({ suppliers: [], products: [], pos: [], paymentMethods: [], accounts: [] });
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [appliedDocNoState, setAppliedDocNoState] = useState(null);
     const [isApplying, setIsApplying] = useState(false);
     const [showAddProductModal, setShowAddProductModal] = useState(false);
     const [showLockModal, setShowLockModal] = useState(false);
@@ -23,6 +29,20 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    
+    // Create Modals
+    const [showSupplierMaster, setShowSupplierMaster] = useState(false);
+    const [showAccountMaster, setShowAccountMaster] = useState(false);
+
+    const handleSupplierMasterClose = () => {
+        setShowSupplierMaster(false);
+        fetchLookups(formData.company);
+    };
+
+    const handleAccountMasterClose = () => {
+        setShowAccountMaster(false);
+        fetchLookups(formData.company);
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -34,7 +54,6 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('grnDate');
     const [productSearchQuery, setProductSearchQuery] = useState('');
-    const [showExpenseSearch, setShowExpenseSearch] = useState(false);
     const [orders, setOrders] = useState([]);
     const [newDocNo, setNewDocNo] = useState('');
     const [showColumnSelector, setShowColumnSelector] = useState(false);
@@ -49,6 +68,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
         payType: 'Cash',
         suppInv: '',
         invAmount: '0.00',
+        expenseAcc: '',
+        expenseAccName: '',
         consignmentBasis: false,
         acceptOtherSupp: false,
         comment: '',
@@ -100,8 +121,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
             const data = await grnService.getLookups(company);
             const methods = await paymentMethodService.getAll(company);
             const orderList = await grnService.searchDocs(company).catch(() => []);
+            const accountsList = await vendorTypeService.searchAccounts().catch(() => []);
             setOrders(orderList || []);
-            setLookups({ ...data, paymentMethods: methods });
+            setLookups({ ...data, paymentMethods: methods, accounts: accountsList || [] });
         } catch (error) {
             showErrorToast('Failed to load lookups.');
         }
@@ -119,10 +141,25 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     const handleInput = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+        setFormData(prev => {
+            const next = { ...prev, [name]: type === 'checkbox' ? checked : value };
+            
+            // Consignment Basis Logic: Clear invoice details if checked
+            if (name === 'consignmentBasis' && checked) {
+                next.suppInv = '';
+                next.invAmount = '0.00';
+            }
+            
+            // Accept Other Supp Logic: If unchecked while a PO is selected, revert supplier to PO's supplier
+            if (name === 'acceptOtherSupp' && !checked && next.poNo) {
+                const selectedPO = orders.find(o => o.docNo === next.poNo || o.doc_No === next.poNo);
+                if (selectedPO) {
+                    next.suppCode = selectedPO.vendor_Id?.trim() || next.suppCode;
+                }
+            }
+            
+            return next;
+        });
     };
 
     const handleDateSelect = (date) => {
@@ -193,6 +230,14 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const handleApply = async () => {
         if (!formData.suppCode) return showErrorToast('Select Supplier.');
         if (products.length === 0) return showErrorToast('No products entered.');
+        
+        const invAmt = parseFloat(formData.invAmount) || 0;
+        const netAmt = parseFloat(totals.netAmount) || 0;
+        
+        if (Math.abs(invAmt - netAmt) > 0.01) {
+            return showErrorToast(`Invoice Amount (${invAmt.toFixed(2)}) does not match Net Liability (${netAmt.toFixed(2)}).`);
+        }
+
         setShowConfirmModal(true);
     };
 
@@ -200,8 +245,14 @@ const GRNBoard = ({ isOpen, onClose }) => {
         setIsApplying(true);
         const payload = preparePayload();
         try {
-            await grnService.apply(payload);
+            const result = await grnService.apply(payload);
             showSuccessToast('GRN Applied successfully.');
+            
+            // Auto open GRN Report inside a Modal
+            const appliedDocNo = result?.docNo || result?.DocNo || formData.docNo;
+            setAppliedDocNoState(appliedDocNo);
+            setShowReportModal(true);
+
             handleClear();
             setShowConfirmModal(false);
         } catch (error) { showErrorToast(error.toString()); } finally { setIsApplying(false); }
@@ -476,24 +527,34 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     <div className="flex items-center justify-between mb-1 px-1">
                         <div className="flex items-center gap-4">
                             <label className="flex items-center gap-2 cursor-pointer group">
-                                <input
-                                    type="checkbox"
-                                    name="consignmentBasis"
-                                    checked={formData.consignmentBasis}
-                                    onChange={handleInput}
-                                    className="w-4 h-4 rounded text-[#0285fd] focus:ring-[#0285fd] border-gray-300 transition-all cursor-pointer"
-                                />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-hover:text-[#0285fd] transition-colors">Consignment Basis</span>
+                                <div className="relative flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        name="consignmentBasis"
+                                        checked={formData.consignmentBasis}
+                                        onChange={handleInput}
+                                        className="sr-only"
+                                    />
+                                    <div className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all shadow-sm ${formData.consignmentBasis ? 'bg-[#0285fd] border-[#0285fd]' : 'border-gray-300 bg-white'}`}>
+                                        <Check size={12} className={`text-white transition-opacity duration-200 ${formData.consignmentBasis ? 'opacity-100' : 'opacity-0'}`} strokeWidth={4} />
+                                    </div>
+                                </div>
+                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-hover:text-[#0285fd] transition-colors mt-[2px]">Consignment Basis</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer group">
-                                <input
-                                    type="checkbox"
-                                    name="acceptOtherSupp"
-                                    checked={formData.acceptOtherSupp}
-                                    onChange={handleInput}
-                                    className="w-4 h-4 rounded text-[#0285fd] focus:ring-[#0285fd] border-gray-300 transition-all cursor-pointer"
-                                />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-hover:text-[#0285fd] transition-colors">Accept Other Supp.</span>
+                                <div className="relative flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        name="acceptOtherSupp"
+                                        checked={formData.acceptOtherSupp}
+                                        onChange={handleInput}
+                                        className="sr-only"
+                                    />
+                                    <div className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all shadow-sm ${formData.acceptOtherSupp ? 'bg-[#0285fd] border-[#0285fd]' : 'border-gray-300 bg-white'}`}>
+                                        <Check size={12} className={`text-white transition-opacity duration-200 ${formData.acceptOtherSupp ? 'opacity-100' : 'opacity-0'}`} strokeWidth={4} />
+                                    </div>
+                                </div>
+                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-hover:text-[#0285fd] transition-colors mt-[2px]">Accept Other Supp.</span>
                             </label>
                         </div>
                         <div className="flex gap-2">
@@ -568,13 +629,24 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             {/* Row 2: Supplier | PO Number */}
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier</label>
-                                <div className="relative">
-                                    <select value={formData.suppCode} onChange={e => setFormData(prev => ({ ...prev, suppCode: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
-                                        <option value="">-- Select Supplier --</option>
-                                        {lookups.suppliers.map(s => (
-                                            <option key={s.code} value={s.code?.trim()}>{s.code} - {s.name}</option>
-                                        ))}
-                                    </select>
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <select 
+                                            value={formData.suppCode} 
+                                            onChange={e => setFormData(prev => ({ ...prev, suppCode: e.target.value }))} 
+                                            disabled={!!formData.poNo && !formData.acceptOtherSupp}
+                                            className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none truncate transition-colors ${!!formData.poNo && !formData.acceptOtherSupp ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white cursor-pointer text-gray-700'}`} 
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">-- Select Supplier --</option>
+                                            {lookups.suppliers.map(s => (
+                                                <option key={s.code} value={s.code?.trim()}>{s.code} - {s.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <button type="button" onClick={() => setShowSupplierMaster(true)} className="w-10 h-10 shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-[3px] flex items-center justify-center hover:bg-emerald-100 transition-colors active:scale-95" title="Add New Supplier">
+                                        <Plus size={18} />
+                                    </button>
                                 </div>
                             </div>
                             <div className="col-span-4">
@@ -592,16 +664,38 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             {/* Row 3: Supp. Inv | Inv. Amount | Pay Method */}
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier Invoice</label>
-                                <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                <input 
+                                    type="text" 
+                                    name="suppInv" 
+                                    value={formData.suppInv} 
+                                    onChange={handleInput} 
+                                    disabled={formData.consignmentBasis}
+                                    placeholder={formData.consignmentBasis ? "N/A (Consignment)" : ""}
+                                    className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400 placeholder-gray-400' : 'bg-white text-gray-700'}`} 
+                                />
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Invoice Amount</label>
-                                <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-right text-gray-700" />
+                                <input 
+                                    type="text" 
+                                    name="invAmount" 
+                                    value={formData.invAmount} 
+                                    onChange={handleInput} 
+                                    disabled={formData.consignmentBasis}
+                                    className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-right transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white text-gray-700'}`} 
+                                />
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Method</label>
                                 <div className="relative">
-                                    <select value={formData.payType} onChange={e => setFormData(prev => ({ ...prev, payType: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                    <select 
+                                        name="payType"
+                                        value={formData.payType} 
+                                        onChange={handleInput} 
+                                        disabled={formData.consignmentBasis}
+                                        className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none truncate transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white cursor-pointer text-gray-700'}`} 
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
                                         <option value="">-- Select Payment Method --</option>
                                         {(lookups.paymentMethods || []).map(m => (
                                             <option key={m.code} value={m.code}>{m.code} - {m.name}</option>
@@ -655,7 +749,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                 <tbody className="divide-y divide-gray-50">
                                     {products.length === 0 ? (
                                         <tr>
-                                            <td colSpan="9" className="py-10 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No items added. Click "ADD ITEM" to begin.</td>
+                                            <td colSpan="9" className="py-10 text-center text-gray-300 font-black text-[10px] uppercase tracking-widest">No items added. Click "ADD ITEM" to begin.</td>
                                         </tr>
                                     ) : products.map((p, idx) => (
                                         <tr key={idx} className="text-[12px] font-bold text-gray-700 border-b border-gray-50 hover:bg-slate-50/30 transition-colors">
@@ -669,7 +763,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                     type="text"
                                                     value={p.qty}
                                                     onChange={(ev) => {
-                                                        const newQty = e.target.value;
+                                                        const newQty = ev.target.value;
                                                         const newAmount = (parseFloat(newQty) || 0) * (parseFloat(p.cost) || 0);
                                                         setProducts(products.map((item, i) =>
                                                             i === idx ? { ...item, qty: newQty, amount: newAmount.toFixed(2) } : item
@@ -684,7 +778,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                     value={p.free}
                                                     onChange={(ev) => {
                                                         setProducts(products.map((item, i) =>
-                                                            i === idx ? { ...item, free: e.target.value } : item
+                                                            i === idx ? { ...item, free: ev.target.value } : item
                                                         ));
                                                     }}
                                                     className="w-full h-8 border border-gray-200 rounded-[3px] text-center text-[12px] font-mono text-blue-700 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
@@ -699,7 +793,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                         setProductToDelete(p);
                                                         setShowDeleteConfirm(true);
                                                     }}
-                                                    className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
+                                                    className="px-5 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                                                 >
                                                     <Trash2 size={13} />
                                                 </button>
@@ -718,14 +812,28 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-3">
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Expense Account</label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value=""
-                                            onClick={() => setShowExpenseSearch(true)}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-500 appearance-none"
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <select 
+                                                name="expenseAcc"
+                                                value={formData.expenseAcc}
+                                                onChange={e => {
+                                                    const val = e.target.value;
+                                                    const acc = (lookups.accounts || []).find(a => a.sub_Code === val);
+                                                    setFormData(prev => ({ ...prev, expenseAcc: val, expenseAccName: acc ? acc.sub_Acc_Name : '' }));
+                                                }}
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none truncate"
+                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                            >
+                                                <option value="">Select Expense Account...</option>
+                                                {(lookups.accounts || []).map((a, i) => (
+                                                    <option key={i} value={a.sub_Code}>{a.sub_Code} - {a.sub_Acc_Name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <button type="button" onClick={() => setShowAccountMaster(true)} className="w-10 h-10 shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-[3px] flex items-center justify-center hover:bg-emerald-100 transition-colors active:scale-95" title="Add New Expense Account">
+                                            <Plus size={18} />
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="">
@@ -833,8 +941,6 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-
-
             {/* Add Product Modal (Catalog) */}
             <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[700px]">
                 <div className="space-y-4 px-1 font-['Tahoma']">
@@ -848,7 +954,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                     value={productSearchQuery}
                                     onChange={async (e) => {
-                                        const val = ev.target.value; setProductSearchQuery(val);
+                                        const val = e.target.value; setProductSearchQuery(val);
                                         if (val.length >= 2) { try { const r = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
                                         else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
                                     }}
@@ -1007,52 +1113,23 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-
-
-
-
-            {/* Expense Account Search Modal */}
-            <SimpleModal
-                isOpen={showExpenseSearch}
-                onClose={() => setShowExpenseSearch(false)}
-                title="Expense Account Lookup"
-                maxWidth="max-w-[700px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                placeholder="Filter ledger accounts..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Account Name</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    <tr>
-                                        <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No accounts configured</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
-
             {/* Confirm Apply Modal */}
             <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Save & Apply GRN" message={`Are you sure you want to Save and Apply GRN document ${formData.docNo}?`} loading={isApplying} confirmText="Apply GRN" />
+
+            {/* GRN Report Modal */}
+            {showReportModal && (
+                <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-white w-[95vw] h-[95vh] rounded shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+                        <ReportTemplate
+                            title="GRN Report"
+                            companyCode={formData.company}
+                            docNo={appliedDocNoState}
+                            isStandalone={true}
+                            onClose={() => setShowReportModal(false)}
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* Calendar Modal */}
             <CalendarModal
@@ -1140,6 +1217,16 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 isOpen={showColumnSelector}
                 onClose={() => setShowColumnSelector(false)}
                 onDownload={handleTemplateDownload}
+            />
+
+            {/* Create Modals */}
+            <SupplierMasterBoard 
+                isOpen={showSupplierMaster}
+                onClose={handleSupplierMasterClose}
+            />
+            <NewAccountBoard
+                isOpen={showAccountMaster}
+                onClose={handleAccountMasterClose}
             />
         </>
     );

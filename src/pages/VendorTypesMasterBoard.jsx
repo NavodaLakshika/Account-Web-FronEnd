@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, RotateCcw, Save, Building2, Loader2, Trash2, CheckCircle } from 'lucide-react';
+import { Search, RotateCcw, Save, Building2, Loader2, Trash2, CheckCircle, Plus } from 'lucide-react';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SimpleModal from '../components/SimpleModal';
+import NewAccountBoard from './NewAccountBoard';
 import { vendorTypeService } from '../services/vendorType.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import SearchableSelect from '../components/SearchableSelect';
@@ -20,6 +21,12 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
     const [accounts, setAccounts] = useState([]);
     const [vendorSearchTerm, setVendorSearchTerm] = useState('');
     const [accSearchTerm, setAccSearchTerm] = useState('');
+    const [showAccountMaster, setShowAccountMaster] = useState(false);
+
+    const handleAccountMasterClose = () => {
+        setShowAccountMaster(false);
+        fetchInitialData();
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -141,25 +148,30 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payable Account</label>
-                                <div className="relative">
-                                    <select 
-                                        value={formData.PaybleAccCode} 
-                                        onChange={(e) => {
-                                            const acc = accounts.find(a => a.sub_Code === e.target.value);
-                                            if (acc) {
-                                                setFormData(prev => ({ ...prev, PaybleAccCode: acc.sub_Code, PaybleAccName: acc.sub_Acc_Name }));
-                                            } else {
-                                                setFormData(prev => ({ ...prev, PaybleAccCode: '', PaybleAccName: '' }));
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select account...</option>
-                                        {accounts.map((a, i) => (
-                                            <option key={i} value={a.sub_Code}>{a.sub_Code} - {a.sub_Acc_Name}</option>
-                                        ))}
-                                    </select>
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <select 
+                                            value={formData.PaybleAccCode} 
+                                            onChange={(e) => {
+                                                const acc = accounts.find(a => a.sub_Code === e.target.value);
+                                                if (acc) {
+                                                    setFormData(prev => ({ ...prev, PaybleAccCode: acc.sub_Code, PaybleAccName: acc.sub_Acc_Name }));
+                                                } else {
+                                                    setFormData(prev => ({ ...prev, PaybleAccCode: '', PaybleAccName: '' }));
+                                                }
+                                            }}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none truncate"  
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select account...</option>
+                                            {accounts.map((a, i) => (
+                                                <option key={i} value={a.sub_Code}>{a.sub_Code} - {a.sub_Acc_Name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <button type="button" onClick={() => setShowAccountMaster(true)} className="w-10 h-10 shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-[3px] flex items-center justify-center hover:bg-emerald-100 transition-colors active:scale-95" title="Add New Payable Account">
+                                        <Plus size={18} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -234,6 +246,11 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
                 loading={loading}
                 confirmText="Delete Now"
                 variant="danger"
+            />
+            
+            <NewAccountBoard
+                isOpen={showAccountMaster}
+                onClose={handleAccountMasterClose}
             />
         </>
     );

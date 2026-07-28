@@ -1379,6 +1379,7 @@ const Dashboard = () => {
                     { label: 'Stock Take Worksheet', onClick: () => setSelectedReport('Stock Take Worksheet') },
                     { label: 'Product/Service List', onClick: () => setSelectedReport('Product/Service List') },
                     { label: 'Products Report', onClick: () => setSelectedReport('Products Report') },
+                    { label: 'GRN Report', onClick: () => setSelectedReport('GRN Report') },
                 ]
             },
             {
