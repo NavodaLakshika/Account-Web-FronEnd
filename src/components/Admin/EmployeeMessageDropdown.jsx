@@ -130,10 +130,10 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
     };
 
     const templates = [
-        "Please check the system for an urgent update.",
-        "Your password reset request has been processed successfully.",
-        "A new notification requires your immediate attention.",
-        "Please contact the Super Admin as soon as possible."
+        "Please check the Onimta Accounting system for an urgent update. Visit: https://www.onimtait.com",
+        "Your password reset request for Onimta Accounting has been processed successfully.",
+        "A new notification in Onimta Accounting requires your immediate attention.",
+        "Please contact the Onimta Accounting Super Admin as soon as possible."
     ];
 
     return createPortal(
@@ -233,7 +233,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                         </div>
                         
                         <div className="flex-1 p-5 flex flex-col overflow-y-auto">
-                            <div className="text-center mb-6">
+                            <div className="text-center mb-12">
                                 <div className="w-14 h-14 rounded-[3px] bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto mb-3">
                                     <Smartphone size={24} className="text-[#0285fd]" />
                                 </div>
@@ -241,16 +241,16 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                                 <p className="text-xs text-gray-500 mt-1">Message will be sent instantly via SMS gateway</p>
                             </div>
 
-                            <div className="mb-4">
+                            <div className="mb-12">
                                 <div className="flex items-center gap-2 mb-2 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                     <FileText size={12} /> Quick Templates
                                 </div>
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-col gap-4">
                                     {templates.map((tmpl, idx) => (
                                         <button 
                                             key={idx}
                                             onClick={() => applyTemplate(tmpl)}
-                                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
+                                            className="w-full min-h-[40px] py-2 px-4 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100 leading-snug"
                                         >
                                             {tmpl}
                                         </button>
