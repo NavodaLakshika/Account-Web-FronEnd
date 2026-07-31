@@ -92,6 +92,29 @@ const ExpensesDashboardBoard = ({
         res.categoryBreakdown = cleaned;
       }
 
+      // Safe parse for transactions to ensure amount/total is always caught
+      if (res.recentTransactions && Array.isArray(res.recentTransactions)) {
+        res.recentTransactions = res.recentTransactions.map(tx => ({
+          ...tx,
+          total: Number(tx.total || tx.Total || tx.amount || tx.Amount || tx.totalAmount || tx.TotalAmount || 0)
+        }));
+      }
+
+      // Fix Total Expenses if it's returning 0 or undefined but we have transactions
+      if (!res.totalExpenses) {
+        res.totalExpenses = Number(res.totalExpenses || res.totalExpense || res.TotalExpenses || res.TotalExpense || 0);
+        
+        // If still 0, try to compute from category breakdown or transactions
+        if (res.totalExpenses === 0 && res.categoryBreakdown && res.categoryBreakdown.length > 0) {
+          res.totalExpenses = res.categoryBreakdown.reduce((sum, cat) => sum + (Number(cat.amount) || 0), 0);
+        } else if (res.totalExpenses === 0 && res.recentTransactions && res.recentTransactions.length > 0) {
+          // Fallback to summing up transactions that aren't payments
+          res.totalExpenses = res.recentTransactions
+            .filter(tx => tx.type !== 'Bill Payment' && tx.type !== 'Vendor Payment')
+            .reduce((sum, tx) => sum + tx.total, 0);
+        }
+      }
+
       setData(res);
     } catch (error) {
       showErrorToast('Failed to load spend dashboard data.');
