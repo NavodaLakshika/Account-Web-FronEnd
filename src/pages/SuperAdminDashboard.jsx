@@ -74,10 +74,10 @@ const itemVariants = {
 const CustomYAxisTick = (props) => {
     const { x, y, payload } = props;
     const text = payload.value || '';
-    
+
     let line1 = text;
     let line2 = '';
-    
+
     if (text.length > 14) {
         const splitIndex = text.lastIndexOf(' ', 14);
         if (splitIndex !== -1) {
@@ -90,7 +90,7 @@ const CustomYAxisTick = (props) => {
                 line2 = text.substring(nextSpace + 1);
             }
         }
-        
+
         if (line2.length > 20) {
             line2 = line2.substring(0, 17) + '...';
         }
@@ -118,7 +118,7 @@ const SuperAdminDashboard = () => {
     const [activeMenu, setActiveMenu] = useState(() => localStorage.getItem('saDefaultView') || 'Dashboard');
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedEmps, setExpandedEmps] = useState({});
-    
+
     const [showMessageDropdown, setShowMessageDropdown] = useState(false);
     const [currentUserCode, setCurrentUserCode] = useState('');
     const [selectedEmpForCompanies, setSelectedEmpForCompanies] = useState(null);
@@ -207,7 +207,7 @@ const SuperAdminDashboard = () => {
     const [loadingPermissions, setLoadingPermissions] = useState(false);
     const [savingPermissions, setSavingPermissions] = useState(false);
 
-    
+
     // Create Role State
     const [showCreateRoleModal, setShowCreateRoleModal] = useState(false);
     const [newRoleName, setNewRoleName] = useState('');
@@ -366,6 +366,29 @@ const SuperAdminDashboard = () => {
         }
     };
 
+    const verifySuperAdminPassword = async (password) => {
+        try {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) return false;
+            const user = JSON.parse(userStr);
+            const empName = user.EmpName || user.empName || user.Emp_Name || user.Email || user.email || user.EmpCode;
+
+            const res = await api.post('/Auth/verify-password', {
+                Emp_Name: empName,
+                Pass_Word: password
+            });
+            return res.data.success;
+        } catch (error) {
+            setAlertConfig({
+                isOpen: true,
+                title: 'Security Error',
+                message: error.response?.data?.message || 'Password verification failed.',
+                variant: 'danger'
+            });
+            return false;
+        }
+    };
+
     const handleInitiateUpdateRole = () => {
         setRolePasswordInput('');
         setShowRolePasswordModal(true);
@@ -383,6 +406,9 @@ const SuperAdminDashboard = () => {
             });
             return;
         }
+
+        const isValid = await verifySuperAdminPassword(rolePasswordInput);
+        if (!isValid) return;
 
         setShowRolePasswordModal(false);
         setSavingRole(true);
@@ -466,19 +492,19 @@ const SuperAdminDashboard = () => {
 
     useEffect(() => {
         if (!sessionTimeout || sessionTimeout.toString().toLowerCase() === 'never') return;
-        
+
         const timeoutMs = parseInt(sessionTimeout) * 60 * 1000;
         let timeoutId;
-        
+
         const resetTimeout = () => {
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 handleLogout();
             }, timeoutMs);
         };
-        
+
         resetTimeout();
-        
+
         const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
         const handleUserActivity = () => {
             resetTimeout();
@@ -621,6 +647,10 @@ const SuperAdminDashboard = () => {
             });
             return;
         }
+
+        const isValid = await verifySuperAdminPassword(savePermissionsPasswordInput);
+        if (!isValid) return;
+
         setShowSavePermissionsPasswordModal(false);
         setSavingPermissions(true);
         try {
@@ -741,6 +771,20 @@ const SuperAdminDashboard = () => {
 
     const confirmDeleteAction = async (password) => {
         if (!pendingDeleteAction) return;
+
+        if (!password) {
+            setAlertConfig({
+                isOpen: true,
+                title: 'Error',
+                message: 'Super Admin password is required to delete record.',
+                variant: 'warning'
+            });
+            return;
+        }
+
+        const isValid = await verifySuperAdminPassword(password);
+        if (!isValid) return;
+
         const action = pendingDeleteAction;
         setPendingDeleteAction(null);
         setShowDeletePasswordModal(false);
@@ -1037,7 +1081,7 @@ const SuperAdminDashboard = () => {
                                 {showResets && createPortal(
                                     <div className="fixed inset-0 z-[99999] flex justify-end">
                                         <div className="absolute inset-0 bg-black/40" onClick={() => setShowResets(false)}></div>
-                                        <div 
+                                        <div
                                             className="relative w-full md:w-[450px] h-full bg-white shadow-2xl flex flex-col border-l border-gray-200 font-['Tahoma']"
                                             onClick={(e) => e.stopPropagation()}
                                         >
@@ -1098,20 +1142,20 @@ const SuperAdminDashboard = () => {
                                     document.body
                                 )}
                             </div>
-                            
+
                             {/* Profile Dropdown */}
                             <div className="relative flex items-center gap-2 pl-3 border-l border-gray-200 ml-1">
-                                <button 
+                                <button
                                     onClick={() => setShowProfileMenu(prev => !prev)}
                                     className="w-[28px] h-[28px] bg-[#0285fd] text-white flex items-center justify-center font-bold text-[14px] shadow-sm rounded-[3px] hover:ring-2 hover:ring-[#0285fd]/50 transition-all focus:outline-none"
                                 >
                                     A
                                 </button>
-                                
+
                                 {showProfileMenu && (
                                     <>
                                         <div className="fixed inset-0 z-[90]" onClick={() => setShowProfileMenu(false)} />
-                                        
+
                                         <div className="absolute right-0 top-full mt-3 w-64 bg-white border border-gray-200 shadow-2xl rounded-[3px] z-[100]">
                                             <div className="p-4 border-b border-gray-200 bg-white flex items-center gap-3">
                                                 <div className="w-10 h-10 bg-[#0285fd] text-white flex items-center justify-center font-bold text-lg rounded-[3px] shadow-sm shrink-0">
@@ -1122,7 +1166,7 @@ const SuperAdminDashboard = () => {
                                                     <p className="text-[11px] text-gray-500 font-mono truncate">admin@accounts.lk</p>
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="p-2">
                                                 <div className="px-3 py-2">
                                                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">System Access</p>
@@ -1137,10 +1181,10 @@ const SuperAdminDashboard = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="h-px bg-gray-200 my-2" />
-                                                
-                                                <button 
+
+                                                <button
                                                     onClick={() => {
                                                         setShowProfileMenu(false);
                                                         handleLogout();
@@ -1224,35 +1268,35 @@ const SuperAdminDashboard = () => {
                                         </div>
                                     </div>
                                 </div>
-                                </motion.div>
+                            </motion.div>
 
-                                {/* Quick Actions Row */}
-                                <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                                    <button onClick={() => setActiveMenu('Companies')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
-                                        <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:bg-[#0285fd] group-hover:text-white transition-colors">
-                                            <Building2 className="w-5 h-5" />
-                                        </div>
-                                        <span className="text-[11px] font-bold uppercase tracking-wider">Manage Companies</span>
-                                    </button>
-                                    <button onClick={() => setActiveMenu('Employees')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
-                                        <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                                            <Users className="w-5 h-5" />
-                                        </div>
-                                        <span className="text-[11px] font-bold uppercase tracking-wider">System Users</span>
-                                    </button>
-                                    <button onClick={() => setActiveMenu('Security Audit')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
-                                        <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-colors">
-                                            <ShieldAlert className="w-5 h-5" />
-                                        </div>
-                                        <span className="text-[11px] font-bold uppercase tracking-wider">Security Audit</span>
-                                    </button>
-                                    <button onClick={() => setShowSettingsModal(true)} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
-                                        <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                                            <Settings className="w-5 h-5" />
-                                        </div>
-                                        <span className="text-[11px] font-bold uppercase tracking-wider">System Config</span>
-                                    </button>
-                                </motion.div>
+                            {/* Quick Actions Row */}
+                            <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                <button onClick={() => setActiveMenu('Companies')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
+                                    <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:bg-[#0285fd] group-hover:text-white transition-colors">
+                                        <Building2 className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider">Manage Companies</span>
+                                </button>
+                                <button onClick={() => setActiveMenu('Employees')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
+                                    <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                        <Users className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider">System Users</span>
+                                </button>
+                                <button onClick={() => setActiveMenu('Security Audit')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
+                                    <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                                        <ShieldAlert className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider">Security Audit</span>
+                                </button>
+                                <button onClick={() => setShowSettingsModal(true)} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
+                                    <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                                        <Settings className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider">System Config</span>
+                                </button>
+                            </motion.div>
 
                             {/* Professional Charts Section */}
                             {(() => {
@@ -1266,25 +1310,25 @@ const SuperAdminDashboard = () => {
                                         else companyStats.push({ name, tx: c.transactions || 0 });
                                     });
                                 });
-                                const topCompanies = companyStats.sort((a,b) => b.tx - a.tx).slice(0, 4);
+                                const topCompanies = companyStats.sort((a, b) => b.tx - a.tx).slice(0, 4);
 
                                 // 2. Derive Module Data
                                 const moduleData = (allModules && allModules.length > 0)
                                     ? allModules.slice(0, 6).map(m => ({ name: (m.moduleName || m.name || 'Module').substring(0, 10), usage: m.companiesUsing || m.usagePercentage || m.usage || m.count || 0 }))
-                                    : [ { name: 'Finance', usage: 85 }, { name: 'HR', usage: 45 }, { name: 'Sales', usage: 92 }, { name: 'Inventory', usage: 67 } ];
+                                    : [{ name: 'Finance', usage: 85 }, { name: 'HR', usage: 45 }, { name: 'Sales', usage: 92 }, { name: 'Inventory', usage: 67 }];
 
                                 // 3. Derive Roles Data
                                 const rolesData = [
                                     { name: 'Admin', value: hierarchy.filter(e => e.role === 99).length || 1 },
                                     { name: 'Managers', value: hierarchy.filter(e => e.role === 3).length || 2 },
                                     { name: 'Accountants', value: hierarchy.filter(e => e.role === 2).length || 4 },
-                                    { name: 'Staff', value: hierarchy.filter(e => ![99,3,2].includes(e.role)).length || 8 },
+                                    { name: 'Staff', value: hierarchy.filter(e => ![99, 3, 2].includes(e.role)).length || 8 },
                                 ].filter(r => r.value > 0);
                                 const ROLE_COLORS = ['#0285fd', '#8b5cf6', '#ec4899', '#10b981'];
 
                                 return (
                                     <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                                        
+
                                         {/* Employee Productivity */}
                                         <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
                                             <div className="mb-5 flex items-center justify-between border-b border-gray-100 pb-3">
@@ -1317,7 +1361,7 @@ const SuperAdminDashboard = () => {
                                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
                                                         <XAxis type="number" hide domain={[0, dataMax => Math.max(dataMax * 1.05, 5)]} />
                                                         <YAxis dataKey="name" type="category" tick={<CustomYAxisTick />} axisLine={false} tickLine={false} width={150} />
-                                                        <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                                        <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                                                         <Bar dataKey="tx" name="Transactions" fill="#10b981" radius={[0, 3, 3, 0]} barSize={20}>
                                                             {topCompanies.map((entry, index) => (
                                                                 <Cell key={`cell-${index}`} fill={index === 0 ? '#10b981' : '#6ee7b7'} />
@@ -1357,7 +1401,7 @@ const SuperAdminDashboard = () => {
                                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                                         <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dy={8} />
                                                         <YAxis tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dx={-5} />
-                                                        <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                                        <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                                                         <Bar dataKey="usage" name="Usage %" fill="#0285fd" radius={[3, 3, 0, 0]} barSize={28} />
                                                     </BarChart>
                                                 </ResponsiveContainer>
@@ -1399,66 +1443,66 @@ const SuperAdminDashboard = () => {
                                             {filteredHierarchy.map((emp) => (
                                                 <React.Fragment key={emp.empCode}>
                                                     <tr className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group cursor-pointer" onClick={() => { setActiveMenu('Companies'); setSelectedEmpForCompanies(emp); }}>
-                                                    <td className="py-3.5 px-6">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-9 h-9 bg-gray-100 text-gray-700 flex items-center justify-center font-bold text-sm shadow-sm rounded-[3px] shrink-0">
-                                                                {emp.empName.charAt(0).toUpperCase()}
+                                                        <td className="py-3.5 px-6">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-9 h-9 bg-gray-100 text-gray-700 flex items-center justify-center font-bold text-sm shadow-sm rounded-[3px] shrink-0">
+                                                                    {emp.empName.charAt(0).toUpperCase()}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-[13px] font-bold text-slate-700 uppercase group-hover:text-[#0285fd] transition-colors">{emp.empName}</p>
+                                                                    <p className="text-[11px] text-slate-500 font-mono font-semibold mt-0.5">{emp.empCode} <span className="text-gray-400 font-normal mx-1">•</span> <span className="text-gray-500 font-normal">{emp.email || 'No Email'}</span></p>
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <p className="text-[13px] font-bold text-slate-700 uppercase group-hover:text-[#0285fd] transition-colors">{emp.empName}</p>
-                                                                <p className="text-[11px] text-slate-500 font-mono font-semibold mt-0.5">{emp.empCode} <span className="text-gray-400 font-normal mx-1">•</span> <span className="text-gray-500 font-normal">{emp.email || 'No Email'}</span></p>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-3.5 px-6">
-                                                        <span className={`inline-flex items-center px-2.5 py-1 text-[10px] uppercase tracking-widest font-bold rounded-[3px] shadow-sm ${emp.role === 99 ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 border border-gray-200'}`}>
-                                                            {emp.role === 99 ? 'Super Admin' : `Role ${emp.role}`}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-3.5 px-6">
-                                                        <span className={`inline-flex items-center px-2 py-1 text-[10px] uppercase tracking-widest font-bold rounded-[3px] shadow-sm border ${emp.status === 'Suspended' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
-                                                            {emp.status || 'Active'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-3.5 px-6">
-                                                        <span className="text-[13px] font-medium text-gray-700">
-                                                            {emp.lastLogin ? new Date(emp.lastLogin).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : <span className="text-gray-400">Never</span>}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-3.5 px-6">
-                                                        <span className="text-[13px] font-bold text-gray-800">{emp.loginCount || 0}</span>
-                                                    </td>
-                                                    <td className="py-3.5 px-6">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="w-7 h-7 bg-gray-100 border border-gray-300 text-gray-700 flex items-center justify-center text-[11px] font-bold rounded-[3px]">
-                                                                {emp.companies.length}
+                                                        </td>
+                                                        <td className="py-3.5 px-6">
+                                                            <span className={`inline-flex items-center px-2.5 py-1 text-[10px] uppercase tracking-widest font-bold rounded-[3px] shadow-sm ${emp.role === 99 ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 border border-gray-200'}`}>
+                                                                {emp.role === 99 ? 'Super Admin' : `Role ${emp.role}`}
                                                             </span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-3.5 px-6 text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <button
-                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-[#0285fd] hover:bg-[#0073ff] rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setEditingEmp(emp);
-                                                                    setSelectedRoleId(emp.role);
-                                                                    setSelectedGroupName(emp.memberId || 'Administrators');
-                                                                }}
-                                                                title="Edit User Role"
-                                                            >
-                                                                <Edit className="w-[14px] h-[14px]" /> Edit
-                                                            </button>
-                                                            <button
-                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
-                                                                onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(e, emp.empCode); }}
-                                                                title="Delete Employee"
-                                                            >
-                                                                <Trash2 className="w-[14px] h-[14px]" /> Delete
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                        </td>
+                                                        <td className="py-3.5 px-6">
+                                                            <span className={`inline-flex items-center px-2 py-1 text-[10px] uppercase tracking-widest font-bold rounded-[3px] shadow-sm border ${emp.status === 'Suspended' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
+                                                                {emp.status || 'Active'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-3.5 px-6">
+                                                            <span className="text-[13px] font-medium text-gray-700">
+                                                                {emp.lastLogin ? new Date(emp.lastLogin).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : <span className="text-gray-400">Never</span>}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-3.5 px-6">
+                                                            <span className="text-[13px] font-bold text-gray-800">{emp.loginCount || 0}</span>
+                                                        </td>
+                                                        <td className="py-3.5 px-6">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="w-7 h-7 bg-gray-100 border border-gray-300 text-gray-700 flex items-center justify-center text-[11px] font-bold rounded-[3px]">
+                                                                    {emp.companies.length}
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-3.5 px-6 text-right">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <button
+                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-[#0285fd] hover:bg-[#0073ff] rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setEditingEmp(emp);
+                                                                        setSelectedRoleId(emp.role);
+                                                                        setSelectedGroupName(emp.memberId || 'Administrators');
+                                                                    }}
+                                                                    title="Edit User Role"
+                                                                >
+                                                                    <Edit className="w-[14px] h-[14px]" /> Edit
+                                                                </button>
+                                                                <button
+                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
+                                                                    onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(e, emp.empCode); }}
+                                                                    title="Delete Employee"
+                                                                >
+                                                                    <Trash2 className="w-[14px] h-[14px]" /> Delete
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
                                                 </React.Fragment>
                                             ))}
                                         </tbody>
@@ -1603,9 +1647,9 @@ const SuperAdminDashboard = () => {
                                                         </button>
                                                         <button
                                                             className={`px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5 ${(emp.userRole_Id == 99) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                            onClick={(e) => { 
-                                                                e.stopPropagation(); 
-                                                                if (emp.userRole_Id != 99) handleDeleteEmployee(e, emp.emp_Code); 
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (emp.userRole_Id != 99) handleDeleteEmployee(e, emp.emp_Code);
                                                             }}
                                                             title={emp.userRole_Id == 99 ? "Super Admin cannot be deleted" : "Delete Employee"}
                                                             disabled={emp.userRole_Id == 99}
@@ -1701,7 +1745,7 @@ const SuperAdminDashboard = () => {
                                                 <button
                                                     onClick={(e) => {
                                                         const group = userGroups.find(g => g.group_Id === selectedRole);
-                                                        if(group) {
+                                                        if (group) {
                                                             setEditingUserRole(group);
                                                             setEditRoleName(group.group_Name);
                                                             setEditRoleDesc(group.description || '');
@@ -1714,7 +1758,7 @@ const SuperAdminDashboard = () => {
                                                 <button
                                                     onClick={(e) => handleDeleteUserRole(e, selectedRole)}
                                                     className="px-3 py-1.5 text-xs font-bold bg-blue-50 border border-red-200 text-white bg-red-600 hover:bg-red-700 rounded-[3px] transition-all flex items-center gap-1"
-                                                    
+
                                                 >
                                                     <Trash2 size={12} /> Delete
                                                 </button>
@@ -1768,99 +1812,99 @@ const SuperAdminDashboard = () => {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-50">
-                                            {(() => {
-                                                const filtered = permissions.filter(p => {
-                                                    const code = (p.system_Fuction || p.systemFuction || p.System_Fuction || '').toLowerCase();
-                                                    const desc = (p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || '').toLowerCase();
-                                                    const term = permSearch.toLowerCase();
-                                                    return code.includes(term) || desc.includes(term);
-                                                });
+                                                {(() => {
+                                                    const filtered = permissions.filter(p => {
+                                                        const code = (p.system_Fuction || p.systemFuction || p.System_Fuction || '').toLowerCase();
+                                                        const desc = (p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || '').toLowerCase();
+                                                        const term = permSearch.toLowerCase();
+                                                        return code.includes(term) || desc.includes(term);
+                                                    });
 
-                                                const categoryOrder = ['ACC_', 'MST_', 'TRN_', 'RPT_', 'SYS_'];
-                                                const categoryLabels = {
-                                                    ACC_: { label: 'General' },
-                                                    MST_: { label: 'Master Data' },
-                                                    TRN_: { label: 'Transactions' },
-                                                    RPT_: { label: 'Reports' },
-                                                    SYS_: { label: 'System Administration' },
-                                                };
+                                                    const categoryOrder = ['ACC_', 'MST_', 'TRN_', 'RPT_', 'SYS_'];
+                                                    const categoryLabels = {
+                                                        ACC_: { label: 'General' },
+                                                        MST_: { label: 'Master Data' },
+                                                        TRN_: { label: 'Transactions' },
+                                                        RPT_: { label: 'Reports' },
+                                                        SYS_: { label: 'System Administration' },
+                                                    };
 
-                                                const getCategory = (code) => {
-                                                    const up = code.toUpperCase();
-                                                    const prefix = categoryOrder.find(p => up.startsWith(p));
-                                                    return prefix || 'OTHER';
-                                                };
+                                                    const getCategory = (code) => {
+                                                        const up = code.toUpperCase();
+                                                        const prefix = categoryOrder.find(p => up.startsWith(p));
+                                                        return prefix || 'OTHER';
+                                                    };
 
-                                                const grouped = {};
-                                                filtered.forEach(p => {
-                                                    const code = p.system_Fuction || p.systemFuction || p.System_Fuction || '';
-                                                    const cat = getCategory(code);
-                                                    if (!grouped[cat]) grouped[cat] = [];
-                                                    grouped[cat].push(p);
-                                                });
+                                                    const grouped = {};
+                                                    filtered.forEach(p => {
+                                                        const code = p.system_Fuction || p.systemFuction || p.System_Fuction || '';
+                                                        const cat = getCategory(code);
+                                                        if (!grouped[cat]) grouped[cat] = [];
+                                                        grouped[cat].push(p);
+                                                    });
 
-                                                const rows = [];
-                                                const renderItems = (items, label) => {
-                                                    if (!items.length) return;
-                                                    rows.push(
-                                                        <tr key={`cat-${label}`} className="bg-gray-100 border-b border-gray-200">
-                                                            <td colSpan={3} className="px-4 py-2.5">
-                                                                <span className="text-[11px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-2">
-                                                                    <span className="w-1.5 h-1.5 bg-[#0285fd] inline-block rounded-[2px]"></span>
-                                                                    {label}
-                                                                    <span className="text-[10px] font-normal text-gray-500 normal-case">({items.length} function{(items.length !== 1) ? 's' : ''})</span>
-                                                                </span>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                    items.forEach(p => {
-                                                        const code = p.system_Fuction || p.systemFuction || p.System_Fuction;
-                                                        const desc = p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || code;
-                                                        const isAllowed = (p.allow_Fuction || p.allowFuction || p.Allow_Fuction) === 'T';
+                                                    const rows = [];
+                                                    const renderItems = (items, label) => {
+                                                        if (!items.length) return;
                                                         rows.push(
-                                                            <tr key={code} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
-                                                                <td className="py-3.5 px-6">
-                                                                    <span className="font-mono text-[12px] font-bold text-blue-600">{code}</span>
-                                                                </td>
-                                                                <td className="py-3.5 px-6">
-                                                                    <span className="text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">{desc}</span>
-                                                                </td>
-                                                                <td className="py-3.5 px-6 text-center">
-                                                                    <button
-                                                                        onClick={() => handleTogglePermission(code)}
-                                                                        className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all ${isAllowed
-                                                                            ? 'bg-emerald-600 text-white shadow-sm'
-                                                                            : 'bg-red-600 text-white shadow-sm'
-                                                                            }`}
-                                                                    >
-                                                                        {isAllowed ? 'Allowed' : 'Denied'}
-                                                                    </button>
+                                                            <tr key={`cat-${label}`} className="bg-gray-100 border-b border-gray-200">
+                                                                <td colSpan={3} className="px-4 py-2.5">
+                                                                    <span className="text-[11px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-2">
+                                                                        <span className="w-1.5 h-1.5 bg-[#0285fd] inline-block rounded-[2px]"></span>
+                                                                        {label}
+                                                                        <span className="text-[10px] font-normal text-gray-500 normal-case">({items.length} function{(items.length !== 1) ? 's' : ''})</span>
+                                                                    </span>
                                                                 </td>
                                                             </tr>
                                                         );
+                                                        items.forEach(p => {
+                                                            const code = p.system_Fuction || p.systemFuction || p.System_Fuction;
+                                                            const desc = p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || code;
+                                                            const isAllowed = (p.allow_Fuction || p.allowFuction || p.Allow_Fuction) === 'T';
+                                                            rows.push(
+                                                                <tr key={code} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
+                                                                    <td className="py-3.5 px-6">
+                                                                        <span className="font-mono text-[12px] font-bold text-blue-600">{code}</span>
+                                                                    </td>
+                                                                    <td className="py-3.5 px-6">
+                                                                        <span className="text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">{desc}</span>
+                                                                    </td>
+                                                                    <td className="py-3.5 px-6 text-center">
+                                                                        <button
+                                                                            onClick={() => handleTogglePermission(code)}
+                                                                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all ${isAllowed
+                                                                                ? 'bg-emerald-600 text-white shadow-sm'
+                                                                                : 'bg-red-600 text-white shadow-sm'
+                                                                                }`}
+                                                                        >
+                                                                            {isAllowed ? 'Allowed' : 'Denied'}
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        });
+                                                    };
+
+                                                    categoryOrder.forEach(prefix => {
+                                                        renderItems(grouped[prefix] || [], categoryLabels[prefix].label);
                                                     });
-                                                };
+                                                    renderItems(grouped['OTHER'] || [], 'Other');
 
-                                                categoryOrder.forEach(prefix => {
-                                                    renderItems(grouped[prefix] || [], categoryLabels[prefix].label);
-                                                });
-                                                renderItems(grouped['OTHER'] || [], 'Other');
-
-                                                return rows;
-                                            })()}
-                                        </tbody>
-                                    </table>
-                                    {!permissions.filter(p => {
-                                        const code = (p.system_Fuction || p.systemFuction || p.System_Fuction || '').toLowerCase();
-                                        const desc = (p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || '').toLowerCase();
-                                        const term = permSearch.toLowerCase();
-                                        return code.includes(term) || desc.includes(term);
-                                    }).length && (
-                                            <div className="flex items-center justify-center py-12 text-gray-500 gap-2">
-                                                <Search size={16} />
-                                                <span className="text-xs font-medium">No functions match your search.</span>
-                                            </div>
-                                        )}
+                                                    return rows;
+                                                })()}
+                                            </tbody>
+                                        </table>
+                                        {!permissions.filter(p => {
+                                            const code = (p.system_Fuction || p.systemFuction || p.System_Fuction || '').toLowerCase();
+                                            const desc = (p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || '').toLowerCase();
+                                            const term = permSearch.toLowerCase();
+                                            return code.includes(term) || desc.includes(term);
+                                        }).length && (
+                                                <div className="flex items-center justify-center py-12 text-gray-500 gap-2">
+                                                    <Search size={16} />
+                                                    <span className="text-xs font-medium">No functions match your search.</span>
+                                                </div>
+                                            )}
                                     </div>
                                 </div>
                             )}
@@ -1924,62 +1968,62 @@ const SuperAdminDashboard = () => {
                     )}
 
                     {/* Create Role Modal */}
-            {showCreateRoleModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
-                    <div className="bg-white border border-gray-200 shadow-2xl w-full max-w-md rounded-[3px] overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
-                            <h3 className="text-[15px] font-bold text-gray-800">Create New Role</h3>
-                            <button onClick={() => setShowCreateRoleModal(false)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-[3px] transition-colors">
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-                        <div className="p-6">
-                            <div className="bg-white border border-gray-200 rounded-[3px] p-4 space-y-4">
-                                <div>
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Role Name *</label>
-                                    <input
-                                        type="text"
-                                        value={newRoleName}
-                                        onChange={e => setNewRoleName(e.target.value)}
-                                        placeholder="e.g. HR Manager"
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
-                                        autoFocus
-                                    />
+                    {showCreateRoleModal && (
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
+                            <div className="bg-white border border-gray-200 shadow-2xl w-full max-w-md rounded-[3px] overflow-hidden">
+                                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
+                                    <h3 className="text-[15px] font-bold text-gray-800">Create New Role</h3>
+                                    <button onClick={() => setShowCreateRoleModal(false)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-[3px] transition-colors">
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
-                                <div>
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Description</label>
-                                    <input
-                                        type="text"
-                                        value={newRoleDescription}
-                                        onChange={e => setNewRoleDescription(e.target.value)}
-                                        placeholder="Optional description"
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
-                                    />
+                                <div className="p-6">
+                                    <div className="bg-white border border-gray-200 rounded-[3px] p-4 space-y-4">
+                                        <div>
+                                            <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Role Name *</label>
+                                            <input
+                                                type="text"
+                                                value={newRoleName}
+                                                onChange={e => setNewRoleName(e.target.value)}
+                                                placeholder="e.g. HR Manager"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                autoFocus
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Description</label>
+                                            <input
+                                                type="text"
+                                                value={newRoleDescription}
+                                                onChange={e => setNewRoleDescription(e.target.value)}
+                                                placeholder="Optional description"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3 justify-end mt-6">
+                                        <button
+                                            onClick={() => setShowCreateRoleModal(false)}
+                                            className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleCreateRole}
+                                            disabled={creatingRole}
+                                            className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"
+                                        >
+                                            {creatingRole ? (
+                                                <><Loader2 className="animate-spin" size={14} /> Creating...</>
+                                            ) : (
+                                                'Create Role'
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex gap-3 justify-end mt-6">
-                                <button
-                                    onClick={() => setShowCreateRoleModal(false)}
-                                    className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleCreateRole}
-                                    disabled={creatingRole}
-                                    className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"
-                                >
-                                    {creatingRole ? (
-                                        <><Loader2 className="animate-spin" size={14} /> Creating...</>
-                                    ) : (
-                                        'Create Role'
-                                    )}
-                                </button>
-                            </div>
                         </div>
-                    </div>
-                </div>
-            )}
+                    )}
 
                     {/* ENGAGEMENT VIEW */}
                     {activeMenu === 'Engagement' && (
@@ -2001,84 +2045,84 @@ const SuperAdminDashboard = () => {
                                 </div>
                                 <span className="bg-gray-50 border border-gray-200 text-gray-600 text-[10px] font-bold px-3 py-1.5 rounded-[3px]">{feedbackData.length} Records</span>
                             </div>
-                            
+
                             <div className="border border-gray-200 overflow-hidden mx-6 bg-white rounded-[3px] shadow-sm flex-1 flex flex-col mb-4">
                                 <div className="w-full overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="bg-[#f8fafc] border-b border-gray-100">
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Date</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Employee Name</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Company</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Report Name</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Feedback</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Images</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {feedbackLoading ? (
-                                            <tr>
-                                                <td colSpan={7} className="py-12 text-center text-gray-500 text-[13px] font-medium">Loading feedback...</td>
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-[#f8fafc] border-b border-gray-100">
+                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Date</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Employee Name</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Company</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Report Name</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Feedback</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Images</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Action</th>
                                             </tr>
-                                        ) : feedbackData.length === 0 ? (
-                                            <tr>
-                                                <td colSpan={7} className="py-12 text-center text-gray-500 text-[13px] font-medium">No feedback records found.</td>
-                                            </tr>
-                                        ) : (
-                                            feedbackData.map((item) => (
-                                                <tr key={item.id} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
-                                                    <td className="py-3.5 px-6 text-[12px] text-gray-500 whitespace-nowrap group-hover:text-blue-600 transition-colors">
-                                                        {new Date(item.createdAt).toLocaleString()}
-                                                    </td>
-                                                    <td className="py-3.5 px-6 text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">
-                                                        {item.employeeName || '-'}
-                                                    </td>
-                                                    <td className="py-3.5 px-6 text-[12px] text-blue-600 font-mono font-bold">
-                                                        {item.companyId || '-'}
-                                                    </td>
-                                                    <td className="py-3.5 px-6 text-[12px] font-medium text-gray-600">
-                                                        {item.reportName || '-'}
-                                                    </td>
-                                                    <td className="py-3.5 px-6 text-[12px] text-gray-500 max-w-[250px] truncate" title={item.feedbackText}>
-                                                        {item.feedbackText}
-                                                    </td>
-                                                    <td className="py-3.5 px-6">
-                                                        {(() => {
-                                                            try {
-                                                                if (!item.images || item.images === '[]') return <span className="text-[12px] text-gray-500">-</span>;
-                                                                const imgs = JSON.parse(item.images);
-                                                                if (!Array.isArray(imgs) || imgs.length === 0) return <span className="text-[12px] text-gray-500">-</span>;
-                                                                return (
-                                                                    <div className="flex gap-1.5 overflow-x-auto max-w-[120px] pb-1">
-                                                                        {imgs.map((img, i) => (
-                                                                            <div key={i} onClick={() => setFullScreenImage(img)} className="shrink-0 block cursor-pointer" title="Click to view full image">
-                                                                                <img src={img} alt={`Attachment ${i+1}`} className="w-8 h-8 object-cover rounded shadow-sm border border-gray-200 hover:opacity-80 transition-opacity" />
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                );
-                                                            } catch (e) {
-                                                                return <span className="text-[12px] text-gray-500">Error</span>;
-                                                            }
-                                                        })()}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-right">
-                                                        <div className="flex justify-end">
-                                                            <button
-                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
-                                                                onClick={() => handleDeleteFeedback(item.id)}
-                                                                title="Delete Feedback"
-                                                            >
-                                                                <Trash2 size={10} /> Delete
-                                                            </button>
-                                                        </div>
-                                                    </td>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-50">
+                                            {feedbackLoading ? (
+                                                <tr>
+                                                    <td colSpan={7} className="py-12 text-center text-gray-500 text-[13px] font-medium">Loading feedback...</td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                                            ) : feedbackData.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={7} className="py-12 text-center text-gray-500 text-[13px] font-medium">No feedback records found.</td>
+                                                </tr>
+                                            ) : (
+                                                feedbackData.map((item) => (
+                                                    <tr key={item.id} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
+                                                        <td className="py-3.5 px-6 text-[12px] text-gray-500 whitespace-nowrap group-hover:text-blue-600 transition-colors">
+                                                            {new Date(item.createdAt).toLocaleString()}
+                                                        </td>
+                                                        <td className="py-3.5 px-6 text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">
+                                                            {item.employeeName || '-'}
+                                                        </td>
+                                                        <td className="py-3.5 px-6 text-[12px] text-blue-600 font-mono font-bold">
+                                                            {item.companyId || '-'}
+                                                        </td>
+                                                        <td className="py-3.5 px-6 text-[12px] font-medium text-gray-600">
+                                                            {item.reportName || '-'}
+                                                        </td>
+                                                        <td className="py-3.5 px-6 text-[12px] text-gray-500 max-w-[250px] truncate" title={item.feedbackText}>
+                                                            {item.feedbackText}
+                                                        </td>
+                                                        <td className="py-3.5 px-6">
+                                                            {(() => {
+                                                                try {
+                                                                    if (!item.images || item.images === '[]') return <span className="text-[12px] text-gray-500">-</span>;
+                                                                    const imgs = JSON.parse(item.images);
+                                                                    if (!Array.isArray(imgs) || imgs.length === 0) return <span className="text-[12px] text-gray-500">-</span>;
+                                                                    return (
+                                                                        <div className="flex gap-1.5 overflow-x-auto max-w-[120px] pb-1">
+                                                                            {imgs.map((img, i) => (
+                                                                                <div key={i} onClick={() => setFullScreenImage(img)} className="shrink-0 block cursor-pointer" title="Click to view full image">
+                                                                                    <img src={img} alt={`Attachment ${i + 1}`} className="w-8 h-8 object-cover rounded shadow-sm border border-gray-200 hover:opacity-80 transition-opacity" />
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    );
+                                                                } catch (e) {
+                                                                    return <span className="text-[12px] text-gray-500">Error</span>;
+                                                                }
+                                                            })()}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-right">
+                                                            <div className="flex justify-end">
+                                                                <button
+                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
+                                                                    onClick={() => handleDeleteFeedback(item.id)}
+                                                                    title="Delete Feedback"
+                                                                >
+                                                                    <Trash2 size={10} /> Delete
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -2213,15 +2257,15 @@ const SuperAdminDashboard = () => {
                                     ...selectedEmployeeView,
                                     'PASSWORD': selectedEmployeeView.pass_Word || selectedEmployeeView.password || selectedEmployeeView.Pass_Word || '•••••••• (Encrypted by Backend)'
                                 })
-                                .filter(([key, value]) => typeof value !== 'object' && key !== 'companies' && key !== 'pass_Word' && key !== 'password' && key !== 'Pass_Word')
-                                .map(([key, value], index, array) => (
-                                    <div key={key} className={`${key === 'PASSWORD' && array.length % 2 !== 0 ? 'md:col-span-2' : ''}`}>
-                                        <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">{key.replace(/_/g, ' ')}</label>
-                                        <div className="w-full min-h-[42px] border border-slate-200 bg-slate-50 rounded-[3px] px-4 py-2.5 flex items-center shadow-sm group hover:border-[#0285fd]/40 transition-colors">
-                                            <span className="text-[14px] font-bold text-slate-700 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-400 font-normal italic">Empty</span>}</span>
+                                    .filter(([key, value]) => typeof value !== 'object' && key !== 'companies' && key !== 'pass_Word' && key !== 'password' && key !== 'Pass_Word')
+                                    .map(([key, value], index, array) => (
+                                        <div key={key} className={`${key === 'PASSWORD' && array.length % 2 !== 0 ? 'md:col-span-2' : ''}`}>
+                                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">{key.replace(/_/g, ' ')}</label>
+                                            <div className="w-full min-h-[42px] border border-slate-200 bg-slate-50 rounded-[3px] px-4 py-2.5 flex items-center shadow-sm group hover:border-[#0285fd]/40 transition-colors">
+                                                <span className="text-[14px] font-bold text-slate-700 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-400 font-normal italic">Empty</span>}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         </div>
                         <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
@@ -2363,7 +2407,7 @@ const SuperAdminDashboard = () => {
             {/* AI Chatbot Trigger Button */}
             {!showAIChatbot && !showAITyping && (
                 <div className="fixed bottom-6 right-6 z-[9900]">
-                    <button 
+                    <button
                         onClick={() => {
                             setShowAITyping(true);
                             setAiTypingText('');
@@ -2410,8 +2454,8 @@ const SuperAdminDashboard = () => {
             <AdminAIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} onAction={handleAIAction} />
 
             {/* Settings Modal */}
-            <SuperAdminSettingsModal 
-                isOpen={showSettingsModal} 
+            <SuperAdminSettingsModal
+                isOpen={showSettingsModal}
                 onClose={() => setShowSettingsModal(false)}
                 sessionTimeout={sessionTimeout}
                 setSessionTimeout={setSessionTimeout}
