@@ -250,8 +250,8 @@ const BIDashboardPage = () => {
                 <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300">
                     <div className="flex flex-col items-center gap-8 max-w-2xl px-8">
                         <div className="w-32 h-32 flex items-center justify-center">
-                            <DotLottiePlayer
-                                src="/lottiefile/AI loading.lottie"
+                            <DotLottiePlayer worker={false}
+                                src="/lottiefile/AI loading.lottie?v=1"
                                 autoplay
                                 loop
                                 style={{ width: '100%', height: '100%' }}
@@ -323,6 +323,8 @@ const BIDashboardPage = () => {
 };
 
 export default BIDashboardPage;
+
+
 
 
 

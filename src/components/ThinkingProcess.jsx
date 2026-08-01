@@ -25,7 +25,7 @@ const ThinkingProcess = () => {
         <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-1 overflow-hidden">
-                    <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '130%', height: '130%' }} />
+                    <DotLottiePlayer worker={false} src="/lottiefile/AI loading.lottie?v=1" autoplay loop style={{ width: '130%', height: '130%' }} />
                 </div>
                 <span className="text-[14px] font-semibold text-slate-700">Working...</span>
             </div>
@@ -45,3 +45,5 @@ const ThinkingProcess = () => {
 };
 
 export default ThinkingProcess;
+
+

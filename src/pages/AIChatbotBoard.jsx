@@ -384,7 +384,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
             <div className="h-14 border-b border-slate-100 flex items-center justify-between px-4 shrink-0 bg-white z-20">
                 <div className="flex items-center gap-3">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                        <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '150%', height: '150%' }} />
+                        <DotLottiePlayer worker={false} src="/lottiefile/AI loading.lottie?v=1" autoplay loop style={{ width: '150%', height: '150%' }} />
                     </div>
                     <h2 className="text-[15px] font-semibold text-slate-800 flex items-center gap-2">
                         Onimta Intelligence
@@ -503,7 +503,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                         ) : (
                                             <div className="flex gap-4 max-w-[90%]">
                                                 <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-1 group overflow-hidden">
-                                                    <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '130%', height: '130%' }} />
+                                                    <DotLottiePlayer worker={false} src="/lottiefile/AI loading.lottie?v=1" autoplay loop style={{ width: '130%', height: '130%' }} />
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                     <div className="text-[12px] font-medium text-slate-400 flex items-center gap-1.5">
@@ -758,3 +758,5 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
 };
 
 export default AIChatbotBoard;
+
+

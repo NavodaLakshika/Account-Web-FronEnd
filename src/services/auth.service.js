@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Using relative path so Vite proxy handles the connection
 const api = axios.create({
-  baseURL: '/api', 
+  baseURL: import.meta.env.PROD ? (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://194.233.76.58:8282/api') : '/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -46,7 +46,7 @@ export const authService = {
         Emp_Name: empName,
         Pass_Word: password
       });
-      
+
       if (response.data && (response.data.token || response.data.Token)) {
         const token = response.data.token || response.data.Token;
         localStorage.setItem('user', JSON.stringify(response.data));
@@ -86,8 +86,8 @@ export const authService = {
       const response = await api.post('/Auth/register', registerData);
       return response.data;
     } catch (error) {
-       console.error('Registration Error:', error);
-       throw error.response?.data || 'Registration failed. Please try again.';
+      console.error('Registration Error:', error);
+      throw error.response?.data || 'Registration failed. Please try again.';
     }
   },
 
@@ -219,7 +219,7 @@ export const authService = {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (response.data) {
         localStorage.setItem('selectedCompany', JSON.stringify(response.data));
       }

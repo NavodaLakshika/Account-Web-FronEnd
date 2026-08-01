@@ -15,10 +15,10 @@ function smtpPlugin() {
           req.on('end', async () => {
             try {
               const { to, subject, html } = JSON.parse(body);
-              
+
               const resend = new Resend('REMOVED_SECRET');
               const toArray = to.split(',').map(e => e.trim()).filter(e => e);
-              
+
               const { data, error } = await resend.emails.send({
                 from: 'onboarding@resend.dev',
                 to: toArray,
@@ -52,9 +52,13 @@ function smtpPlugin() {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  return { 
+  return {
     plugins: [react(), smtpPlugin()],
+    build: {
+      minify: false,
+    },
     server: {
+      port: 5174,
       proxy: {
         '/api': {
           target: env.VITE_API_URL || 'http://localhost:5000',

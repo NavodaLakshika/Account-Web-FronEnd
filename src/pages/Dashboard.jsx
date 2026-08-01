@@ -1882,8 +1882,8 @@ const Dashboard = () => {
                 <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300">
                     <div className="flex flex-col items-center gap-8 max-w-2xl px-8">
                         <div className="w-32 h-32 flex items-center justify-center">
-                            <DotLottiePlayer
-                                src="/lottiefile/AI loading.lottie"
+                            <DotLottiePlayer worker={false}
+                                src="/lottiefile/AI loading.lottie?v=1"
                                 autoplay
                                 loop
                                 style={{ width: '100%', height: '100%' }}
@@ -2257,8 +2257,8 @@ const Dashboard = () => {
 
                                     {/* AI Lottie Icon */}
                                     <div className="w-[28px] h-[28px] flex items-center justify-center shrink-0">
-                                        <DotLottiePlayer
-                                            src="/lottiefile/AI loading.lottie"
+                                        <DotLottiePlayer worker={false}
+                                            src="/lottiefile/AI loading.lottie?v=1"
                                             autoplay
                                             loop
                                             style={{ width: '100%', height: '100%' }}
@@ -2360,7 +2360,7 @@ const Dashboard = () => {
                                                             >
                                                                 <div className="w-8 h-8 rounded-[3px] flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
                                                                     {iconData.isLottie ? (
-                                                                        <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '20px', height: '20px' }} />
+                                                                        <DotLottiePlayer worker={false} src="/lottiefile/AI loading.lottie?v=1" autoplay loop style={{ width: '20px', height: '20px' }} />
                                                                     ) : (
                                                                         <Icon size={16} strokeWidth={2.2} style={{ color: isActive ? '#1d4ed8' : iconData.iconColor }} />
                                                                     )}
@@ -2892,6 +2892,8 @@ const AITypingText = () => {
 };
 
 export default Dashboard;
+
+
 
 
 

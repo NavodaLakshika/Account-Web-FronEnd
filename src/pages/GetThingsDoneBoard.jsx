@@ -1318,8 +1318,8 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
                           {/* AI Lottie Icon */}
                           <div className="w-[28px] h-[28px] flex items-center justify-center shrink-0">
-                              <DotLottiePlayer
-                                  src="/lottiefile/AI loading.lottie"
+                              <DotLottiePlayer worker={false}
+                                  src="/lottiefile/AI loading.lottie?v=1"
                                   autoplay
                                   loop
                                   style={{ width: '100%', height: '100%' }}
@@ -2309,5 +2309,7 @@ const AITypingText = () => {
 };
 
 export default GetThingsDoneBoard;
+
+
 
 

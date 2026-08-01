@@ -2429,7 +2429,7 @@ const SuperAdminDashboard = () => {
                         title="Open Onimta Intelligence"
                     >
                         <div className="w-20 h-20">
-                            <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '100%', height: '100%' }} />
+                            <DotLottiePlayer worker={false} src="/lottiefile/AI loading.lottie?v=1" autoplay loop style={{ width: '100%', height: '100%' }} />
                         </div>
                     </button>
                 </div>
@@ -2470,3 +2470,5 @@ const SuperAdminDashboard = () => {
 };
 
 export default SuperAdminDashboard;
+
+

@@ -156,8 +156,8 @@ const RegisterPage = () => {
             {loading && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-transparent animate-in fade-in duration-300">
                     <div className="w-[120px] h-[120px]">
-                        <DotLottiePlayer
-                            src="/lottiefile/DashboardLoader.lottie"
+                        <DotLottiePlayer worker={false}
+                            src="/lottiefile/DashboardLoader.lottie?v=1"
                             autoplay
                             loop
                         />
@@ -498,3 +498,5 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
+
+

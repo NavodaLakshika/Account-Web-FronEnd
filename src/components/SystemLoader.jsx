@@ -6,8 +6,8 @@ const SystemLoader = ({ inline = false, message }) => {
         return (
             <div className="flex flex-col items-center justify-center py-10 gap-3 text-slate-400">
                 <div className="w-20 h-20">
-                    <DotLottiePlayer
-                        src="/lottiefile/DashboardLoader.lottie"
+                    <DotLottiePlayer worker={false}
+                        src="/lottiefile/DashboardLoader.lottie?v=1"
                         autoplay
                         loop
                     />
@@ -20,8 +20,8 @@ const SystemLoader = ({ inline = false, message }) => {
     return (
         <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-transparent">
             <div className="w-[150px] h-[150px]">
-                <DotLottiePlayer
-                    src="/lottiefile/DashboardLoader.lottie"
+                <DotLottiePlayer worker={false}
+                    src="/lottiefile/DashboardLoader.lottie?v=1"
                     autoplay
                     loop
                 />
@@ -31,3 +31,5 @@ const SystemLoader = ({ inline = false, message }) => {
 };
 
 export default SystemLoader;
+
+

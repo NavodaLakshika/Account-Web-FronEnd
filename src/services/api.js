@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.PROD ? (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://194.233.76.58:8282/api') : '/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -33,7 +33,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     const companyStr = localStorage.getItem('selectedCompany');
     if (companyStr) {
       let companyCode = '';
