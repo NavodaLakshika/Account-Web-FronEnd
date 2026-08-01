@@ -133,7 +133,10 @@ export const authService = {
     if (dst.startsWith('0')) dst = '94' + dst.slice(1);
 
     const message = encodeURIComponent(`Your ONIMTA verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`);
-    const url = `/sms/send_sms.php?username=onimta&password=gUY2eBbvpr&src=ONIMTA&dst=${dst}&msg=${message}&dr=1`;
+
+    // In dev, use the Vite proxy (starts with '/sms'). In prod, hit the Airtel gateway directly.
+    const baseUrl = import.meta.env.PROD ? 'http://sms.airtel.lk:5000' : '';
+    const url = `${baseUrl}/sms/send_sms.php?username=onimta&password=gUY2eBbvpr&src=ONIMTA&dst=${dst}&msg=${message}&dr=1`;
 
     try {
       const res = await fetch(url);
