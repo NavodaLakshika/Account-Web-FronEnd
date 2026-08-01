@@ -139,11 +139,17 @@ export const authService = {
     const url = `${baseUrl}/sms/send_sms.php?username=onimta&password=gUY2eBbvpr&src=ONIMTA&dst=${dst}&msg=${message}&dr=1`;
 
     try {
-      const res = await fetch(url);
-      const text = await res.text();
-      console.log('SMS Gateway response:', text);
-      // Most SMS gateways return a success code/message; we trust the send succeeded
-      return otp; // Return the OTP so caller can verify locally
+      if (import.meta.env.PROD) {
+        // Use 'no-cors' to prevent the browser from blocking the request.
+        // The SMS will be sent, but we can't read the response text.
+        await fetch(url, { mode: 'no-cors' });
+        return otp;
+      } else {
+        const res = await fetch(url);
+        const text = await res.text();
+        console.log('SMS Gateway response:', text);
+        return otp;
+      }
     } catch (error) {
       console.error('SMS Gateway Error:', error);
       throw 'Failed to send OTP. Please check your phone number and try again.';
