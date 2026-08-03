@@ -19,10 +19,31 @@ const AddReminderBoard = ({ isOpen, onClose, editTask }) => {
             setSaving(false);
             if (editTask) {
                 setDescription(editTask.task || editTask.Task || '');
-                const taskDate = editTask.date || editTask.Date || '';
-                const taskTime = editTask.time || editTask.Time || '';
-                if (taskDate) setDate(taskDate);
-                if (taskTime) setTime(taskTime);
+                let taskDate = editTask.date || editTask.Date || '';
+                let taskTime = editTask.time || editTask.Time || '';
+
+                if (taskDate) {
+                    if (taskDate.includes('/')) {
+                        const parts = taskDate.split('/');
+                        if (parts.length === 3) {
+                            taskDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                        }
+                    }
+                    setDate(taskDate);
+                }
+
+                if (taskTime) {
+                    if (taskTime.toUpperCase().includes('AM') || taskTime.toUpperCase().includes('PM')) {
+                        const isPM = taskTime.toUpperCase().includes('PM');
+                        const timePart = taskTime.replace(/(AM|PM)/i, '').trim();
+                        let [h, m] = timePart.split(':');
+                        h = parseInt(h, 10);
+                        if (isPM && h < 12) h += 12;
+                        if (!isPM && h === 12) h = 0;
+                        taskTime = `${h.toString().padStart(2, '0')}:${m}`;
+                    }
+                    setTime(taskTime);
+                }
             }
         }
     }, [isOpen, editTask]);
