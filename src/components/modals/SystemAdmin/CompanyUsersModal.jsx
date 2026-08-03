@@ -17,7 +17,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
-    const [roleId, setRoleId] = useState(2); 
+    const [roleId, setRoleId] = useState(2);
     const [groupName, setGroupName] = useState('Accountants');
     const [roleOptions, setRoleOptions] = useState([]);
 
@@ -42,13 +42,13 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
             }
         }
         if (!activeCompany) activeCompany = localStorage.getItem('activeCompany') || localStorage.getItem('company') || '';
-        
+
         setCompanyCode(activeCompany);
 
         const fetchRoles = async () => {
             try {
-                // Pass the active company code so the backend can filter roles correctly
-                const res = await api.get(`/UserRole/system-roles?companyCode=${activeCompany}`);
+                // Requesting all system roles as required, bypassing company filters
+                const res = await api.get('/UserRole/all-system-roles');
                 const mapped = (res.data || []).map(r => ({
                     id: r.id || r.Id,
                     name: r.name || r.Name,
@@ -164,7 +164,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
             footer={
                 <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                     <div className="flex gap-3">
-                        <button type="button" onClick={() => {setUsername(''); setPassword(''); setEmail(''); setPhone('');}} disabled={submitting} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                        <button type="button" onClick={() => { setUsername(''); setPassword(''); setEmail(''); setPhone(''); }} disabled={submitting} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                             <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
@@ -177,7 +177,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
             }
         >
             <div className="select-none font-['Tahoma'] space-y-4">
-                
+
                 {/* Add User Form Section */}
                 <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                     <div className="flex items-center gap-3 border-b border-slate-200 pb-3 mb-2">
@@ -199,9 +199,20 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                             </div>
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">User Role *</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={roleOptions.find(o => o.id === roleId)?.name || 'Select Role'} onClick={() => setShowRoleModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer uppercase appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                </div>
+                                <select
+                                    value={roleId}
+                                    onChange={(e) => {
+                                        const selectedId = Number(e.target.value);
+                                        const selectedRole = roleOptions.find(o => o.id === selectedId);
+                                        if (selectedRole) handleSelectRole(selectedRole);
+                                    }}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer uppercase appearance-none"
+                                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                >
+                                    {roleOptions.map(role => (
+                                        <option key={role.id} value={role.id}>{role.name}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 
@@ -229,26 +240,25 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                             System Users List
                         </button>
                     </div>
-                    
+
                     <div className="flex-1 overflow-auto">
                         <table className="w-full text-sm text-left border-collapse">
                             <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
                                 <tr>
                                     <th className="px-4 h-10 border-r border-slate-200">Employee ID</th>
                                     <th className="px-4 h-10 border-r border-slate-200">Details</th>
-                                    <th className="px-4 h-10 border-r border-slate-200 text-center">System Role</th>
-                                    <th className="px-4 py-2 text-center">Action</th>
+                                    <th className="px-4 h-10 text-center">System Role</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading && (
                                     <tr>
-                                        <td colSpan="4" className="h-[120px] align-middle text-center text-gray-300 font-black text-[11px] uppercase tracking-widest animate-pulse">Loading Users...</td>
+                                        <td colSpan="3" className="h-[120px] align-middle text-center text-gray-300 font-black text-[11px] uppercase tracking-widest animate-pulse">Loading Users...</td>
                                     </tr>
                                 )}
                                 {!loading && employees.length === 0 && (
                                     <tr>
-                                        <td colSpan="4" className="h-[120px] align-middle text-center text-gray-300 font-black text-[11px] uppercase tracking-widest">No users found.</td>
+                                        <td colSpan="3" className="h-[120px] align-middle text-center text-gray-300 font-black text-[11px] uppercase tracking-widest">No users found.</td>
                                     </tr>
                                 )}
                                 {!loading && employees.map((emp) => {
@@ -261,29 +271,15 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                                                 <div className="text-[10px] font-mono font-bold text-slate-400 tracking-wider">{code}</div>
                                             </td>
                                             <td className="px-4 py-3 border-r border-slate-100 text-[11px] font-mono text-slate-600">
-                                                {emp.email && <div className="flex items-center gap-2"><Mail size={12} className="text-slate-400"/> {emp.email}</div>}
-                                                {emp.phone_Number && <div className="flex items-center gap-2 mt-1"><Phone size={12} className="text-slate-400"/> {emp.phone_Number}</div>}
+                                                {emp.email && <div className="flex items-center gap-2"><Mail size={12} className="text-slate-400" /> {emp.email}</div>}
+                                                {emp.phone_Number && <div className="flex items-center gap-2 mt-1"><Phone size={12} className="text-slate-400" /> {emp.phone_Number}</div>}
                                                 {!emp.email && !emp.phone_Number && <span className="text-slate-400 italic font-sans text-[10px]">N/A</span>}
                                             </td>
-                                            <td className="px-4 py-3 border-r border-slate-100 text-center">
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-[3px] border text-[9px] font-black uppercase tracking-wider ${
-                                                    emp.userRole_Id === 1 || emp.UserRole_Id === 1 ? 'bg-blue-50 border-blue-200 text-[#0285fd]' : 'bg-slate-50 border-slate-200 text-slate-500'
-                                                }`}>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-[3px] border text-[9px] font-black uppercase tracking-wider ${emp.userRole_Id === 1 || emp.UserRole_Id === 1 ? 'bg-blue-50 border-blue-200 text-[#0285fd]' : 'bg-slate-50 border-slate-200 text-slate-500'
+                                                    }`}>
                                                     {roleName}
                                                 </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                {emp.userRole_Id !== 1 && emp.UserRole_Id !== 1 ? (
-                                                    <button
-                                                        onClick={() => requestDeleteUser(code)}
-                                                        className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
-                                                        title="Delete User"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                ) : (
-                                                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1"><Lock size={10} /> Protected</span>
-                                                )}
                                             </td>
                                         </tr>
                                     );
@@ -294,42 +290,6 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                 </div>
             </div>
 
-            {/* Role Search Modal styled to match */}
-            <SimpleModal isOpen={showRoleModal} onClose={() => setShowRoleModal(false)} title="Select User Role">
-                <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Roles</span>
-                        <input
-                            type="text"
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1 uppercase"
-                            value={roleSearchTerm}
-                            onChange={(e) => setRoleSearchTerm(e.target.value)}
-                        />
-                    </div>
-                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
-                                <tr>
-                                    <th className="border-b px-5 py-3">Code</th>
-                                    <th className="border-b px-5 py-3">Role Name</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {roleOptions.filter(r => (r.name || '').toLowerCase().includes(roleSearchTerm.toLowerCase())).map((role, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50 transition-all border-b border-gray-50 cursor-pointer">
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{role.id}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3 uppercase">{role.name}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3 text-center">
-                                            <button onClick={() => handleSelectRole(role)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
 
             {/* Warning alerts styled like ConfirmModal */}
             {showDeleteConfirm && (
