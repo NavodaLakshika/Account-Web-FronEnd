@@ -134,6 +134,7 @@ import { biDashboardService } from '../services/biDashboard.service';
 import GetThingsDoneBoard from './GetThingsDoneBoard';
 import SystemLoader from '../components/SystemLoader';
 import GlobalSearchModal from '../components/modals/GlobalSearchModal';
+import DashboardSettingsDropdown from '../components/modals/DashboardSettingsDropdown';
 
 // Master File specific boards
 import CompanyBoard from './CompanyProfileBoard';
@@ -798,7 +799,7 @@ const Dashboard = () => {
             } else {
                 // Show first-time onboarding guide based on DB login count
                 const loginCount = currentUser?.loginCount || currentUser?.LoginCount || 0;
-                
+
                 // If it's exactly 1, it's their very first time logging into the system
                 if (loginCount === 1) {
                     setTimeout(() => setShowFirstTimeGuide(true), 1000);
@@ -1445,7 +1446,7 @@ const Dashboard = () => {
         {
             group: 'TOOLS',
             items: [
-            { label: 'Data Backup', onClick: () => setShowBackupBoard(true) },
+                { label: 'Data Backup', onClick: () => setShowBackupBoard(true) },
                 { label: 'System Update', onClick: () => setShowSystemUpdateModal(true) },
                 { label: 'Reconcile', onClick: () => setShowBankRecModal(true) },
                 { label: 'Audit Log', onClick: () => setSelectedReport('Audit Log') },
@@ -1462,11 +1463,26 @@ const Dashboard = () => {
     ];
 
     const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
+    const [showDashboardDisplayDropdown, setShowDashboardDisplayDropdown] = useState(false);
+
+    const [dashboardSettings, setDashboardSettings] = useState(() => {
+        try {
+            const saved = localStorage.getItem('dashboardDisplaySettings');
+            return saved ? JSON.parse(saved) : {
+                compactLayout: false, listLayout: false, solidCards: false, roundedButtons: false, fullWidth: false, disableAnimations: false, grayscale: false, fontFamily: 'Default'
+            };
+        } catch { return {}; }
+    });
+
+    const updateDashboardSettings = (newSettings) => {
+        setDashboardSettings(newSettings);
+        localStorage.setItem('dashboardDisplaySettings', JSON.stringify(newSettings));
+    };
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
     const globalSearchItems = [];
     const _seenLabels = new Set();
-    
+
     Object.entries(menuDropdownItems).forEach(([menuName, groups]) => {
         groups.forEach(group => {
             if (group.items) {
@@ -1508,7 +1524,64 @@ const Dashboard = () => {
     });
 
     return (
-        <div className="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans'] bg-slate-50 select-none text-slate-800 overflow-hidden">
+        <div className={`h-screen w-screen flex flex-col bg-slate-50 select-none text-slate-800 overflow-hidden ${dashboardSettings?.fontFamily === 'Monospace' ? 'font-mono' : (dashboardSettings?.fontFamily === 'Serif' ? 'font-serif' : 'font-sans')}`}
+            style={{
+                filter: [
+                    dashboardSettings?.grayscale ? 'grayscale(1)' : '',
+                    dashboardSettings?.sepiaMode ? 'sepia(0.8)' : '',
+                    dashboardSettings?.vibrantMode ? 'saturate(2) contrast(1.1) brightness(1.05)' : ''
+                ].filter(Boolean).join(' ') || 'none',
+                transform: dashboardSettings?.compactLayout ? 'scale(0.92)' : 'scale(1)',
+                transformOrigin: 'top center',
+                transition: dashboardSettings?.disableAnimations ? 'none' : 'all 0.3s ease-in-out'
+            }}
+        >
+            {dashboardSettings?.disableAnimations && (
+                <style>{`
+                *, *::before, *::after {
+                    transition: none !important;
+                    animation: none !important;
+                }
+            `}</style>
+            )}
+            {dashboardSettings?.solidCards && (
+                <style>{`
+                .glass-card, .bg-white\\/80, .bg-slate-50\\/50, .backdrop-blur-sm, div[class*="shadow-["] {
+                    background-color: white !important;
+                    backdrop-filter: none !important;
+                    border: 1px solid #e2e8f0 !important;
+                    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+                }
+            `}</style>
+            )}
+            {dashboardSettings?.borderStyle && dashboardSettings.borderStyle !== 'Default' && (
+            <style>{`
+                ${dashboardSettings.borderStyle === 'Sharp' ? '* { border-radius: 0px !important; }' : ''}
+                ${dashboardSettings.borderStyle === 'Round' ? 'button, input, select, textarea, [class~="rounded"], [class*="rounded-"] { border-radius: 10px !important; }' : ''}
+                ${dashboardSettings.borderStyle === 'Pill' ? 'button, input, select, textarea { border-radius: 9999px !important; }' : ''}
+            `}</style>
+        )}
+            {dashboardSettings?.fullWidth && (
+            <style>{`
+                main > .p-8 { padding-left: 1rem !important; padding-right: 1rem !important; max-width: 100% !important; }
+            `}</style>
+        )}
+            {dashboardSettings?.listLayout && (
+            <style>{`
+                div.grid[class*="sm\\:grid-cols-"] { 
+                    grid-template-columns: 1fr !important; 
+                }
+            `}</style>
+        )}
+            {dashboardSettings?.fontFamily && dashboardSettings?.fontFamily !== 'Default' && (
+                <style>{`
+                * {
+                    font-family: ${dashboardSettings.fontFamily === 'Inter' ? '"Inter", sans-serif' :
+                        dashboardSettings.fontFamily === 'Monospace' ? 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' :
+                            dashboardSettings.fontFamily === 'Tahoma' ? '"Tahoma", sans-serif' : 'inherit'} !important;
+                }
+            `}</style>
+            )}
             {/* Top Subscription Banner OR Marquee Bar */}
             {showSubscriptionBanner ? (
                 <div className="bg-[#0078d4] text-white text-[13px] h-9 flex justify-center items-center gap-2 relative z-50 transition-all animate-in slide-in-from-top duration-300 mb-2">
@@ -1812,10 +1885,10 @@ const Dashboard = () => {
             />
 
             {/* System Admin Modals */}
-            
+
             <InventoryDownloadBoard isOpen={showInventoryDownloadModal} onClose={() => setShowInventoryDownloadModal(false)} />
             <StockBalanceUpdateModal isOpen={showStockBalanceUpdateModal} onClose={() => setShowStockBalanceUpdateModal(false)} />
-            
+
             <DeleteAccountModal isOpen={showDeleteAccountModal} onClose={() => setShowDeleteAccountModal(false)} />
             <SystemUpdateModal isOpen={showSystemUpdateModal} onClose={() => setShowSystemUpdateModal(false)} />
             <ClearTempDataModal isOpen={showClearTempDataModal} onClose={() => setShowClearTempDataModal(false)} />
@@ -1890,10 +1963,10 @@ const Dashboard = () => {
                             />
                         </div>
                         <div className="h-16 flex items-center justify-center">
-                              <span className="text-white/90 text-2xl md:text-3xl font-light tracking-wide">
-                                  {aiTypingText}
-                                  <span className="animate-pulse ml-0.5 text-indigo-400">|</span>
-                              </span>
+                            <span className="text-white/90 text-2xl md:text-3xl font-light tracking-wide">
+                                {aiTypingText}
+                                <span className="animate-pulse ml-0.5 text-indigo-400">|</span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -2140,6 +2213,22 @@ const Dashboard = () => {
 
                     {/* Right: User + AI + Menu */}
                     <div className="flex items-center gap-3">
+                        {/* Dashboard Display Settings Icon */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowDashboardDisplayDropdown(!showDashboardDisplayDropdown)}
+                                className="flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-slate-100 transition-colors text-slate-500 hover:text-[#0078d4]"
+                                title="Display Settings"
+                            >
+                                <SlidersHorizontal size={20} />
+                            </button>
+                            <DashboardSettingsDropdown
+                                isOpen={showDashboardDisplayDropdown}
+                                onClose={() => setShowDashboardDisplayDropdown(false)}
+                                settings={dashboardSettings}
+                                onSettingsChange={updateDashboardSettings}
+                            />
+                        </div>
                         {/* Help / Learn More Icon */}
                         <div className="relative">
                             <button
@@ -2218,7 +2307,7 @@ const Dashboard = () => {
                                         {selectedCompany?.name || selectedCompany?.companyName || 'ONIMTA Information Technology'}
                                     </div>
 
-                                    <button 
+                                    <button
                                         className="text-[13px] text-[#0077c5] hover:text-[#005ca6] font-medium hover:underline mb-5 transition-colors"
                                         onClick={() => {
                                             setShowProfileDropdown(false);
@@ -2541,9 +2630,9 @@ const Dashboard = () => {
                     position="inline-right"
                     onAction={handleAIAction}
                 />
-                <TwoFactorSetupModal 
-                    isOpen={showTwoFactorModal} 
-                    onClose={() => setShowTwoFactorModal(false)} 
+                <TwoFactorSetupModal
+                    isOpen={showTwoFactorModal}
+                    onClose={() => setShowTwoFactorModal(false)}
                     position="inline-right"
                 />
                 <AddReminderBoard
