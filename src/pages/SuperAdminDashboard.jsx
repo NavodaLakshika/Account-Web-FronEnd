@@ -445,7 +445,7 @@ const SuperAdminDashboard = () => {
             setAlertConfig({
                 isOpen: true,
                 title: 'Error',
-                message: error.response?.data?.message || 'Failed to update employee role.',
+                message: error.response?.data?.message || 'Failed to update employee role..',
                 variant: 'warning'
             });
         } finally {
