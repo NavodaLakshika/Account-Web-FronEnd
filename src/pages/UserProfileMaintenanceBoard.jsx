@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { User, Search, RotateCcw, Save, Trash2, Eye, EyeOff, Calendar, ShieldCheck, Users, Loader2, AlertTriangle } from 'lucide-react';
+import { User, RotateCcw, Save, Trash2, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
-import CalendarModal from '../components/CalendarModal';
-import UserSearchModal from '../components/modals/UserSearchModal';
-import UserGroupSearchModal from '../components/modals/UserGroupSearchModal';
 import CostCenterAuthModal from '../components/modals/MasterSubModal/CostCenterAuthModal';
 import { userProfileService } from '../services/userProfile.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -16,15 +13,12 @@ const UserProfileMaintenanceBoard = ({ isOpen, onClose }) => {
     const [must_Change, setMust_Change] = useState('0');
     const [cant_Change, setCant_Change] = useState('0');
     const [acc_Desable, setAcc_Desable] = useState('0');
+    const [member_Id, setMember_Id] = useState('');
+    const [last_Modified_User, setLast_Modified_User] = useState('');
     const [exp_Date, setExp_Date] = useState('');
-    const [member_Id, setMember_Id] = useState('Administrators');
-    const [last_Modified_User, setLast_Modified_User] = useState('SYSTEM');
 
-    const [showSearchModal, setShowSearchModal] = useState(false);
-    const [showGroupModal, setShowGroupModal] = useState(false);
+    const [usersList, setUsersList] = useState([]);
     const [showCostCenterAuth, setShowCostCenterAuth] = useState(false);
-    const [showCalendar, setShowCalendar] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
     const [fetching, setFetching] = useState(false);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -35,41 +29,56 @@ const UserProfileMaintenanceBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
-            if (user) setLast_Modified_User(user.empName || user.emp_Name || 'SYSTEM');
+            if (user) setLast_Modified_User(user.empName || user.emp_Name || '');
+            loadUsers();
         }
     }, [isOpen]);
+
+    const loadUsers = async () => {
+        const companyData = localStorage.getItem('selectedCompany');
+        let companyCode = '';
+        if (companyData) {
+            try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
+        }
+        try {
+            const users = await userProfileService.searchUsers(companyCode, '');
+            setUsersList(users || []);
+        } catch (err) { showErrorToast('Failed to load users list'); }
+    };
 
     const handleClear = () => {
         setEmp_Code(''); setEmp_Name(''); setPass_Word(''); setConpass_Word('');
         setMust_Change('0'); setCant_Change('0'); setAcc_Desable('0');
-        setExp_Date(''); setMember_Id('Administrators'); setShowPassword(false);
+        setMember_Id(''); setShowPassword(false);
+        setExp_Date('');
     };
 
-    const handleUserSelect = async (user) => {
-        const selectedCode = user.emp_Code || user.Emp_Code;
-        if (!selectedCode) return;
+    const handleUserSelect = async (selectedCode) => {
+        if (!selectedCode) {
+            handleClear();
+            return;
+        }
         setFetching(true);
         try {
             const profile = await userProfileService.getUserProfile(selectedCode);
             setEmp_Code(profile.emp_Code); setEmp_Name(profile.emp_Name || '');
             setPass_Word(profile.pass_Word || ''); setConpass_Word(profile.pass_Word || '');
             setMust_Change(profile.must_Change || '0'); setCant_Change(profile.cant_Change || '0');
-            setAcc_Desable(profile.acc_Desable || '0'); setExp_Date(profile.exp_Date || '');
-            setMember_Id(profile.member_Id || 'Administrators');
+            setAcc_Desable(profile.acc_Desable || '0');
+            setMember_Id(profile.member_Id || '');
+            setExp_Date(profile.exp_Date || '2099-12-31');
         } catch (error) { showErrorToast('Failed to load user profile'); } finally { setFetching(false); }
     };
 
     const handleSave = async () => {
-        if (!emp_Name.trim()) return showErrorToast('Employee Name is required');
-        if (!pass_Word.trim()) return showErrorToast('Password is required');
-        if (pass_Word !== conpass_Word) return showErrorToast('Passwords do not match');
+        if (!emp_Code) return showErrorToast('Please select a user to update');
         setSaving(true);
         try {
             const payload = { emp_Code, emp_Name, pass_Word, must_Change, cant_Change, acc_Desable, exp_Date, member_Id, last_Modified_User };
             const result = await userProfileService.saveProfile(payload);
-            if (!emp_Code && result.empCode) setEmp_Code(result.empCode);
-            showSuccessToast(result.message || 'User profile saved successfully');
-        } catch (error) { showErrorToast(error.message || 'Failed to save user profile'); } finally { setSaving(false); }
+            showSuccessToast(result.message || 'User profile updated successfully');
+            loadUsers();
+        } catch (error) { showErrorToast(error.message || 'Failed to update user profile'); } finally { setSaving(false); }
     };
 
     const handleDelete = () => {
@@ -79,7 +88,13 @@ const UserProfileMaintenanceBoard = ({ isOpen, onClose }) => {
 
     const confirmDelete = async () => {
         setDeleting(true);
-        try { await userProfileService.deleteUser(emp_Code); showSuccessToast('User profile deleted successfully'); handleClear(); setShowDeleteConfirm(false); } catch (error) { showErrorToast(error.message || 'Failed to delete user profile'); } finally { setDeleting(false); }
+        try {
+            await userProfileService.deleteUser(emp_Code);
+            showSuccessToast('User profile deleted successfully');
+            handleClear();
+            setShowDeleteConfirm(false);
+            loadUsers();
+        } catch (error) { showErrorToast(error.message || 'Failed to delete user profile'); } finally { setDeleting(false); }
     };
 
     return (
@@ -93,82 +108,83 @@ const UserProfileMaintenanceBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex gap-3">
                             {isEditing && <button onClick={handleDelete} disabled={deleting} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(deleting) ? 'opacity-50 cursor-not-allowed' : ''}`}>{deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} DELETE</button>}
-                            <button onClick={handleSave} disabled={saving} className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">{saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} {isEditing ? 'UPDATE' : 'ADD USER'}</button>
+                            <button onClick={handleSave} disabled={saving || !isEditing} className={`px-6 h-10 text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${isEditing ? 'bg-[#0285fd] hover:bg-[#0073ff]' : 'bg-gray-400 cursor-not-allowed'}`}>{saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} UPDATE</button>
                         </div>
                     </div>
                 }
             >
-                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
-                    <div className="bg-white p-4 border border-gray-200 rounded-[3px] shadow-sm space-y-4">
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            <div className="col-span-6">
-                                <label className="text-[12.5px] font-bold text-gray-700 block mb-1.5">User Code</label>
-                                <div className="relative">
-                                    <div className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-gray-50 text-[#0285fd] font-mono flex items-center outline-none pr-10">{fetching ? 'LOADING...' : (emp_Code || '')}</div>
-                                    <button onClick={() => setShowSearchModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer"><Search size={16} /></button>
+                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma'] p-4">
+                    <div className="max-w-xl mx-auto space-y-4">
+                        <div className="bg-white p-6 border border-gray-200 rounded-[3px] shadow-sm space-y-4">
+                            <div className="grid grid-cols-12 gap-x-6 gap-y-4">
+                                <div className="col-span-12">
+                                    <label className="text-[12.5px] font-bold text-gray-700 block mb-1.5">User Code</label>
+                                    <select
+                                        value={emp_Code}
+                                        onChange={(e) => handleUserSelect(e.target.value)}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono cursor-pointer disabled:opacity-50"
+                                        disabled={fetching}
+                                    >
+                                        <option value="">{fetching ? 'LOADING...' : 'Select user...'}</option>
+                                        {usersList.map(u => (
+                                            <option key={u.emp_Code} value={u.emp_Code}>{u.emp_Code} - {u.emp_Name}</option>
+                                        ))}
+                                    </select>
                                 </div>
-                            </div>
-                            <div className="col-span-6">
-                                <label className="text-[12.5px] font-bold text-gray-700 block mb-1.5">User Name</label>
-                                <input type="text" value={emp_Name} onChange={(e) => setEmp_Name(e.target.value)} placeholder="Enter user name" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase" />
-                            </div>
-                            <div className="col-span-6">
-                                <label className="text-[12.5px] font-bold text-gray-700 block mb-1.5">Password</label>
-                                <div className="relative">
-                                    <input type={showPassword ? "text" : "password"} value={pass_Word} onChange={(e) => setPass_Word(e.target.value)} placeholder="Enter password" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10" />
-                                    <button onClick={() => setShowPassword(!showPassword)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
-                                </div>
-                            </div>
-                            <div className="col-span-6">
-                                <label className="text-[12.5px] font-bold text-gray-700 block mb-1.5">Confirm Pwd</label>
-                                <input type={showPassword ? "text" : "password"} value={conpass_Word} onChange={(e) => setConpass_Word(e.target.value)} placeholder="Confirm password" className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 ${conpass_Word && pass_Word === conpass_Word ? 'border-green-400 bg-blue-50/20' : ''}`} />
-                            </div>
-                            <div className="col-span-6">
-                                <label className="text-[12.5px] font-bold text-gray-700 block mb-1.5">Member Group</label>
-                                <div className="relative">
-                                    <input type="text" value={member_Id} readOnly className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-gray-50 text-gray-700 outline-none pr-10 cursor-default" />
-                                    <button onClick={() => setShowGroupModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer"><Users size={16} /></button>
-                                </div>
-                            </div>
-                            <div className="col-span-6">
-                                <label className="text-[12.5px] font-bold text-gray-700 block mb-1.5">Expiry Date</label>
-                                <div className="relative">
-                                    <input type="text" value={exp_Date} readOnly onClick={() => setShowCalendar(true)} placeholder="Select date..." className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer" />
-                                    <button onClick={() => setShowCalendar(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer"><Calendar size={16} /></button>
-                                </div>
+                                {emp_Code && (
+                                    <div className="col-span-12 mt-2 p-4 bg-slate-50 border border-slate-200 rounded-[3px] flex items-center gap-4 animate-in fade-in zoom-in-95 duration-300">
+                                        <div className="w-14 h-14 rounded-full bg-blue-100 text-[#0285fd] flex flex-col items-center justify-center font-black shadow-sm ring-4 ring-white">
+                                            {emp_Name ? <span className="text-xl leading-none">{emp_Name.charAt(0).toUpperCase()}</span> : <User size={24} />}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h4 className="text-[14px] font-black text-slate-800 uppercase tracking-wide">{emp_Name}</h4>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-white border border-slate-200 px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                                    User Role: {member_Id || 'N/A'}
+                                                </span>
+                                                {acc_Desable === '1' ? (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                                        <AlertTriangle size={12} /> ACCOUNT DISABLED
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 border border-green-100 px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                                        <ShieldCheck size={12} /> ACCOUNT ACTIVE
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
 
-                    <div className="bg-white p-4 border border-gray-200 rounded-[3px] shadow-sm">
-                        <div className="text-[13px] font-black text-slate-900 uppercase mb-3">Account Options</div>
-                        <div className="bg-white border border-gray-200 rounded-[3px] p-4 space-y-4">
-                            <label className="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" checked={must_Change === '1'} onChange={(e) => setMust_Change(e.target.checked ? '1' : '0')} className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
-                                <span className="text-[12.5px] font-bold text-slate-700 select-none">Must Change Password Next Login</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" checked={cant_Change === '1'} onChange={(e) => setCant_Change(e.target.checked ? '1' : '0')} className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
-                                <span className="text-[12.5px] font-bold text-slate-700 select-none">User Cannot Change Password</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" checked={acc_Desable === '1'} onChange={(e) => setAcc_Desable(e.target.checked ? '1' : '0')} className="w-3.5 h-3.5 rounded border-gray-300 text-red-500 focus:ring-red-500" />
-                                <span className="text-[12.5px] font-bold text-red-600 select-none">Account Disabled</span>
-                            </label>
-                            <div className="pt-3 border-t border-gray-200 mt-2">
-                                <button onClick={() => setShowCostCenterAuth(true)} disabled={!emp_Code} className="w-full h-10 bg-[#0285fd] text-white text-[11px] font-mono font-bold rounded-[3px] hover:bg-[#0073ff] shadow-sm transition-all active:scale-95 flex items-center justify-center uppercase tracking-widest gap-2 disabled:opacity-40">
-                                    <ShieldCheck size={16} /> Cost Center Authentication
-                                </button>
+                        <div className="bg-white p-6 border border-gray-200 rounded-[3px] shadow-sm">
+                            <div className="text-[13px] font-black text-slate-900 uppercase mb-4">Account Options</div>
+                            <div className="bg-white border border-gray-200 rounded-[3px] p-5 space-y-4">
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" checked={must_Change === '1'} onChange={(e) => setMust_Change(e.target.checked ? '1' : '0')} className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                                    <span className="text-[12.5px] font-bold text-slate-700 select-none">Must Change Password Next Login</span>
+                                </label>
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" checked={cant_Change === '1'} onChange={(e) => setCant_Change(e.target.checked ? '1' : '0')} className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                                    <span className="text-[12.5px] font-bold text-slate-700 select-none">User Cannot Change Password</span>
+                                </label>
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" checked={acc_Desable === '1'} onChange={(e) => setAcc_Desable(e.target.checked ? '1' : '0')} className="w-3.5 h-3.5 rounded border-gray-300 text-red-500 focus:ring-red-500" />
+                                    <span className="text-[12.5px] font-bold text-red-600 select-none">Account Disabled</span>
+                                </label>
+                                <div className="pt-4 border-t border-gray-200 mt-2 flex justify-start">
+                                    <button onClick={() => setShowCostCenterAuth(true)} disabled={!emp_Code} className="px-8 h-10 bg-[#0285fd] text-white text-[11px] font-mono font-bold rounded-[3px] hover:bg-[#0073ff] shadow-sm transition-all active:scale-95 flex items-center justify-center uppercase tracking-widest gap-2 disabled:opacity-40">
+                                        <ShieldCheck size={16} /> Cost Center Authentication
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </TransactionFormWrapper>
 
-            <UserSearchModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} onSelect={handleUserSelect} />
-            <UserGroupSearchModal isOpen={showGroupModal} onClose={() => setShowGroupModal(false)} onSelect={setMember_Id} />
             <CostCenterAuthModal isOpen={showCostCenterAuth} onClose={() => setShowCostCenterAuth(false)} empCode={emp_Code} empName={emp_Name} userRole={member_Id} />
-            <CalendarModal isOpen={showCalendar} onClose={() => setShowCalendar(false)} onSelectDate={(date) => { setExp_Date(date); setShowCalendar(false); }} initialDate={exp_Date} />
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
