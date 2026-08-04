@@ -122,7 +122,7 @@ export const authService = {
   },
 
   // SEND OTP VIA AIRTEL SMS GATEWAY (frontend direct call via Vite proxy)
-  async sendSmsOtp(phoneNumber) {
+  async sendSmsOtp(phoneNumber, type = 'register') {
     // Generate a secure 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -132,7 +132,13 @@ export const authService = {
     // Sri Lanka: if starts with 94, keep; if starts with 0, replace with 94
     if (dst.startsWith('0')) dst = '94' + dst.slice(1);
 
-    const message = encodeURIComponent(`Your ONIMTA verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`);
+    let rawMessage = `Your ONIMTA verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`;
+
+    if (type === 'recovery') {
+      rawMessage = `ONIMTA Security: Your password recovery code is ${otp}. Use this 6-digit code to securely reset your password. Do not share this with anyone.`;
+    }
+
+    const message = encodeURIComponent(rawMessage);
 
     // In dev, use the Vite proxy (starts with '/sms'). In prod, hit the Airtel gateway directly.
     const baseUrl = import.meta.env.PROD ? 'http://sms.airtel.lk:5000' : '';
@@ -179,6 +185,20 @@ export const authService = {
       return response.data;
     } catch (error) {
       console.error('Reset Password Error:', error);
+      throw error.response?.data || 'Failed to reset password.';
+    }
+  },
+
+  // RESET PASSWORD DIRECT (SMS)
+  async resetPasswordDirect(empCode, newPassword) {
+    try {
+      const response = await api.post('/Auth/reset-password-direct', {
+        EmpCode: empCode,
+        NewPassword: newPassword
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Reset Password Direct Error:', error);
       throw error.response?.data || 'Failed to reset password.';
     }
   },

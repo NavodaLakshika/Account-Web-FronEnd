@@ -66,7 +66,7 @@ const AuthPage = () => {
     const translations = {
         EN: {
             systemTitle: 'Financial System',
-            username: 'Username ',
+            username: 'Email Address',
             password: 'Password',
             remember: 'Remember Password',
             forgot: 'Forgot Password?',
@@ -75,7 +75,7 @@ const AuthPage = () => {
         },
         CN: {
             systemTitle: '管理系统',
-            username: '用户名 / 邮箱',
+            username: '电子邮件 (Email)',
             password: '密码',
             remember: '记住密码',
             forgot: '忘记密码？',
@@ -115,7 +115,7 @@ const AuthPage = () => {
         setLoading(true);
         try {
             const result = await authService.login(loginData.empName, loginData.password);
-            
+
             if (result.requires2FA || result.Requires2FA) {
                 setTempToken(result.tempToken || result.TempToken);
                 setAuthEmpCode(result.empCode || result.EmpCode);
@@ -163,7 +163,7 @@ const AuthPage = () => {
         setLoading(true);
         try {
             const result = await authService.verify2FALogin(authEmpCode, tempToken, twoFACode);
-            
+
             const user = authService.getCurrentUser();
             setCurrentUser(user);
 
@@ -206,19 +206,27 @@ const AuthPage = () => {
         setShowAccountSelector(false);
     };
 
+    const [recoveryForgotEmpCode, setRecoveryForgotEmpCode] = useState('');
+    const [recoveryOtp, setRecoveryOtp] = useState('');
+    const [inputOtp, setInputOtp] = useState('');
+
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
             const result = await authService.forgotPassword(forgotEmail);
-            showPageAlert('success', 'Recovery Email Sent', result.message || 'Recovery instruction sent');
+            if (result.success && result.phone) {
+                // Now send OTP to the phone 
+                const otp = await authService.sendSmsOtp(result.phone, 'recovery');
+                setRecoveryOtp(otp);
+                setRecoveryForgotEmpCode(result.empCode);
 
-            // Second alert for the 24 hour wait as requested
-            setTimeout(() => {
-                showPageAlert('info', 'Protocol Init', 'Waiting for 24 hours recovery and reset your password');
-            }, 1500);
-
-            setRecoveryStep(2); // Move to reset step
+                const maskedPhone = result.phone.substring(0, 3) + '*****' + result.phone.substring(result.phone.length - 2);
+                showPageAlert('success', 'SMS Sent', `Recovery code sent to your registered mobile number: ${maskedPhone}`);
+                setRecoveryStep(2); // Move to OTP step
+            } else {
+                throw new Error("No valid phone number linked to this account for SMS recovery.");
+            }
         } catch (err) {
             showPageAlert('error', 'Request Failed', typeof err === 'object' ? (err.message || 'Request failed') : err);
         } finally {
@@ -226,16 +234,38 @@ const AuthPage = () => {
         }
     };
 
+    const handleVerifyForgotOtp = (e) => {
+        e.preventDefault();
+        if (inputOtp === recoveryOtp) {
+            setRecoveryStep(3); // Move to new password step
+            showPageAlert('success', 'Verified', 'OTP verified successfully. Create a new password.');
+        } else {
+            showPageAlert('error', 'Verification Failed', 'Invalid OTP. Please try again.');
+        }
+    };
+
     const handleResetPassword = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const result = await authService.resetPassword(resetToken, newPassword);
-            showPageAlert('success', 'Password Reset', result.message || 'Password reset successful');
-            setShowForgot(false);
-            setRecoveryStep(1);
-            setResetToken('');
-            setNewPassword('');
+            if (recoveryStep === 3) {
+                const result = await authService.resetPasswordDirect(recoveryForgotEmpCode, newPassword);
+                showPageAlert('success', 'Password Reset', result.message || 'Password reset successful');
+                setShowForgot(false);
+                setRecoveryStep(1);
+                setRecoveryOtp('');
+                setInputOtp('');
+                setNewPassword('');
+                setRecoveryForgotEmpCode('');
+            } else {
+                // For forced password reset upon login (which uses step 2 with a resetToken)
+                const result = await authService.resetPassword(resetToken, newPassword);
+                showPageAlert('success', 'Password Reset', result.message || 'Password reset successful');
+                setShowForgot(false);
+                setRecoveryStep(1);
+                setResetToken('');
+                setNewPassword('');
+            }
         } catch (err) {
             showPageAlert('error', 'Reset Failed', typeof err === 'object' ? (err.message || 'Reset failed') : err);
         } finally {
@@ -271,9 +301,9 @@ const AuthPage = () => {
                             <h2 className="text-slate-800 text-2xl font-tahoma font-bold mb-6 text-center">
                                 Let's get you in to Onimta
                             </h2>
-                            
+
                             {/* Saved Account Card */}
-                            <button 
+                            <button
                                 onClick={handleSelectSavedAccount}
                                 className="w-full bg-white border border-slate-300 hover:border-[#00acee] hover:shadow-md transition-all rounded-none p-4 mb-6 flex items-center gap-4 text-left shadow-sm mt-"
                             >
@@ -294,14 +324,14 @@ const AuthPage = () => {
                             {/* Other Actions */}
                             <div className="w-full">
                                 <p className="text-sm text-slate-500 font-bold mb-3 px-1">Other actions</p>
-                                <button 
+                                <button
                                     onClick={() => setShowAccountSelector(false)}
                                     className="w-full bg-white border border-slate-300 hover:border-[#00acee] transition-all rounded-none p-4 mb-3 flex items-center gap-4 text-left font-bold text-slate-700 text-sm shadow-sm"
                                 >
                                     <div className="text-slate-600"><RefreshCw size={20} /></div>
                                     Use a different account
                                 </button>
-                                <button 
+                                <button
                                     onClick={handleRemoveSavedAccount}
                                     className="w-full bg-white border border-slate-300 hover:border-red-400 transition-all rounded-none p-4 mb-8 flex items-center gap-4 text-left font-bold text-slate-700 text-sm shadow-sm"
                                 >
@@ -325,9 +355,9 @@ const AuthPage = () => {
                                     Two-Factor Auth
                                 </h2>
                                 <p className="text-slate-500 font-mono text-sm leading-relaxed">
-                                    {twoFAMethod === 'EMAIL' 
-                                      ? 'Please enter the 6-digit code sent to your email.' 
-                                      : 'Please enter the 6-digit code from your authenticator app.'}
+                                    {twoFAMethod === 'EMAIL'
+                                        ? 'Please enter the 6-digit code sent to your email.'
+                                        : 'Please enter the 6-digit code from your authenticator app.'}
                                 </p>
                             </div>
 
@@ -346,7 +376,7 @@ const AuthPage = () => {
                                         required
                                     />
                                 </div>
-                                
+
                                 <div className="flex flex-col gap-4 pt-2">
                                     <button
                                         disabled={loading}
@@ -354,7 +384,7 @@ const AuthPage = () => {
                                     >
                                         {loading ? <Loader2 className="animate-spin mx-auto text-white" /> : "VERIFY CODE"}
                                     </button>
-                                    
+
                                     <button
                                         type="button"
                                         onClick={() => { setShow2FA(false); setTwoFACode(''); }}
@@ -377,7 +407,7 @@ const AuthPage = () => {
                                         {t.username}
                                     </label>
                                     <input
-                                        type="text"
+                                        type="email"
                                         id="empName"
                                         name="empName"
                                         value={loginData.empName}
@@ -452,26 +482,31 @@ const AuthPage = () => {
                     ) : (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                             <h2 className="text-slate-800 text-3xl font-tahoma font-bold mb-4 uppercase tracking-tight">
-                                {recoveryStep === 1 ? 'Account Recovery' : 'Reset Password'}
+                                {recoveryStep === 1 ? 'Account Recovery' : recoveryStep === 2 && !resetToken ? 'Verify OTP' : 'Reset Password'}
                             </h2>
                             <p className="text-slate-500 font-mono text-sm mb-8 leading-relaxed">
                                 {recoveryStep === 1
-                                    ? <>Enter your <span className="text-[#00acee] font-bold">Username or Corporate Email</span> and we will send you a recovery protocol.</>
-                                    : <>Enter the <span className="text-[#00acee] font-bold">Recovery Token</span> sent to you and your <span className="text-[#00acee] font-bold">New Password</span>.</>
+                                    ? <>Enter your <span className="text-[#00acee] font-bold">Corporate Email</span> and we will send you a recovery SMS.</>
+                                    : recoveryStep === 2 && !resetToken
+                                        ? <>Enter the <span className="text-[#00acee] font-bold">6-Digit Code</span> sent to your mobile device.</>
+                                        : <>Enter your <span className="text-[#00acee] font-bold">New Password</span> to secure your account.</>
                                 }
                             </p>
 
                             <form
-                                onSubmit={recoveryStep === 1 ? handleForgotPassword : handleResetPassword}
+                                onSubmit={
+                                    recoveryStep === 1 ? handleForgotPassword :
+                                        recoveryStep === 2 && !resetToken ? handleVerifyForgotOtp : handleResetPassword
+                                }
                                 className="space-y-6"
                             >
                                 {recoveryStep === 1 ? (
                                     <div className="space-y-1">
                                         <label htmlFor="forgotEmail" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                            Username / Email
+                                            Email Address
                                         </label>
                                         <input
-                                            type="text"
+                                            type="email"
                                             id="forgotEmail"
                                             value={forgotEmail}
                                             onChange={(e) => setForgotEmail(e.target.value)}
@@ -479,21 +514,40 @@ const AuthPage = () => {
                                             required
                                         />
                                     </div>
+                                ) : recoveryStep === 2 && !resetToken ? (
+                                    <div className="space-y-1">
+                                        <label htmlFor="inputOtp" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                            Verification Code
+                                        </label>
+                                        <input
+                                            type="text"
+                                            maxLength={6}
+                                            id="inputOtp"
+                                            value={inputOtp}
+                                            onChange={(e) => setInputOtp(e.target.value)}
+                                            placeholder="000000"
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-center tracking-[0.5em] text-xl"
+                                            required
+                                        />
+                                    </div>
                                 ) : (
                                     <>
-                                        <div className="space-y-1">
-                                            <label htmlFor="resetToken" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                                Recovery Token
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="resetToken"
-                                                value={resetToken}
-                                                onChange={(e) => setResetToken(e.target.value)}
-                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
-                                                required
-                                            />
-                                        </div>
+                                        {/* Show token ONLY if it's the old forced reset approach */}
+                                        {resetToken && (
+                                            <div className="space-y-1">
+                                                <label htmlFor="resetToken" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                                    Recovery Token
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="resetToken"
+                                                    value={resetToken}
+                                                    onChange={(e) => setResetToken(e.target.value)}
+                                                    className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                                    required
+                                                />
+                                            </div>
+                                        )}
                                         <div className="space-y-1">
                                             <label htmlFor="newPassword" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                                 New Password
@@ -514,20 +568,27 @@ const AuthPage = () => {
                                         disabled={loading}
                                         className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase"
                                     >
-                                        {loading ? <Loader2 className="animate-spin mx-auto" /> : (recoveryStep === 1 ? 'Request Reset' : 'Update Password')}
+                                        {loading ? <Loader2 className="animate-spin mx-auto" /> : (
+                                            recoveryStep === 1 ? 'Request SMS' :
+                                                recoveryStep === 2 && !resetToken ? 'Verify OTP' :
+                                                    'Update Password'
+                                        )}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            if (recoveryStep === 2) {
+                                            if (recoveryStep === 3) {
+                                                setRecoveryStep(2);
+                                            } else if (recoveryStep === 2 && !resetToken) {
                                                 setRecoveryStep(1);
                                             } else {
                                                 setShowForgot(false);
+                                                setRecoveryStep(1);
                                             }
                                         }}
                                         className="w-full py-2 text-slate-500 font-mono text-xs hover:text-slate-800 transition-all uppercase tracking-widest font-bold"
                                     >
-                                        {recoveryStep === 1 ? 'Back to Sign In' : 'Back to Request'}
+                                        {recoveryStep === 1 || (recoveryStep === 2 && resetToken) ? 'Back to Sign In' : 'Go Back'}
                                     </button>
                                 </div>
                             </form>
@@ -611,8 +672,8 @@ const AuthPage = () => {
                         background: glowType === 'error'
                             ? 'linear-gradient(180deg, rgba(220,38,38,0.15) 0%, rgba(220,38,38,0.04) 40%, transparent 70%)'
                             : glowType === 'success'
-                            ? 'linear-gradient(180deg, rgba(5,150,105,0.15) 0%, rgba(5,150,105,0.04) 40%, transparent 70%)'
-                            : 'linear-gradient(180deg, rgba(2,132,199,0.15) 0%, rgba(2,132,199,0.04) 40%, transparent 70%)'
+                                ? 'linear-gradient(180deg, rgba(5,150,105,0.15) 0%, rgba(5,150,105,0.04) 40%, transparent 70%)'
+                                : 'linear-gradient(180deg, rgba(2,132,199,0.15) 0%, rgba(2,132,199,0.04) 40%, transparent 70%)'
                     }}
                 />
             )}

@@ -17,8 +17,7 @@ const RegisterPage = () => {
     const [showHelp, setShowHelp] = useState(false);
     const [legalModalConfig, setLegalModalConfig] = useState({ isOpen: false, title: '', content: null, type: '' });
     const [step, setStep] = useState(1);
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const otpRefs = useRef([]);
+    const [otp, setOtp] = useState('');
     const generatedOtp = useRef(''); // stores the OTP sent via SMS for local comparison
     const [formData, setFormData] = useState({
         Emp_Name: '', Email: '', Phone_Number: '', Pass_Word: '', Conpass_Word: ''
@@ -60,8 +59,7 @@ const RegisterPage = () => {
 
     useEffect(() => {
         if (step === 2) {
-            setOtp(['', '', '', '', '', '']);
-            otpRefs.current[0]?.focus();
+            setOtp('');
         }
     }, [step]);
 
@@ -82,18 +80,6 @@ const RegisterPage = () => {
     }
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-
-    const handleOtpChange = (index, value) => {
-        if (!/^\d*$/.test(value)) return;
-        const updated = [...otp];
-        updated[index] = value.slice(-1);
-        setOtp(updated);
-        if (value && index < 5) otpRefs.current[index + 1]?.focus();
-    };
-
-    const handleOtpKeyDown = (index, e) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) otpRefs.current[index - 1]?.focus();
-    };
 
     const handleSendOtp = async (e) => {
         e?.preventDefault();
@@ -119,10 +105,9 @@ const RegisterPage = () => {
 
     const handleVerifyAndRegister = async (e) => {
         e.preventDefault();
-        const otpCode = otp.join('');
-        if (otpCode.length < 6) { showPageAlert('error', 'Validation Error', 'Enter the 6-digit OTP'); return; }
+        if (otp.length < 6) { showPageAlert('error', 'Validation Error', 'Enter the 6-digit OTP'); return; }
         // Verify locally against the OTP sent via SMS
-        if (otpCode !== generatedOtp.current) {
+        if (otp !== generatedOtp.current) {
             showPageAlert('error', 'Invalid OTP', 'Incorrect OTP. Please try again.');
             return;
         }
@@ -165,9 +150,9 @@ const RegisterPage = () => {
                 </div>
             )}
 
-            <div className="relative z-10 w-full max-w-6xl px-12 flex items-start justify-center mt-8">
+            <div className="relative z-10 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl px-4 md:px-12 flex items-start justify-center mt-4 lg:mt-8">
 
-                <div className="w-full py-12">
+                <div className="w-full py-8 lg:py-12">
                     {/* Step indicator */}
                     <div className="mb-10">
                         <div className="flex items-center justify-between mb-2">
@@ -186,174 +171,180 @@ const RegisterPage = () => {
                         </div>
                     </div>
 
-                    <div className="max-w-2xl mx-auto">
+                    <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto">
 
-                    {/* STEP 1 */}
-                    {step === 1 && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                            <h2 className="text-slate-800 text-3xl font-tahoma font-bold mb-6 tracking-tight min-h-[36px]">
-                                {displayedRegisterText}<span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
-                            </h2>
-                            <form onSubmit={handleSendOtp} className="space-y-4">
-                                <div className="flex gap-4 items-start">
-                                    <div className="space-y-1 flex-1">
-                                        <label htmlFor="Emp_Name" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                            User Name
-                                        </label>
-                                        <input type="text" id="Emp_Name" name="Emp_Name" value={formData.Emp_Name} onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                    </div>
-                                    <div className="space-y-1 flex-1">
-                                        <label htmlFor="Phone_Number" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                            Phone Number
-                                        </label>
-                                        <input type="tel" id="Phone_Number" name="Phone_Number" value={formData.Phone_Number} onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 items-start">
-                                    <div className="space-y-1 flex-1">
-                                        <label htmlFor="Email" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                            Email Address
-                                        </label>
-                                        <input type="email" id="Email" name="Email" value={formData.Email} onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                    </div>
-                                    <div className="space-y-1 flex-1 relative">
-                                        <label htmlFor="Pass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                            Password
-                                        </label>
-                                        <div className="relative">
-                                            <input type={showPassword ? "text" : "password"} id="Pass_Word" name="Pass_Word" value={formData.Pass_Word} onChange={handleChange}
-                                                onFocus={() => setPasswordFocused(true)}
-                                                onBlur={() => setPasswordFocused(false)}
+                        {/* STEP 1 */}
+                        {step === 1 && (
+                            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                                <h2 className="text-slate-800 text-3xl lg:text-4xl xl:text-5xl font-tahoma font-bold mb-6 lg:mb-8 tracking-tight min-h-[36px] lg:min-h-[48px]">
+                                    {displayedRegisterText}<span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
+                                </h2>
+                                <form onSubmit={handleSendOtp} className="space-y-4 xl:space-y-6">
+                                    <div className="flex flex-col md:flex-row gap-4 xl:gap-6 items-start w-full">
+                                        <div className="space-y-1 flex-1 w-full">
+                                            <label htmlFor="Emp_Name" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                                User Name
+                                            </label>
+                                            <input type="text" id="Emp_Name" name="Emp_Name" value={formData.Emp_Name} onChange={handleChange}
                                                 required
-                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all pr-12" />
-                                            <button type="button" onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hover:bg-[#00acee] bg-white border border-slate-200 hover:border-[#00acee] rounded-md p-1.5 transition-all shadow-sm">
-                                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                            </button>
+                                                className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-base xl:text-lg rounded-sm" />
                                         </div>
-                                        
-                                        {passwordFocused && (
-                                        <div className="absolute z-50 left-0 mt-2 w-full bg-slate-50 rounded-[3px] border border-slate-200 p-4 shadow-xl animate-in fade-in">
-                                            <div className="mb-4">
-                                                <div className="flex justify-between items-center mb-1.5">
-                                                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Strength</span>
-                                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${strengthText === 'Weak' ? 'text-red-500' : strengthText === 'Good' ? 'text-yellow-600' : strengthText === 'Strong' ? 'text-blue-600' : 'text-slate-400'}`}>{strengthText}</span>
-                                                </div>
-                                                <div className="h-1.5 w-full bg-slate-200 rounded-[3px] overflow-hidden flex gap-1">
-                                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 1 ? strengthColor : 'bg-transparent'}`} />
-                                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 2 ? strengthColor : 'bg-transparent'}`} />
-                                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 3 ? strengthColor : 'bg-transparent'}`} />
-                                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 4 ? strengthColor : 'bg-transparent'}`} />
-                                                </div>
+                                        <div className="space-y-1 flex-1 w-full">
+                                            <label htmlFor="Phone_Number" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                                Phone Number
+                                            </label>
+                                            <input type="tel" id="Phone_Number" name="Phone_Number" value={formData.Phone_Number} onChange={handleChange}
+                                                required
+                                                className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-base xl:text-lg rounded-sm" />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col md:flex-row gap-4 xl:gap-6 items-start w-full">
+                                        <div className="space-y-1 flex-1 w-full">
+                                            <label htmlFor="Email" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                                Email Address
+                                            </label>
+                                            <input type="email" id="Email" name="Email" value={formData.Email} onChange={handleChange}
+                                                required
+                                                className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-base xl:text-lg rounded-sm" />
+                                        </div>
+                                        <div className="space-y-1 flex-1 w-full relative">
+                                            <label htmlFor="Pass_Word" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                                Password
+                                            </label>
+                                            <div className="relative">
+                                                <input type={showPassword ? "text" : "password"} id="Pass_Word" name="Pass_Word" value={formData.Pass_Word} onChange={handleChange}
+                                                    onFocus={() => setPasswordFocused(true)}
+                                                    onBlur={() => setPasswordFocused(false)}
+                                                    required
+                                                    className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all pr-12 text-base xl:text-lg rounded-sm" />
+                                                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hover:bg-[#00acee] bg-white border border-slate-200 hover:border-[#00acee] rounded-md p-1.5 transition-all shadow-sm">
+                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </button>
                                             </div>
 
-                                            <p className="text-[11px] font-bold text-slate-700 mb-2">Must contain:</p>
-                                            <ul className="space-y-1.5">
-                                                <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.length ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                    <span className="font-bold w-3 text-center">{criteria.length ? '✓' : '−'}</span>
-                                                    8+ characters
-                                                </li>
-                                                <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.number ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                    <span className="font-bold w-3 text-center">{criteria.number ? '✓' : '−'}</span>
-                                                    Numbers
-                                                </li>
-                                                <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.letter ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                    <span className="font-bold w-3 text-center">{criteria.letter ? '✓' : '−'}</span>
-                                                    Letters
-                                                </li>
-                                                <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.special ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                    <span className="font-bold w-3 text-center">{criteria.special ? '✓' : '−'}</span>
-                                                    Special chars
-                                                </li>
-                                            </ul>
+                                            {passwordFocused && (
+                                                <div className="absolute z-50 left-0 mt-2 w-full bg-slate-50 rounded-[3px] border border-slate-200 p-4 shadow-xl animate-in fade-in">
+                                                    <div className="mb-4">
+                                                        <div className="flex justify-between items-center mb-1.5">
+                                                            <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Strength</span>
+                                                            <span className={`text-[11px] font-bold uppercase tracking-wider ${strengthText === 'Weak' ? 'text-red-500' : strengthText === 'Good' ? 'text-yellow-600' : strengthText === 'Strong' ? 'text-blue-600' : 'text-slate-400'}`}>{strengthText}</span>
+                                                        </div>
+                                                        <div className="h-1.5 w-full bg-slate-200 rounded-[3px] overflow-hidden flex gap-1">
+                                                            <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 1 ? strengthColor : 'bg-transparent'}`} />
+                                                            <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 2 ? strengthColor : 'bg-transparent'}`} />
+                                                            <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 3 ? strengthColor : 'bg-transparent'}`} />
+                                                            <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 4 ? strengthColor : 'bg-transparent'}`} />
+                                                        </div>
+                                                    </div>
+
+                                                    <p className="text-[11px] font-bold text-slate-700 mb-2">Must contain:</p>
+                                                    <ul className="space-y-1.5">
+                                                        <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.length ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                            <span className="font-bold w-3 text-center">{criteria.length ? '✓' : '−'}</span>
+                                                            8+ characters
+                                                        </li>
+                                                        <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.number ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                            <span className="font-bold w-3 text-center">{criteria.number ? '✓' : '−'}</span>
+                                                            Numbers
+                                                        </li>
+                                                        <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.letter ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                            <span className="font-bold w-3 text-center">{criteria.letter ? '✓' : '−'}</span>
+                                                            Letters
+                                                        </li>
+                                                        <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.special ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                            <span className="font-bold w-3 text-center">{criteria.special ? '✓' : '−'}</span>
+                                                            Special chars
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
-                                        )}
                                     </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <label htmlFor="Conpass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                        Confirm Password
-                                    </label>
-                                    <div>
-                                        <input type="password" id="Conpass_Word" name="Conpass_Word" value={formData.Conpass_Word} onChange={handleChange}
+                                    <div className="space-y-1 w-full">
+                                        <label htmlFor="Conpass_Word" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                            Confirm Password
+                                        </label>
+                                        <div>
+                                            <input type="password" id="Conpass_Word" name="Conpass_Word" value={formData.Conpass_Word} onChange={handleChange}
+                                                required
+                                                className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-base xl:text-lg rounded-sm" />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-3 xl:gap-4 py-2 xl:py-4">
+                                        <ShieldCheck size={16} className="text-[#00acee] mt-0.5 xl:mt-1 shrink-0 xl:w-5 xl:h-5" />
+                                        <p className="text-slate-500 text-[10px] xl:text-xs font-mono leading-relaxed">By registering you agree to Onimta Data Protection Policy. An OTP will be sent to verify your phone.</p>
+                                    </div>
+                                    <button disabled={loading}
+                                        className="w-full py-4 xl:py-5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg flex items-center justify-center gap-2 xl:text-lg rounded-sm">
+                                        {loading ? <Loader2 size={18} className="animate-spin" /> : <><Phone size={14} /> SEND OTP & CONTINUE</>}
+                                    </button>
+                                    <button type="button" onClick={() => navigate('/login')}
+                                        className="w-full py-2 xl:py-3 text-slate-500 hover:text-slate-800 font-mono text-xs xl:text-sm transition-all uppercase tracking-widest flex items-center justify-center gap-2 font-bold mt-2 xl:mt-4">
+                                        <ArrowLeft size={12} /> Back to Sign In
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+
+                        {/* STEP 2 */}
+                        {step === 2 && (
+                            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                                <KeyRound size={32} className="text-[#00acee] mb-4 xl:w-10 xl:h-10" />
+                                <h2 className="text-slate-800 text-3xl lg:text-4xl xl:text-5xl font-bold uppercase tracking-tight mb-2">VERIFY OTP</h2>
+                                <p className="text-slate-500 font-mono text-sm xl:text-base mb-8">
+                                    6-digit code sent to <span className="text-[#00acee] font-bold">{formData.Phone_Number}</span>
+                                </p>
+                                <form onSubmit={handleVerifyAndRegister} className="space-y-8 xl:space-y-10">
+                                    <div className="space-y-1">
+                                        <label htmlFor="inputOtp" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                            Verification Code
+                                        </label>
+                                        <input
+                                            type="text"
+                                            maxLength={6}
+                                            id="inputOtp"
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value)}
+                                            placeholder="000000"
+                                            className="w-full px-4 py-3 xl:py-5 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-center tracking-[0.5em] text-xl xl:text-3xl rounded-sm"
                                             required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                        />
                                     </div>
-                                </div>
-                                <div className="flex items-start gap-3 py-2">
-                                    <ShieldCheck size={16} className="text-[#00acee] mt-0.5 shrink-0" />
-                                    <p className="text-slate-500 text-[10px] font-mono leading-relaxed">By registering you agree to Onimta Data Protection Policy. An OTP will be sent to verify your phone.</p>
-                                </div>
-                                <button disabled={loading}
-                                    className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg flex items-center justify-center gap-2">
-                                    {loading ? <Loader2 size={18} className="animate-spin" /> : <><Phone size={14} /> SEND OTP & CONTINUE</>}
-                                </button>
-                                <button type="button" onClick={() => navigate('/login')}
-                                    className="w-full py-2 text-slate-500 hover:text-slate-800 font-mono text-xs transition-all uppercase tracking-widest flex items-center justify-center gap-2 font-bold mt-2">
-                                    <ArrowLeft size={12} /> Back to Sign In
-                                </button>
-                            </form>
-                        </div>
-                    )}
-
-                    {/* STEP 2 */}
-                    {step === 2 && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                            <KeyRound size={32} className="text-[#00acee] mb-4" />
-                            <h2 className="text-slate-800 text-3xl font-bold uppercase tracking-tight mb-2">VERIFY OTP</h2>
-                            <p className="text-slate-500 font-mono text-sm mb-8">
-                                6-digit code sent to <span className="text-[#00acee] font-bold">{formData.Phone_Number}</span>
-                            </p>
-                            <form onSubmit={handleVerifyAndRegister} className="space-y-8">
-                                <div className="flex items-center justify-between gap-2">
-                                    {otp.map((digit, i) => (
-                                        <input key={i} ref={el => otpRefs.current[i] = el}
-                                            type="text" inputMode="numeric" maxLength={1} value={digit}
-                                            onChange={e => handleOtpChange(i, e.target.value)}
-                                            onKeyDown={e => handleOtpKeyDown(i, e)}
-                                            className="otp-box w-12 h-14 text-center text-slate-800 text-xl font-bold font-mono bg-white border-2 border-slate-300 hover:border-[#00acee] focus:border-[#00acee]" />
-                                    ))}
-                                </div>
-                                <button disabled={loading}
-                                    className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg flex items-center justify-center gap-2">
-                                    {loading ? <Loader2 size={18} className="animate-spin" /> : 'VERIFY & CREATE ACCOUNT'}
-                                </button>
-                                <div className="flex items-center justify-between">
-                                    <button type="button" onClick={() => setStep(1)}
-                                        className="text-slate-500 hover:text-slate-800 font-mono text-xs transition-all uppercase tracking-widest flex items-center gap-2 font-bold">
-                                        <ArrowLeft size={12} /> Back
+                                    <button disabled={loading}
+                                        className="w-full py-4 xl:py-5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg flex items-center justify-center gap-2 xl:text-lg rounded-sm">
+                                        {loading ? <Loader2 size={18} className="animate-spin" /> : 'VERIFY & CREATE ACCOUNT'}
                                     </button>
-                                    <button type="button" onClick={handleSendOtp} disabled={loading}
-                                        className="text-[#00acee] hover:text-[#0092cc] font-mono text-xs transition-all uppercase tracking-widest disabled:opacity-50 font-bold">
-                                        Resend OTP
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    )}
+                                    <div className="flex items-center justify-between mt-2 xl:mt-4">
+                                        <button type="button" onClick={() => setStep(1)}
+                                            className="text-slate-500 hover:text-slate-800 font-mono text-xs xl:text-sm transition-all uppercase tracking-widest flex items-center gap-2 font-bold">
+                                            <ArrowLeft size={12} className="xl:w-4 xl:h-4" /> Back
+                                        </button>
+                                        <button type="button" onClick={handleSendOtp} disabled={loading}
+                                            className="text-[#00acee] hover:text-[#0092cc] font-mono text-xs xl:text-sm transition-all uppercase tracking-widest disabled:opacity-50 font-bold">
+                                            Resend OTP
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
 
-                    {/* STEP 3 */}
-                    {step === 3 && (
-                        <div className="animate-in fade-in zoom-in duration-500 text-center flex flex-col items-center gap-6">
-                            <div className="w-24 h-24 rounded-full bg-blue-50 border-2 border-[#00acee]/40 flex items-center justify-center">
-                                <CheckCircle2 size={48} className="text-[#00acee]" />
+                        {/* STEP 3 */}
+                        {step === 3 && (
+                            <div className="animate-in fade-in zoom-in duration-500 text-center flex flex-col items-center gap-6 xl:gap-8">
+                                <div className="w-24 h-24 xl:w-32 xl:h-32 rounded-full bg-blue-50 border-2 border-[#00acee]/40 flex items-center justify-center">
+                                    <CheckCircle2 size={48} className="text-[#00acee] xl:w-16 xl:h-16" />
+                                </div>
+                                <div className="space-y-2 xl:space-y-4">
+                                    <h2 className="text-slate-800 text-3xl lg:text-4xl xl:text-5xl font-bold uppercase tracking-tight mb-2">Account Created!</h2>
+                                    <p className="text-slate-500 font-mono text-sm xl:text-base">Welcome, <span className="text-[#00acee] font-bold">{formData.Emp_Name}</span>. Your account is ready.</p>
+                                </div>
+                                <button onClick={() => navigate('/login')}
+                                    className="w-full py-4 xl:py-5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] uppercase shadow-lg xl:text-lg rounded-sm mt-4 xl:mt-8">
+                                    SIGN IN NOW
+                                </button>
                             </div>
-                            <div>
-                                <h2 className="text-slate-800 text-3xl font-bold uppercase tracking-tight mb-2">Account Created!</h2>
-                                <p className="text-slate-500 font-mono text-sm">Welcome, <span className="text-[#00acee] font-bold">{formData.Emp_Name}</span>. Your account is ready.</p>
-                            </div>
-                            <button onClick={() => navigate('/login')}
-                                className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] uppercase shadow-lg">
-                                SIGN IN NOW
-                            </button>
-                        </div>
-                    )}
+                        )}
                     </div>
                 </div>
             </div>
@@ -423,8 +414,8 @@ const RegisterPage = () => {
                         background: glowType === 'error'
                             ? 'linear-gradient(180deg, rgba(220,38,38,0.15) 0%, rgba(220,38,38,0.04) 40%, transparent 70%)'
                             : glowType === 'success'
-                            ? 'linear-gradient(180deg, rgba(5,150,105,0.15) 0%, rgba(5,150,105,0.04) 40%, transparent 70%)'
-                            : 'linear-gradient(180deg, rgba(2,132,199,0.15) 0%, rgba(2,132,199,0.04) 40%, transparent 70%)'
+                                ? 'linear-gradient(180deg, rgba(5,150,105,0.15) 0%, rgba(5,150,105,0.04) 40%, transparent 70%)'
+                                : 'linear-gradient(180deg, rgba(2,132,199,0.15) 0%, rgba(2,132,199,0.04) 40%, transparent 70%)'
                     }}
                 />
             )}
