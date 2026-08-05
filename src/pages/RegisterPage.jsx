@@ -150,11 +150,11 @@ const RegisterPage = () => {
                 </div>
             )}
 
-            <div className="relative z-10 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl px-4 md:px-12 flex items-start justify-center mt-4 lg:mt-8">
+            <div className="relative z-10 w-full max-w-6xl px-12 flex items-center justify-center mt-16">
 
-                <div className="w-full py-8 lg:py-12">
+                <div className="w-full max-w-2xl py-12">
                     {/* Step indicator */}
-                    <div className="mb-10">
+                    <div className="mb-10 max-w-md mx-auto">
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-[11px] font-bold font-mono uppercase tracking-wider text-slate-400">
                                 {step === 1 ? 'Details' : step === 2 ? 'Verify' : 'Done'}
@@ -171,44 +171,44 @@ const RegisterPage = () => {
                         </div>
                     </div>
 
-                    <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto">
+                    <div className="w-full mx-auto">
 
                         {/* STEP 1 */}
                         {step === 1 && (
-                            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                                <h2 className="text-slate-800 text-3xl lg:text-4xl xl:text-5xl font-tahoma font-bold mb-6 lg:mb-8 tracking-tight min-h-[36px] lg:min-h-[48px]">
+                            <div className="animate-in fade-in slide-in-from-right-4 duration-500 w-full max-w-2xl mx-auto">
+                                <h2 className="text-slate-800 text-3xl font-tahoma font-bold mb-8 tracking-tight min-h-[40px]">
                                     {displayedRegisterText}<span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
                                 </h2>
-                                <form onSubmit={handleSendOtp} className="space-y-4 xl:space-y-6">
-                                    <div className="flex flex-col md:flex-row gap-4 xl:gap-6 items-start w-full">
+                                <form onSubmit={handleSendOtp} className="space-y-4">
+                                    <div className="flex flex-col md:flex-row gap-4 items-start w-full">
                                         <div className="space-y-1 flex-1 w-full">
-                                            <label htmlFor="Emp_Name" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                            <label htmlFor="Emp_Name" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                                 User Name
                                             </label>
                                             <input type="text" id="Emp_Name" name="Emp_Name" value={formData.Emp_Name} onChange={handleChange}
                                                 required
-                                                className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-base xl:text-lg rounded-sm" />
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all rounded-sm" />
                                         </div>
                                         <div className="space-y-1 flex-1 w-full">
-                                            <label htmlFor="Phone_Number" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                            <label htmlFor="Phone_Number" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                                 Phone Number
                                             </label>
                                             <input type="tel" id="Phone_Number" name="Phone_Number" value={formData.Phone_Number} onChange={handleChange}
                                                 required
-                                                className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-base xl:text-lg rounded-sm" />
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all rounded-sm" />
                                         </div>
                                     </div>
-                                    <div className="flex flex-col md:flex-row gap-4 xl:gap-6 items-start w-full">
+                                    <div className="flex flex-col md:flex-row gap-4 items-start w-full">
                                         <div className="space-y-1 flex-1 w-full">
-                                            <label htmlFor="Email" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                            <label htmlFor="Email" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                                 Email Address
                                             </label>
                                             <input type="email" id="Email" name="Email" value={formData.Email} onChange={handleChange}
                                                 required
-                                                className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-base xl:text-lg rounded-sm" />
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all rounded-sm" />
                                         </div>
                                         <div className="space-y-1 flex-1 w-full relative">
-                                            <label htmlFor="Pass_Word" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                            <label htmlFor="Pass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                                 Password
                                             </label>
                                             <div className="relative">
@@ -216,7 +216,7 @@ const RegisterPage = () => {
                                                     onFocus={() => setPasswordFocused(true)}
                                                     onBlur={() => setPasswordFocused(false)}
                                                     required
-                                                    className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all pr-12 text-base xl:text-lg rounded-sm" />
+                                                    className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all pr-12 rounded-sm" />
                                                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                                                     className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hover:bg-[#00acee] bg-white border border-slate-200 hover:border-[#00acee] rounded-md p-1.5 transition-all shadow-sm">
                                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -262,42 +262,51 @@ const RegisterPage = () => {
                                         </div>
                                     </div>
                                     <div className="space-y-1 w-full">
-                                        <label htmlFor="Conpass_Word" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                        <label htmlFor="Conpass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                             Confirm Password
                                         </label>
                                         <div>
                                             <input type="password" id="Conpass_Word" name="Conpass_Word" value={formData.Conpass_Word} onChange={handleChange}
                                                 required
-                                                className="w-full px-4 py-3 xl:py-4 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-base xl:text-lg rounded-sm" />
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all rounded-sm" />
                                         </div>
                                     </div>
-                                    <div className="flex items-start gap-3 xl:gap-4 py-2 xl:py-4">
-                                        <ShieldCheck size={16} className="text-[#00acee] mt-0.5 xl:mt-1 shrink-0 xl:w-5 xl:h-5" />
-                                        <p className="text-slate-500 text-[10px] xl:text-xs font-mono leading-relaxed">By registering you agree to Onimta Data Protection Policy. An OTP will be sent to verify your phone.</p>
+                                    <div className="flex items-start gap-3 py-2">
+                                        <ShieldCheck size={16} className="text-[#00acee] mt-0.5 shrink-0" />
+                                        <p className="text-slate-500 text-[10px] sm:text-xs font-mono leading-relaxed">By registering you agree to Onimta Data Protection Policy. An OTP will be sent to verify your phone.</p>
                                     </div>
-                                    <button disabled={loading}
-                                        className="w-full py-4 xl:py-5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg flex items-center justify-center gap-2 xl:text-lg rounded-sm">
-                                        {loading ? <Loader2 size={18} className="animate-spin" /> : <><Phone size={14} /> SEND OTP & CONTINUE</>}
-                                    </button>
-                                    <button type="button" onClick={() => navigate('/login')}
-                                        className="w-full py-2 xl:py-3 text-slate-500 hover:text-slate-800 font-mono text-xs xl:text-sm transition-all uppercase tracking-widest flex items-center justify-center gap-2 font-bold mt-2 xl:mt-4">
-                                        <ArrowLeft size={12} /> Back to Sign In
-                                    </button>
+                                    <div className="flex flex-col gap-6 pt-2">
+                                        <button disabled={loading}
+                                            className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg shadow-black/10 flex items-center justify-center gap-2 rounded-none">
+                                            {loading ? <Loader2 size={18} className="animate-spin" /> : <><Phone size={14} /> SEND OTP & CONTINUE</>}
+                                        </button>
+                                        <div className="flex items-center gap-3 w-full max-w-sm mx-auto">
+                                            <div className="flex-1 h-[1px] bg-slate-300" />
+                                            <span className="text-slate-400 font-mono text-[10px] uppercase tracking-widest">or</span>
+                                            <div className="flex-1 h-[1px] bg-slate-300" />
+                                        </div>
+                                        <button type="button" onClick={() => navigate('/login')}
+                                            className="w-full max-w-sm mx-auto py-3 border border-transparent text-slate-500 hover:text-slate-800 font-mono font-bold tracking-[0.1em] transition-all uppercase text-xs">
+                                            <ArrowLeft size={12} className="inline mr-2" /> Back to Sign In
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         )}
 
                         {/* STEP 2 */}
                         {step === 2 && (
-                            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                                <KeyRound size={32} className="text-[#00acee] mb-4 xl:w-10 xl:h-10" />
-                                <h2 className="text-slate-800 text-3xl lg:text-4xl xl:text-5xl font-bold uppercase tracking-tight mb-2">VERIFY OTP</h2>
-                                <p className="text-slate-500 font-mono text-sm xl:text-base mb-8">
-                                    6-digit code sent to <span className="text-[#00acee] font-bold">{formData.Phone_Number}</span>
-                                </p>
-                                <form onSubmit={handleVerifyAndRegister} className="space-y-8 xl:space-y-10">
+                            <div className="animate-in fade-in slide-in-from-right-4 duration-500 w-full max-w-md mx-auto">
+                                <div className="text-center mb-8">
+                                    <KeyRound size={28} className="text-[#00acee] mb-4 mx-auto" />
+                                    <h2 className="text-slate-800 text-3xl font-tahoma font-bold mb-4 uppercase tracking-tight">VERIFY OTP</h2>
+                                    <p className="text-slate-500 font-mono text-sm leading-relaxed">
+                                        6-digit code sent to <span className="text-[#00acee] font-bold">{formData.Phone_Number}</span>
+                                    </p>
+                                </div>
+                                <form onSubmit={handleVerifyAndRegister} className="space-y-6">
                                     <div className="space-y-1">
-                                        <label htmlFor="inputOtp" className="block text-sm xl:text-base font-sans font-medium text-slate-700 ml-1">
+                                        <label htmlFor="inputOtp" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                             Verification Code
                                         </label>
                                         <input
@@ -307,23 +316,25 @@ const RegisterPage = () => {
                                             value={otp}
                                             onChange={(e) => setOtp(e.target.value)}
                                             placeholder="000000"
-                                            className="w-full px-4 py-3 xl:py-5 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all text-center tracking-[0.5em] text-xl xl:text-3xl rounded-sm"
+                                            className="w-full px-4 py-4 bg-white font-mono text-slate-800 font-bold tracking-[0.5em] text-center text-xl outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all rounded-none"
                                             required
                                         />
                                     </div>
-                                    <button disabled={loading}
-                                        className="w-full py-4 xl:py-5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg flex items-center justify-center gap-2 xl:text-lg rounded-sm">
-                                        {loading ? <Loader2 size={18} className="animate-spin" /> : 'VERIFY & CREATE ACCOUNT'}
-                                    </button>
-                                    <div className="flex items-center justify-between mt-2 xl:mt-4">
-                                        <button type="button" onClick={() => setStep(1)}
-                                            className="text-slate-500 hover:text-slate-800 font-mono text-xs xl:text-sm transition-all uppercase tracking-widest flex items-center gap-2 font-bold">
-                                            <ArrowLeft size={12} className="xl:w-4 xl:h-4" /> Back
+                                    <div className="flex flex-col gap-4 pt-2">
+                                        <button disabled={loading}
+                                            className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg shadow-black/10 flex items-center justify-center gap-2 rounded-none">
+                                            {loading ? <Loader2 size={18} className="animate-spin" /> : 'VERIFY & CREATE ACCOUNT'}
                                         </button>
-                                        <button type="button" onClick={handleSendOtp} disabled={loading}
-                                            className="text-[#00acee] hover:text-[#0092cc] font-mono text-xs xl:text-sm transition-all uppercase tracking-widest disabled:opacity-50 font-bold">
-                                            Resend OTP
-                                        </button>
+                                        <div className="flex items-center justify-between px-1">
+                                            <button type="button" onClick={() => setStep(1)}
+                                                className="text-slate-500 hover:text-slate-800 font-mono text-xs transition-all uppercase tracking-[0.1em] font-bold">
+                                                <ArrowLeft size={12} className="inline mr-1" /> Back
+                                            </button>
+                                            <button type="button" onClick={handleSendOtp} disabled={loading}
+                                                className="text-[#00acee] hover:text-[#0092cc] font-mono text-xs transition-all uppercase tracking-[0.1em] disabled:opacity-50 font-bold">
+                                                Resend OTP
+                                            </button>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -331,16 +342,16 @@ const RegisterPage = () => {
 
                         {/* STEP 3 */}
                         {step === 3 && (
-                            <div className="animate-in fade-in zoom-in duration-500 text-center flex flex-col items-center gap-6 xl:gap-8">
-                                <div className="w-24 h-24 xl:w-32 xl:h-32 rounded-full bg-blue-50 border-2 border-[#00acee]/40 flex items-center justify-center">
-                                    <CheckCircle2 size={48} className="text-[#00acee] xl:w-16 xl:h-16" />
+                            <div className="animate-in fade-in zoom-in duration-500 text-center flex flex-col items-center gap-6 w-full max-w-md mx-auto">
+                                <div className="w-24 h-24 rounded-full bg-blue-50 border-2 border-[#00acee]/40 flex items-center justify-center">
+                                    <CheckCircle2 size={48} className="text-[#00acee]" />
                                 </div>
-                                <div className="space-y-2 xl:space-y-4">
-                                    <h2 className="text-slate-800 text-3xl lg:text-4xl xl:text-5xl font-bold uppercase tracking-tight mb-2">Account Created!</h2>
-                                    <p className="text-slate-500 font-mono text-sm xl:text-base">Welcome, <span className="text-[#00acee] font-bold">{formData.Emp_Name}</span>. Your account is ready.</p>
+                                <div className="space-y-2">
+                                    <h2 className="text-slate-800 text-3xl font-tahoma font-bold mb-4 uppercase tracking-tight">Account Created!</h2>
+                                    <p className="text-slate-500 font-mono text-sm leading-relaxed">Welcome, <span className="text-[#00acee] font-bold">{formData.Emp_Name}</span>. Your account is ready.</p>
                                 </div>
                                 <button onClick={() => navigate('/login')}
-                                    className="w-full py-4 xl:py-5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] uppercase shadow-lg xl:text-lg rounded-sm mt-4 xl:mt-8">
+                                    className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] uppercase shadow-lg shadow-black/10 mt-4 rounded-none">
                                     SIGN IN NOW
                                 </button>
                             </div>
