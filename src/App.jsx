@@ -35,6 +35,15 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const LoggedInRoute = ({ children }) => {
+  const user = authService.getCurrentUser();
+  if (user) {
+    const isSuperAdmin = user.userRoleId === "99" || user.UserRoleId === "99";
+    return <Navigate to={isSuperAdmin ? "/super-admin" : "/dashboard"} replace />;
+  }
+  return children;
+};
+
 function App() {
   return (
     <HelmetProvider>
@@ -49,7 +58,7 @@ function App() {
           />
           <Routes>
             {/* Public Routes */}
-            <Route path="/login" element={<AuthPage />} />
+            <Route path="/login" element={<LoggedInRoute><AuthPage /></LoggedInRoute>} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/legal" element={<LegalTermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
