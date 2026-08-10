@@ -72,15 +72,6 @@ const AuthPage = () => {
             forgot: 'Forgot Password?',
             login: 'LOGIN',
             footer: 'Powered by Onimta Information Technology'
-        },
-        CN: {
-            systemTitle: '管理系统',
-            username: '电子邮件 (Email)',
-            password: '密码',
-            remember: '记住密码',
-            forgot: '忘记密码？',
-            login: '登录',
-            footer: '由 Onimta 云基础设施 provide powered'
         }
     };
 
