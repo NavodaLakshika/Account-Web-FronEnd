@@ -352,5 +352,26 @@ export const authService = {
   getCurrentUser() {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
+  },
+
+  // CHECK IF JWT TOKEN IS EXPIRED
+  isTokenExpired(token = this.getToken()) {
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload && payload.exp) {
+        return payload.exp * 1000 < Date.now();
+      }
+    } catch {
+      // Not a valid JWT payload - treat as not expired so it can be validated by the server
+    }
+    return false;
+  },
+
+  // CHECK IF USER HAS A VALID SESSION (user saved AND a valid non-expired token)
+  isAuthenticated() {
+    if (!localStorage.getItem('user')) return false;
+    if (this.isTokenExpired()) return false;
+    return true;
   }
 };

@@ -27,19 +27,9 @@ import BIDashboardPage from './pages/BIDashboardPage';
 import GlobalLoader from './components/GlobalLoader';
 
 const ProtectedRoute = ({ children }) => {
-  const user = authService.getCurrentUser();
   const location = useLocation();
-  if (!user) {
+  if (!authService.isAuthenticated()) {
     return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  return children;
-};
-
-const LoggedInRoute = ({ children }) => {
-  const user = authService.getCurrentUser();
-  if (user) {
-    const isSuperAdmin = user.userRoleId === "99" || user.UserRoleId === "99";
-    return <Navigate to={isSuperAdmin ? "/super-admin" : "/dashboard"} replace />;
   }
   return children;
 };
@@ -58,7 +48,7 @@ function App() {
           />
           <Routes>
             {/* Public Routes */}
-            <Route path="/login" element={<LoggedInRoute><AuthPage /></LoggedInRoute>} />
+            <Route path="/login" element={<AuthPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/legal" element={<LegalTermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
