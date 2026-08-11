@@ -315,7 +315,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                                         ))}
                                     </select>
                                 </div>
-                                <div className={`mt-1.5 px-3 h-7 rounded-[3px] flex items-center text-[10px] font-bold uppercase tracking-wider border ${
+                                {/* <div className={`mt-1.5 px-3 h-7 rounded-[3px] flex items-center text-[10px] font-bold uppercase tracking-wider border ${
                                     getReportType(formData.accountId) === 'Balance Sheet'
                                     ? 'bg-blue-50 text-blue-600 border-blue-100'
                                     : getReportType(formData.accountId) === 'Profit & Loss'
@@ -323,7 +323,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                                     : 'bg-gray-50 text-gray-400 border-gray-200'
                                 }`}>
                                     {getReportType(formData.accountId) || 'Pending Class'}
-                                </div>
+                                </div> */}
                             </div>
 
                             <div className="col-span-6">
