@@ -18,7 +18,7 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
         try {
             const data = await costCenterService.getAll(compCode);
             setCostCentersList(data);
-        } catch (error) { console.error('Failed to load cost centers:', error); }
+        } catch (error) { console.error('Failed to load cost centers :', error); }
     };
 
     useEffect(() => {
