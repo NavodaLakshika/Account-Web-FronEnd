@@ -497,7 +497,7 @@ const Dashboard = () => {
         {
             id: 'bank_connect',
             title: 'Have you connected your bank yet?',
-            body: 'Connecting your bank unlocks real-time insights and saves hours of manual admin. Not sure where to start? Book in with our experts or organise a callback, and we\'ll guide you step by step.',
+            body: 'Connecting your bank unlocks real-time insights and saves hours of manual admin. Not sure where to start? Book in with our experts or organise a callback, and we\'ll guide you step by step',
             action: 'Get help connecting today',
             onAction: () => setShowNewAccountModal(true),
             image: '/bank_connect.png',
