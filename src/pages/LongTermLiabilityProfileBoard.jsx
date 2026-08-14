@@ -25,8 +25,8 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
             let companyCode = 'C001';
             if (companyData) {
                 try { const parsed = JSON.parse(companyData); companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData; } catch (e) { companyCode = companyData; }
