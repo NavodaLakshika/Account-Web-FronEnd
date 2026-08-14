@@ -373,7 +373,7 @@ const ReportTemplate = ({
         if (endpoint) {
             setApiLoading(true);
             try {
-                const companyRaw = localStorage.getItem('selectedCompany');
+                const companyRaw = sessionStorage.getItem('selectedCompany');
                 const company = companyRaw ? JSON.parse(companyRaw) : null;
                 const localCompanyId = company?.companyCode || company?.CompanyCode || company?.Company_Code || company?.Code || company?.Company_Id || company?.companyId || company?.code || company?.id || '';
                 const companyId = companyCode || localCompanyId;
@@ -738,7 +738,7 @@ const ReportTemplate = ({
     // Dynamic company name from local storage
     const displayCompanyName = (() => {
         try {
-            const companyRaw = localStorage.getItem('selectedCompany');
+            const companyRaw = sessionStorage.getItem('selectedCompany');
             if (companyRaw) {
                 const parsed = JSON.parse(companyRaw);
                 const name = parsed?.companyName || parsed?.CompanyName || parsed?.Company_Name || parsed?.Name || parsed?.name;
@@ -751,7 +751,7 @@ const ReportTemplate = ({
     // Dynamic user name from local storage
     const displayUserName = (() => {
         try {
-            const userRaw = localStorage.getItem('user');
+            const userRaw = sessionStorage.getItem('user');
             if (userRaw) {
                 const parsed = JSON.parse(userRaw);
                 const name = parsed?.Emp_Name || parsed?.empName || parsed?.EmpName || parsed?.userName || parsed?.name;
@@ -902,7 +902,7 @@ const ReportTemplate = ({
             let activeCompanyCode = companyCode;
             if (!activeCompanyCode) {
                 try {
-                    const companyStr = localStorage.getItem('selectedCompany');
+                    const companyStr = sessionStorage.getItem('selectedCompany');
                     if (companyStr) {
                         const company = JSON.parse(companyStr);
                         activeCompanyCode = company.Company_Code || company.CompanyCode || company.companyCode || company.Company_Id || 'UNKNOWN';
@@ -912,7 +912,7 @@ const ReportTemplate = ({
                 }
             }
 
-            const userStr = localStorage.getItem('user');
+            const userStr = sessionStorage.getItem('user');
             let employeeName = '';
             try {
                 if (userStr) {
