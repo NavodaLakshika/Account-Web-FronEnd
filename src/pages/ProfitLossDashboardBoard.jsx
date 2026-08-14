@@ -35,7 +35,7 @@ const ProfitLossDashboardBoard = ({
 
   useEffect(() => {
     try {
-      const companyRaw = localStorage.getItem('selectedCompany');
+      const companyRaw = sessionStorage.getItem('selectedCompany');
       if (companyRaw) {
         const parsed = JSON.parse(companyRaw);
         setCompanyName(parsed.CompanyName || parsed.companyName || parsed.Company_Name || 'Profit & Loss Workspace');
