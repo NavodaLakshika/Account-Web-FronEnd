@@ -4,7 +4,7 @@ import api from '../../../services/api';
 import AlertModal from '../AlertModal';
 
 const TwoFactorSetupModal = ({ isOpen, onClose, position = 'center' }) => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
     const currentUserCode = user.emp_Code || user.empCode || user.EmpCode || '';
     
     const [is2FAEnabled, setIs2FAEnabled] = useState(null);
