@@ -76,7 +76,7 @@ const BIDashboardPage = () => {
 
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
-        const companyRaw = localStorage.getItem('selectedCompany');
+        const companyRaw = sessionStorage.getItem('selectedCompany');
         
         if (!currentUser) {
             window.location.href = '/login';
