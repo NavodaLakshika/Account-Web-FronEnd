@@ -49,6 +49,13 @@ const AuthPage = () => {
     const [twoFAMethod, setTwoFAMethod] = useState('APP');
 
     useEffect(() => {
+        if (authService.isAuthenticated()) {
+            const user = authService.getCurrentUser();
+            navigate(authService.isSuperAdmin(user) ? '/super-admin' : '/dashboard', { replace: true });
+        }
+    }, [navigate]);
+
+    useEffect(() => {
         if (pageAlert) {
             setGlowType(pageAlert.type);
             const glowTimer = setTimeout(() => setGlowType(null), 1000);
@@ -266,7 +273,7 @@ const AuthPage = () => {
 
     const handleCompanySelected = () => {
         setShowSelection(false);
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
     };
 
     return (
@@ -615,8 +622,8 @@ const AuthPage = () => {
                 user={currentUser}
                 onComplete={() => {
                     setShowWelcome(false);
-                    if (currentUser && (currentUser.userRoleId === "99" || currentUser.UserRoleId === "99")) {
-                        navigate('/super-admin');
+                    if (authService.isSuperAdmin(currentUser)) {
+                        navigate('/super-admin', { replace: true });
                     } else {
                         setShowSelection(true);
                     }
