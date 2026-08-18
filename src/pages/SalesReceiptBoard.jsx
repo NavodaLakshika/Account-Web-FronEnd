@@ -61,7 +61,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     const loadInitialData = async () => {
         setIsLoading(true);
         try {
-            const userStr = localStorage.getItem('user');
+            const userStr = sessionStorage.getItem('user');
             const user = userStr ? JSON.parse(userStr) : null;
             const initCompany = user?.company_Id || user?.companyId || 'COM001';
             const initUser = user?.emp_Name || user?.empName || 'Admin';
