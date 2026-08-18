@@ -18,14 +18,15 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             handleClear();
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) {
                 try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
             }
             if (user) {
-                setFormData(prev => ({ ...prev, CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '', Company: companyCode }));
+                setFormData({ ...initialState, CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '', Company: companyCode });
+                setIsEditMode(false);
             }
             fetchInitialData();
         }
@@ -49,7 +50,7 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             const data = await customerTypeService.save(formData);
-            if (data.message === 'inserted') { showSuccessToast('Customer Type created'); setFormData(prev => ({ ...prev, Code: data.code })); setIsEditMode(true); }
+            if (data.message === 'inserted') { showSuccessToast('Customer Type created'); handleClear(); }
             else { showSuccessToast('Customer Type updated'); }
             fetchInitialData();
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
@@ -102,19 +103,19 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer Type Name</label>
                                 <div className="relative">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         list="customerTypesList"
-                                        name="Type_Name" 
-                                        value={formData.Type_Name} 
+                                        name="Type_Name"
+                                        value={formData.Type_Name}
                                         onChange={(e) => {
                                             const val = e.target.value.toUpperCase();
                                             const found = typeList.find(t => (t.name || t.Type_Name || t.Name || '').toUpperCase() === val);
                                             setFormData(prev => ({ ...prev, Type_Name: val, Code: found ? (found.code || found.Code) : '' }));
                                             setIsEditMode(!!found);
-                                        }} 
-                                        placeholder="Select or enter customer type name" 
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase" 
+                                        }}
+                                        placeholder="Select or enter customer type name"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase"
                                     />
                                     <datalist id="customerTypesList">
                                         {typeList.map((t, i) => (
