@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'react-hot-toast';
-import { Check, X, AlertTriangle, Info, Clock, Copy, Pause } from 'lucide-react';
+import { Check, X, AlertTriangle, Info, Clock, Copy, Pause, Lock } from 'lucide-react';
 
 const ToastLayout = ({
     t,
@@ -208,6 +208,40 @@ export const showPendingToast = (message, subMessageOrOptions) => {
                 bgClass="bg-[#f0ad4e]"
                 btnClass="bg-[#f0ad4e]"
                 glowColor="rgba(240, 173, 78, 0.15)"
+                options={options}
+                duration={duration}
+            />
+        ),
+        {
+            duration: duration,
+            position: 'top-right',
+            ...options
+        }
+    );
+};
+
+/* ACCESS DENIED */
+export const showPermissionDeniedToast = (message, subMessageOrOptions) => {
+    const { subMessage, options } = parseArgs(subMessageOrOptions);
+    const duration = options.duration || 4000;
+    const displayTitle = subMessage ? message : "Access Denied";
+    const displaySubtitle = subMessage ? subMessage : (message || "You do not have permission to access this feature.");
+    toast.custom(
+        (t) => (
+            <ToastLayout
+                t={t}
+                title={displayTitle}
+                subtitle={displaySubtitle}
+                hugeIcon={(
+                    <>
+                        <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
+                             <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
+                        </svg>
+                        <Lock size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
+                    </>
+                )}
+                bgClass="bg-[#c0392b]"
+                btnClass="bg-[#c0392b]"
                 options={options}
                 duration={duration}
             />
