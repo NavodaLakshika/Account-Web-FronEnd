@@ -154,7 +154,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
     return (
         <>
             <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
-            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title={companyNameProp ? `Trial Balance - ${companyNameProp}` : "Strategic Portfolio Insight: Trial Balance"}
@@ -401,8 +401,8 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                                             <tr>
                                                 <td colSpan={6} className="py-32 text-center">
                                                     <div className="flex flex-col items-center gap-3 opacity-20">
-                                                        <Search size={48} className="text-gray-400 ml-[300px]" />
-                                                        <span className="text-[10px]  font-black uppercase tracking-[0.3em] text-gray-500 item-center ml-[300px]">No discovery records found</span>
+                                                        <Search size={38} className="text-gray-400 " />
+                                                        <span className="text-[10px]  font-black uppercase tracking-[0.3em] text-gray-500 item-center">No discovery records found</span>
                                                     </div>
                                                 </td>
                                             </tr>
