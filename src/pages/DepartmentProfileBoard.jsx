@@ -17,11 +17,12 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = 'C001';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; } }
-            setFormData(prev => ({ ...prev, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode }));
+            setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
+            setIsEditMode(false);
             fetchDepartments(companyCode);
         }
     }, [isOpen]);
@@ -39,7 +40,7 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             const data = await departmentService.save(formData);
-            if (data.message === 'inserted') { showSuccessToast('Department created'); setFormData(prev => ({ ...prev, Code: data.code })); setIsEditMode(true); fetchDepartments(formData.Company); }
+            if (data.message === 'inserted') { showSuccessToast('Department created'); handleClear(); fetchDepartments(formData.Company); }
             else { showSuccessToast('Department updated'); fetchDepartments(formData.Company); }
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
     };
@@ -65,8 +66,8 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Manage department structure & locations" icon={null}
-                isOpen={isOpen} onClose={onClose} title="Department Profile"
+            <TransactionFormWrapper icon={null}
+                isOpen={isOpen} onClose={onClose} title="Department"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">
