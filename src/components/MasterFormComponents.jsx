@@ -21,8 +21,7 @@ export const MasterFormWrapper = ({
     customFooter
 }) => {
     return (
-        <TransactionFormWrapper
-            isOpen={isOpen}
+        <TransactionFormWrapper isOpen={isOpen}
             onClose={onClose}
             title={title}
             subtitle={subtitle}

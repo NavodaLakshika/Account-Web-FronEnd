@@ -27,7 +27,7 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
+            const user = JSON.parse(sessionStorage.getItem('user'));
             const company = getCompanyCode() || '';
             
             setFormData(prev => ({ 
@@ -67,7 +67,7 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(sessionStorage.getItem('user'));
         const company = getCompanyCode() || '';
         setFormData({
             ...initialState,

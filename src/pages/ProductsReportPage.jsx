@@ -6,8 +6,9 @@ import { Loader2 } from 'lucide-react';
 
 const ProductsReportPage = ({ companyCodeProp, companyNameProp }) => {
     const [searchParams] = useSearchParams();
-    const companyId = companyCodeProp || searchParams.get('company') || 'COM001';
-    const companyName = companyNameProp || searchParams.get('name') || 'ONIMTA IT SOLUTIONS';
+    const storedCompany = (() => { try { return JSON.parse(localStorage.getItem('selectedCompany') || 'null'); } catch (e) { return null; } })();
+    const companyId = companyCodeProp || searchParams.get('company') || storedCompany?.Company_Id || storedCompany?.companyId || storedCompany?.code || storedCompany?.companyCode || '';
+    const companyName = companyNameProp || searchParams.get('name') || storedCompany?.CompanyName || storedCompany?.companyName || '';
     
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);

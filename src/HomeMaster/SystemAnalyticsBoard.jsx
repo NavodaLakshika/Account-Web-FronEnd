@@ -153,29 +153,29 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
                 <div className="lg:col-span-2 bg-white rounded-none-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[300px]">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-6">Traffic Overview (Last 7 Days)</h3>
-                        {loading ? (
-                            <div className="flex-1 flex items-center justify-center">
-                                <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-                            </div>
-                        ) : (
-                            <div className="flex-1 flex items-end gap-2 h-48 mt-auto px-4 border-b border-slate-100 pb-2">
-                                {last7Days.map((day, i) => {
-                                    const h = day.count > 0 ? Math.max((day.count / maxTraffic) * 100, 5) : 0;
-                                    return (
-                                        <div key={i} className="flex-1 flex flex-col items-center justify-end gap-2 group h-full">
-                                            <div className="w-full bg-emerald-100 rounded-none-t-md relative group-hover:bg-emerald-500 transition-colors" style={{ height: `${h}%` }}>
-                                                <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
-                                                    {day.count} events
-                                                </div>
+                    {loading ? (
+                        <div className="flex-1 flex items-center justify-center">
+                            <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex items-end gap-2 h-48 mt-auto px-4 border-b border-slate-100 pb-2">
+                            {last7Days.map((day, i) => {
+                                const h = day.count > 0 ? Math.max((day.count / maxTraffic) * 100, 5) : 0;
+                                return (
+                                    <div key={i} className="flex-1 flex flex-col items-center justify-end gap-2 group h-full">
+                                        <div className="w-full bg-emerald-100 rounded-none-t-md relative group-hover:bg-emerald-500 transition-colors" style={{ height: `${h}%` }}>
+                                            <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
+                                                {day.count} events
                                             </div>
-                                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
-                                                {day.label}
-                                            </span>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
+                                            {day.label}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
 
                 <div className="bg-white rounded-none-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[300px]">

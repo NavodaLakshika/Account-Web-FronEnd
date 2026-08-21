@@ -27,8 +27,8 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             handleClear();
             fetchLookups();
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = 'C001';
             if (companyData) {
                 try {
@@ -71,8 +71,8 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        const companyData = localStorage.getItem('selectedCompany');
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        const companyData = sessionStorage.getItem('selectedCompany');
         let companyCode = 'C001';
         if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) {} }
         setFormData({ ...initialState, CurrentUser: user?.emp_Name || user?.empName || 'SYSTEM', Company: companyCode });
@@ -159,10 +159,10 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
-            <TransactionFormWrapper subtitle="Supplier Master" icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Supplier Master"
+                title="Supplier"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">

@@ -99,7 +99,7 @@ const FormHelpModal = ({ isOpen, onClose }) => {
         <>
             {/* Backdrop */}
             <div className="fixed inset-0 z-[600] bg-transparent" onClick={onClose} />
-            
+
             {/* Side Panel Drawer */}
             <div className="fixed inset-y-0 right-0 z-[601] w-[450px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 font-sans border-l border-gray-200">
                 {/* Body Content */}
@@ -128,7 +128,7 @@ const FormHelpModal = ({ isOpen, onClose }) => {
                             <p>Master the transaction forms to work efficiently in ONIMTA Accounts Advanced.</p>
                             <p>With ONIMTA Accounts, you can quickly input data, manage lookups, and streamline your entire data entry process.</p>
                             <p>The updated form interface combines high-speed processing with modern accessibility tools to enhance your daily workflow.</p>
-                            
+
                             <h3 className="font-bold text-[18px] text-gray-900 mt-8 mb-3">Quick Navigation Tips</h3>
                             <p>Explore the tips below to navigate and fill out your transaction forms faster:</p>
                         </div>
@@ -182,13 +182,13 @@ const FormHelpModal = ({ isOpen, onClose }) => {
                         </span>
                         {!feedbackStatus && (
                             <div className="flex gap-2">
-                                <button 
+                                <button
                                     onClick={() => { setFeedbackStatus('yes'); setHelpfulCount(prev => prev + 1); }}
                                     className="px-5 py-1.5 border border-gray-400 bg-white hover:bg-gray-50 hover:border-[#0077c5] hover:text-[#0077c5] rounded text-[13px] font-bold text-gray-700 transition-colors shadow-sm"
                                 >
                                     Yes
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setFeedbackStatus('no')}
                                     className="px-5 py-1.5 border border-gray-400 bg-white hover:bg-gray-50 hover:border-[#0077c5] hover:text-[#0077c5] rounded text-[13px] font-bold text-gray-700 transition-colors shadow-sm"
                                 >

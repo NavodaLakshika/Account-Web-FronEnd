@@ -67,8 +67,8 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Manage customer classification types" icon={null}
-                isOpen={isOpen} onClose={onClose} title="Customer Type Profile"
+            <TransactionFormWrapper icon={null}
+                isOpen={isOpen} onClose={onClose} title="Customer Type"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">

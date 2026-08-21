@@ -19,13 +19,13 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
         Industry: '', Organiz: '', Start_Date: new Date().toISOString().split('T')[0], Acc_Year: '', To_Year: '',
         Tax_ID: '', Reg_Number: '', User_Name: user?.empName || user?.EmpName || user?.username || 'Admin'
     };
-    
+
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [countries, setCountries] = useState([]);
     const [industries, setIndustries] = useState([]);
-    
+
     const [allCompanies, setAllCompanies] = useState([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -40,7 +40,7 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
                     const empCode = user?.EmpCode || user?.empCode;
 
                     const [countryData, industryData, companyData] = await Promise.all([
-                        authService.getAllCountries(), 
+                        authService.getAllCountries(),
                         authService.getAllIndustries(),
                         (userName && userName !== 'Admin' && empCode) ? authService.getCompaniesByEmployee(empCode) : authService.getAllCompanies()
                     ]);
@@ -73,14 +73,17 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
     const handleSave = async () => {
         if (!formData.Comp_Name) { showErrorToast('Company Name is required.'); return; }
         setLoading(true);
-        try { 
+        try {
+            const payload = { ...formData };
+            if (!payload.Email) payload.Email = null;
+
             if (isEditMode) {
-                await authService.editCompany(formData); 
+                await authService.editCompany(payload);
                 showSuccessToast('Company updated successfully!');
             } else {
-                await authService.createCompany(formData); 
-                showSuccessToast('Company created successfully!'); 
-                setIsEditMode(true);
+                await authService.createCompany(payload);
+                showSuccessToast('Company created successfully!');
+                handleClear();
             }
         } catch (error) { showErrorToast(typeof error === 'string' ? error : error.message || 'Failed to save company.'); } finally { setLoading(false); }
     };
@@ -93,23 +96,23 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
     const confirmDelete = async () => {
         setIsDeleting(true);
         try {
-            await authService.deleteCompany(formData.Code); 
-            showSuccessToast('Company deleted successfully!'); 
-            handleClear(); 
+            await authService.deleteCompany(formData.Code);
+            showSuccessToast('Company deleted successfully!');
+            handleClear();
             setShowDeleteConfirm(false);
-        } catch (error) { 
-            showErrorToast(typeof error === 'string' ? error : error.message || 'Failed to delete company.'); 
-        } finally { 
-            setIsDeleting(false); 
+        } catch (error) {
+            showErrorToast(typeof error === 'string' ? error : error.message || 'Failed to delete company.');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Manage company registration & details" icon={Building2}
+            <TransactionFormWrapper icon={Building2}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Company Profile"
+                title="Company"
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">

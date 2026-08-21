@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { X, MessageSquare, Settings, HelpCircle, History } from 'lucide-react';
 import SubmitReviewModal from './modals/SubmitReviewModal';
@@ -30,6 +30,23 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
     setFormSettings(newSettings);
     localStorage.setItem('transactionFormSettings', JSON.stringify(newSettings));
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      // Push state strictly so we can catch popstate
+      window.history.pushState({ modalOpen: title }, '');
+
+      const handlePopState = (e) => {
+        onClose();
+      };
+      window.addEventListener('popstate', handlePopState);
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+        // Only pop history if we are the ones who pushed it? 
+        // React Router might handle the rest, but it's safe to just remove listener
+      };
+    }
+  }, [isOpen, onClose, title]);
 
   if (!isOpen) return null;
 

@@ -188,10 +188,16 @@ const OtherReportsDropdown = ({ onSelect }) => {
     );
 };
 
+const readStoredValue = (key) => {
+    const fromLocal = localStorage.getItem(key);
+    if (fromLocal) return fromLocal;
+    return sessionStorage.getItem(key);
+};
+
 const ReportTemplate = ({
     title = "A/R Ageing Summary Report",
     subtitle = "As of June 3, 2026",
-    companyName = "ONIMTA IT SOLUTIONS",
+    companyName = "",
     data = [],
     columns = [],
     onClose,
@@ -373,7 +379,7 @@ const ReportTemplate = ({
         if (endpoint) {
             setApiLoading(true);
             try {
-                const companyRaw = sessionStorage.getItem('selectedCompany');
+                const companyRaw = readStoredValue('selectedCompany');
                 const company = companyRaw ? JSON.parse(companyRaw) : null;
                 const localCompanyId = company?.companyCode || company?.CompanyCode || company?.Company_Code || company?.Code || company?.Company_Id || company?.companyId || company?.code || company?.id || '';
                 const companyId = companyCode || localCompanyId;
@@ -738,20 +744,20 @@ const ReportTemplate = ({
     // Dynamic company name from local storage
     const displayCompanyName = (() => {
         try {
-            const companyRaw = sessionStorage.getItem('selectedCompany');
+            const companyRaw = readStoredValue('selectedCompany');
             if (companyRaw) {
                 const parsed = JSON.parse(companyRaw);
                 const name = parsed?.companyName || parsed?.CompanyName || parsed?.Company_Name || parsed?.Name || parsed?.name;
                 if (name) return name;
             }
         } catch (e) {}
-        return companyName;
+        return companyName || 'Admin Company';
     })();
 
     // Dynamic user name from local storage
     const displayUserName = (() => {
         try {
-            const userRaw = sessionStorage.getItem('user');
+            const userRaw = readStoredValue('user');
             if (userRaw) {
                 const parsed = JSON.parse(userRaw);
                 const name = parsed?.Emp_Name || parsed?.empName || parsed?.EmpName || parsed?.userName || parsed?.name;
@@ -902,7 +908,7 @@ const ReportTemplate = ({
             let activeCompanyCode = companyCode;
             if (!activeCompanyCode) {
                 try {
-                    const companyStr = sessionStorage.getItem('selectedCompany');
+                    const companyStr = readStoredValue('selectedCompany');
                     if (companyStr) {
                         const company = JSON.parse(companyStr);
                         activeCompanyCode = company.Company_Code || company.CompanyCode || company.companyCode || company.Company_Id || 'UNKNOWN';
@@ -912,7 +918,7 @@ const ReportTemplate = ({
                 }
             }
 
-            const userStr = sessionStorage.getItem('user');
+            const userStr = readStoredValue('user');
             let employeeName = '';
             try {
                 if (userStr) {

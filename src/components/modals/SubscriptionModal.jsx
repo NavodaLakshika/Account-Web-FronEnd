@@ -44,7 +44,7 @@ const SubscriptionModal = ({ isOpen, onClose }) => {
     const loadUserData = () => {
         let companyCode = 'Not specified';
         let companyName = 'Not specified';
-        const companyStr = localStorage.getItem('selectedCompany');
+        const companyStr = sessionStorage.getItem('selectedCompany');
         if (companyStr) {
             try {
                 const companyObj = JSON.parse(companyStr);
@@ -55,7 +55,7 @@ const SubscriptionModal = ({ isOpen, onClose }) => {
             }
         }
 
-        const userStr = localStorage.getItem('user');
+        const userStr = sessionStorage.getItem('user');
         let userName = 'Not specified';
         let expiryDate = 'N/A';
         let empCode = null;

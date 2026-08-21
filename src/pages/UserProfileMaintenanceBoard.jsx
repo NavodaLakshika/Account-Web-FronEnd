@@ -4,6 +4,7 @@ import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CostCenterAuthModal from '../components/modals/MasterSubModal/CostCenterAuthModal';
 import { userProfileService } from '../services/userProfile.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import { authService } from '../services/auth.service';
 
 const UserProfileMaintenanceBoard = ({ isOpen, onClose }) => {
     const [emp_Code, setEmp_Code] = useState('');
@@ -28,20 +29,23 @@ const UserProfileMaintenanceBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+            const user = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null;
             if (user) setLast_Modified_User(user.empName || user.emp_Name || '');
             loadUsers();
         }
     }, [isOpen]);
 
     const loadUsers = async () => {
-        const companyData = localStorage.getItem('selectedCompany');
+        const companyData = sessionStorage.getItem('selectedCompany');
         let companyCode = '';
         if (companyData) {
             try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
         }
         try {
-            const users = await userProfileService.searchUsers(companyCode, '');
+            let users = await userProfileService.searchUsers(companyCode, '');
+            if (users) {
+                users = users.filter(u => !authService.isSuperAdmin(u));
+            }
             setUsersList(users || []);
         } catch (err) { showErrorToast('Failed to load users list'); }
     };
@@ -99,8 +103,8 @@ const UserProfileMaintenanceBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Manage system user access and profiles" icon={null}
-                isOpen={isOpen} onClose={onClose} title="User Profile Maintenance"
+            <TransactionFormWrapper icon={null}
+                isOpen={isOpen} onClose={onClose} title="User"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
                         <div className="flex gap-3">

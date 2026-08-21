@@ -32,14 +32,15 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+            handleClear();
+            const user = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null;
             if (user) setLast_Modified_User(user.empName || user.emp_Name || '');
             loadData();
         }
     }, [isOpen]);
 
     const loadData = async () => {
-        const companyData = localStorage.getItem('selectedCompany');
+        const companyData = sessionStorage.getItem('selectedCompany');
         let companyCode = '';
         if (companyData) {
             try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }

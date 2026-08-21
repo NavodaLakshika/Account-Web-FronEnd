@@ -288,7 +288,7 @@ const AuthPage = () => {
                 <AnimatedBackground color="0, 172, 238" />
             </div>
 
-            <div className="relative z-10 w-full max-w-6xl px-12 flex items-center justify-center mt-16">
+            <div className="relative z-10 w-full max-w-6xl px-4 sm:px-8 md:px-12 flex items-center justify-center mt-4 sm:mt-16">
 
 
 

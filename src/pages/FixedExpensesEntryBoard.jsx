@@ -21,7 +21,7 @@ const FixedExpensesEntryBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
+            const user = JSON.parse(sessionStorage.getItem('user'));
             const company = getCompanyCode() || '';
             setFormData(prev => ({ ...prev, Company: company, CreateUser: user?.emp_Name || user?.empName || '' }));
             fetchLookups();
@@ -40,7 +40,7 @@ const FixedExpensesEntryBoard = ({ isOpen, onClose }) => {
     const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
 
     const handleClear = () => {
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(sessionStorage.getItem('user'));
         const company = getCompanyCode() || '';
         setFormData({ ...initialState, Company: company, CreateUser: user?.emp_Name || user?.empName || '' });
     };
@@ -61,7 +61,7 @@ const FixedExpensesEntryBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Record fixed expense transactions" icon={null}
+            <TransactionFormWrapper icon={null}
                 isOpen={isOpen} onClose={onClose} title="Fixed Expenses Entry"
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">

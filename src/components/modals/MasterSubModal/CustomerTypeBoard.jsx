@@ -16,8 +16,8 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             handleClear();
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) {
                 try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
@@ -46,8 +46,8 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
             const data = await customerTypeService.save(formData);
             if (data.message === 'inserted') {
                 showSuccessToast('Customer Type created');
-                setFormData(prev => ({ ...prev, Code: data.code }));
-                setIsEditMode(true);
+                
+                handleClear();
             } else { showSuccessToast('Customer Type updated'); }
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
     };
@@ -71,8 +71,8 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
         const code = e.target.value;
         const type = typeList.find(t => t.code === code);
         if (type) {
-            setFormData(prev => ({ ...prev, Code: type.code, Type_Name: type.name }));
-            setIsEditMode(true);
+            
+            handleClear();
         } else {
             setFormData(prev => ({ ...prev, Code: '', Type_Name: '' }));
             setIsEditMode(false);

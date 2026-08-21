@@ -382,7 +382,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Receive Payment"

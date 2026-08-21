@@ -36,7 +36,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             handleClear();
             const user = authService.getCurrentUser();
-            const companyData = localStorage.getItem('selectedCompany');
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = 'C001';
             if (companyData) {
                 try {
@@ -91,7 +91,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
     const handleClear = () => {
         const user = authService.getCurrentUser();
-        const companyData = localStorage.getItem('selectedCompany');
+        const companyData = sessionStorage.getItem('selectedCompany');
         let companyCode = 'C001';
         if (companyData) {
             try {
@@ -195,10 +195,10 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
-            <TransactionFormWrapper subtitle="Customer Master" icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Customer Master"
+                title="Customer"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">

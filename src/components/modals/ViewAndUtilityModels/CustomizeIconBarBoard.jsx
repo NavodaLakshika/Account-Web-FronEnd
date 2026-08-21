@@ -158,7 +158,7 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
 
     const currentUserName = (() => {
         try {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const user = JSON.parse(sessionStorage.getItem('user') || '{}');
             return user.empName || user.EmpName || 'ADMIN';
         } catch {
             return 'ADMIN';

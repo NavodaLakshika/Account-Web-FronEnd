@@ -321,11 +321,10 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper
-                isOpen={isOpen}
+            <TransactionFormWrapper isOpen={isOpen}
                 onClose={onClose}
                 title="Sales Order"
-                subtitle="Sales Transactions"
+                
                 icon={ShoppingCart}
                 maxWidth="max-w-[700px]"
                 footer={

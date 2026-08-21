@@ -201,11 +201,10 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper
-                isOpen={isOpen}
+            <TransactionFormWrapper isOpen={isOpen}
                 onClose={onClose}
                 title="TRANSACTION EDITOR"
-                subtitle="Edit Transactions"
+                
                 icon={FileText}
                 footer={footer}
             >

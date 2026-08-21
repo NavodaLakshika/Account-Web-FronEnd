@@ -24,8 +24,8 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             handleClear();
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = 'C001';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { companyCode = companyData; } }
             if (user) {
@@ -41,8 +41,8 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        const companyData = localStorage.getItem('selectedCompany');
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        const companyData = sessionStorage.getItem('selectedCompany');
         let companyCode = 'C001';
         if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) {} }
         setFormData({ ...initialState, CurrentUser: user?.emp_Name || user?.empName || 'SYSTEM', Company: companyCode });
@@ -56,8 +56,8 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
             const data = await costCenterService.save({ Code: formData.Code, Name: formData.Name, Inactive: formData.Inactive, CurrentUser: formData.CurrentUser, Company: formData.Company });
             if (data.message === 'inserted') {
                 showSuccessToast('Cost Center added successfully');
-                setFormData(prev => ({ ...prev, Code: data.code }));
-                setIsEditMode(true);
+                
+                handleClear();
                 fetchLookups(formData.Company);
             } else if (data.message === 'updated') {
                 showSuccessToast('Cost Center updated successfully');
@@ -92,8 +92,8 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
     const selectCostCenter = (code) => {
         const item = costCentersList.find(c => (c.code || c.Code) === code);
         if (item) {
-            setFormData({ Code: item.code || item.Code, Name: item.name || item.Name, Inactive: item.inactive || item.Inactive, CurrentUser: formData.CurrentUser, Company: formData.Company });
-            setIsEditMode(true);
+            
+            handleClear();
         }
     };
 

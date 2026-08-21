@@ -42,8 +42,8 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
             let companyCode = 'C001';
             
             if (companyData) {

@@ -27,8 +27,8 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             setFormData(getInitialFormData());
-            const companyData = localStorage.getItem('selectedCompany');
-            const userData = localStorage.getItem('user');
+            const companyData = sessionStorage.getItem('selectedCompany');
+            const userData = sessionStorage.getItem('user');
             let companyCode = 'COM001';
             let userName = 'SYSTEM';
 
@@ -117,10 +117,10 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Cheque Register Management"
+                title="Cheque Register"
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <button onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">

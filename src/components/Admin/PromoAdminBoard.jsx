@@ -139,21 +139,21 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
     if (!isOpen && !inlineView) return null;
 
     const Content = (
-        <div className={inlineView ? "flex flex-col h-full animate-in fade-in duration-300" : "bg-slate-50 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300"}>
+        <div className={inlineView ? "flex flex-col h-full animate-in fade-in duration-300" : "bg-transparent rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300"}>
             {/* Header */}
-                <div className={inlineView ? "flex items-center justify-between mb-6" : "flex items-center justify-between p-6 border-b border-slate-200 bg-white"}>
+                <div className={inlineView ? "flex items-center justify-between mb-6" : "flex items-center justify-between p-6 border-b border-gray-100 bg-white"}>
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-800 dark:text-white flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-gray-800 dark:text-white flex items-center gap-2">
                             <Megaphone className="text-orange-500" size={20} />
                             System Advertisements
                         </h2>
-                        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-xs mt-1">Manage promotional banners displayed to users.</p>
+                        <p className="text-gray-500 dark:text-gray-500 dark:text-slate-400 text-xs mt-1">Manage promotional banners displayed to users.</p>
                     </div>
                     <div className="flex items-center gap-4">
                         {!isEditing && (
                             <button 
                                 onClick={() => handleOpenForm()}
-                                className="flex items-center gap-2 px-4 py-2 bg-[#00acee] hover:bg-[#009adb] text-slate-800 dark:text-white text-xs font-bold rounded-[3px] shadow-md transition-all active:scale-[0.98]"
+                                className="flex items-center gap-2 px-4 py-2 bg-[#00acee] hover:bg-[#009adb] text-gray-800 dark:text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-[0.98]"
                             >
                                 <Plus size={16} /> Create New Ad
                             </button>
@@ -161,7 +161,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                         {!inlineView && (
                             <button 
                                 onClick={onClose}
-                                className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"
+                                className="p-2 hover:bg-slate-100 rounded-full text-gray-500 transition-colors"
                             >
                                 <X size={28} strokeWidth={1.5} className="w-6 h-6" />
                             </button>
@@ -173,26 +173,26 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                     {isEditing ? (
                         /* Edit/Create Form */
  <div className="bg-white dark:bg-slate-800 rounded-sm shadow-sm dark:border-slate-700 overflow-hidden p-6 max-w-2xl mx-auto">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-800 dark:text-white mb-6">{currentAd ? 'Edit Advertisement' : 'Create New Advertisement'}</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-gray-800 dark:text-white mb-6">{currentAd ? 'Edit Advertisement' : 'Create New Advertisement'}</h3>
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Title</label>
+                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-500 dark:text-slate-400 mb-2">Title</label>
                                     <input 
                                         type="text" 
                                         value={title} 
                                         onChange={e => setTitle(e.target.value)} 
-                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
+                                        className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                         placeholder="e.g. Merit Plus Finance"
                                         maxLength={40}
                                     />
                                 </div>
                                 
                                 <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Description</label>
+                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-500 dark:text-slate-400 mb-2">Description</label>
                                     <textarea 
                                         value={desc} 
                                         onChange={e => setDesc(e.target.value)} 
-                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
+                                        className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                         placeholder="Brief description of the promotion..."
                                         maxLength={100}
                                     />
@@ -200,7 +200,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
 
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Icon</label>
+                                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-500 dark:text-slate-400 mb-2">Icon</label>
                                         <div className="flex gap-2">
                                             {AVAILABLE_ICONS.map(iconOpt => {
                                                 const IconCmp = iconOpt.component;
@@ -209,7 +209,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                                         key={iconOpt.name}
                                                         type="button"
                                                         onClick={() => setIconName(iconOpt.name)}
-                                                        className={`p-2 rounded-[3px] border transition-all ${iconName === iconOpt.name ? 'border-[#00acee] bg-[#00acee]/10 text-[#00acee] shadow-sm' : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-600'}`}
+                                                        className={`p-2 rounded-xl border transition-all ${iconName === iconOpt.name ? 'border-[#00acee] bg-[#00acee]/10 text-[#00acee] shadow-sm' : 'border-gray-100 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-500 dark:text-gray-500 dark:text-slate-400 hover:bg-transparent dark:hover:bg-slate-600'}`}
                                                         title={iconOpt.name}
                                                     >
                                                         <IconCmp size={20} />
@@ -219,7 +219,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Accent Color</label>
+                                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-500 dark:text-slate-400 mb-2">Accent Color</label>
                                         <div className="flex flex-wrap gap-2">
                                             {AVAILABLE_COLORS.map(c => (
                                                 <button 
@@ -252,7 +252,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                     <button 
                                         type="submit" 
                                         disabled={isSubmitting}
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-slate-800 dark:text-white font-bold rounded-[3px] shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-gray-800 dark:text-white font-bold rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
                                     >
                                         {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                                         Save Advertisement
@@ -261,7 +261,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         type="button" 
                                         onClick={handleCloseForm}
                                         disabled={isSubmitting}
-                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
+                                        className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                     >
                                         Cancel
                                     </button>
@@ -274,70 +274,70 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-700">
-                                            <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Advertisement</th>
-                                            <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Accent</th>
-                                            <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Status</th>
-                                            <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Actions</th>
+                                        <tr className="bg-transparent/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-700">
+                                            <th className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Advertisement</th>
+                                            <th className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Accent</th>
+                                            <th className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Status</th>
+                                            <th className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {loading ? (
                                             <tr>
-                                                <td colSpan="4" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
+                                                <td colSpan="4" className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                     <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-500" />
                                                     Loading ads...
                                                 </td>
-                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-xl hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                         ) : ads.map(ad => {
                                             const iconOpt = AVAILABLE_ICONS.find(i => i.name === ad.iconName) || AVAILABLE_ICONS[3];
                                             const IconCmp = iconOpt.component;
                                             return (
-                                            <tr key={ad.id} className="border-b border-slate-50 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/50 transition-colors">
-                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-10 h-10 rounded-[3px] flex items-center justify-center shrink-0 shadow-sm ${ad.iconBg || 'bg-slate-500'}`}>
-                                                            <IconCmp size={18} className="text-slate-800 dark:text-white" />
+                                            <tr key={ad.id} className="border-b border-slate-50 dark:border-slate-700 hover:bg-transparent/80 dark:hover:bg-slate-700/50 transition-colors">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-xl hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                    <div className="flex items-center gap-4 mb-6">
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${ad.iconBg || 'bg-transparent0'}`}>
+                                                            <IconCmp size={18} className="text-gray-800 dark:text-white" />
                                                         </div>
                                                         <div>
-                                                            <div className="font-bold text-slate-900 dark:text-slate-800 dark:text-white">{ad.title}</div>
-                                                            <div className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 truncate max-w-md mt-0.5">{ad.desc}</div>
+                                                            <div className="font-bold text-slate-900 dark:text-gray-800 dark:text-white">{ad.title}</div>
+                                                            <div className="text-xs text-gray-500 dark:text-gray-500 dark:text-slate-400 truncate max-w-md mt-0.5">{ad.desc}</div>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-xl hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-4 h-4 rounded-full border border-slate-200 dark:border-slate-600" style={{ backgroundColor: ad.accent || '#78716c' }} />
-                                                        <span className="text-xs font-medium text-slate-600 dark:text-slate-500 dark:text-slate-400">{ad.accent || '#78716c'}</span>
+                                                        <div className="w-4 h-4 rounded-full border border-gray-100 dark:border-slate-600" style={{ backgroundColor: ad.accent || '#78716c' }} />
+                                                        <span className="text-xs font-medium text-slate-600 dark:text-gray-500 dark:text-slate-400">{ad.accent || '#78716c'}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-                                                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-[3px] text-[10px] font-bold uppercase tracking-wider ${
-                                                        ad.isActive ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-500 dark:text-slate-400'
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-xl hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase tracking-wider ${
+                                                        ad.isActive ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-gray-500 dark:text-slate-400'
                                                     }`}>
                                                         {ad.isActive ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                                         {ad.isActive ? 'Active' : 'Inactive'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-xl hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <button 
                                                             onClick={() => handleUpdateStatus(ad.id, !ad.isActive)}
-                                                            className={`p-2 rounded-[3px] transition-colors ${ad.isActive ? 'text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}
+                                                            className={`p-2 rounded-xl transition-colors ${ad.isActive ? 'text-[#2563eb] hover:bg-blue-50 dark:hover:bg-blue-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}
                                                             title={ad.isActive ? 'Deactivate' : 'Activate'}
                                                         >
                                                             {ad.isActive ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                                                         </button>
                                                         <button 
                                                             onClick={() => handleOpenForm(ad)}
-                                                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-[3px] transition-colors"
+                                                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl transition-colors"
                                                             title="Edit"
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </button>
                                                         <button 
                                                             onClick={() => handleDelete(ad.id)}
-                                                            className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
+                                                            className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-xl hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                                                             title="Delete"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
@@ -348,7 +348,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         )})}
                                         {!loading && ads.length === 0 && (
                                             <tr>
-                                                <td colSpan="4" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
+                                                <td colSpan="4" className="px-6 h-10 bg-transparent text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                     No advertisements found. Create one to get started.
                                                 </td>
                                             </tr>

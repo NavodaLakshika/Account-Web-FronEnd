@@ -199,7 +199,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Direct Bank" icon={null}
+            <TransactionFormWrapper icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Bank Transaction"

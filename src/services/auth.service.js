@@ -49,6 +49,7 @@ export const authService = {
 
       if (response.data && (response.data.token || response.data.Token)) {
         const token = response.data.token || response.data.Token;
+        response.data._typedUsername = empName;
         localStorage.setItem('user', JSON.stringify(response.data));
         localStorage.setItem('token', token);
       }
@@ -69,6 +70,7 @@ export const authService = {
       });
       if (response.data && (response.data.token || response.data.Token)) {
         const token = response.data.token || response.data.Token;
+        response.data._typedUsername = empName;
         localStorage.setItem('user', JSON.stringify(response.data));
         localStorage.setItem('token', token);
       }
@@ -369,9 +371,44 @@ export const authService = {
   },
 
   // CHECK IF USER HAS A VALID SESSION (user saved AND a valid non-expired token)
+  isSuperAdmin(user) {
+    if (!user) return false;
+
+    // Create a lowercase keyed object to avoid any casing issues from the backend
+    const lowerKeys = {};
+    for (const key in user) {
+      lowerKeys[key.toLowerCase()] = user[key];
+    }
+
+    // 1. Exact Name/Email Check (Based on your DB: 'onimtait@gmail.com' or 'ONIMTA')
+    const typedIdentifier = String(user._typedUsername || lowerKeys.email || lowerKeys.emp_name || '').trim().toLowerCase();
+    const exactAdminIdentifiers = ['onimtait@gmail.com', 'onimta', 'admin@onimta.com', 'superadmin@onimta.com', 'admin'];
+    if (exactAdminIdentifiers.includes(typedIdentifier)) return true;
+
+    // 2. Role explicit
+    const roleStr = String(lowerKeys.role || lowerKeys.usertype || lowerKeys.userrole || lowerKeys.accounttype || lowerKeys.roal || lowerKeys.emp_role || '').trim().toLowerCase();
+    const adminRoles = ['systemadmin', 'superadmin', 'admin', 'super_admin', 'system_admin', 'super admin', 'system admin'];
+    if (adminRoles.includes(roleStr)) return true;
+
+    // 3. UserRole_Id explicit
+    const userRoleId = String(lowerKeys.userrole_id || lowerKeys.userroleid || lowerKeys.role_id || '').trim();
+    if (userRoleId === '99') return true;
+
+    // 4. Emp Code / ID explicit
+    const empCodeStr = String(lowerKeys.emp_code || lowerKeys.empcode || '').trim().toUpperCase();
+    if (empCodeStr === '0' || empCodeStr === 'ADMIN_0' || empCodeStr === 'SUPER_ADMIN') return true;
+
+    // 5. Account/Admin Flags
+    if (lowerKeys.isadmin === true || lowerKeys.issuperadmin === true) return true;
+
+    return false;
+  },
   isAuthenticated() {
     if (!localStorage.getItem('user')) return false;
     if (this.isTokenExpired()) return false;
     return true;
   }
 };
+
+
+

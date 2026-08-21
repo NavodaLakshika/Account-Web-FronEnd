@@ -40,11 +40,11 @@ function App() {
       <Router>
         <GlobalLoader />
         <div className="App selection:bg-blue-100 selection:text-blue-600">
-          <Toaster 
-              position="top-right"
-              toastOptions={{
-                  duration: 4000
-              }}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000
+            }}
           />
           <Routes>
             {/* Public Routes */}
@@ -72,7 +72,7 @@ function App() {
 
             {/* Default Route */}
             <Route path="/" element={<Navigate to="/login" replace />} />
-            
+
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>

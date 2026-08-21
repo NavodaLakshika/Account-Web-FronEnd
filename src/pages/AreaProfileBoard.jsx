@@ -29,11 +29,13 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; } }
-            setFormData(prev => ({ ...prev, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode }));
+            setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
+            setIsEditMode(false);
+            setAreaList([]);
             fetchRoutes(companyCode);
         }
     }, [isOpen]);
@@ -42,7 +44,7 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
         try {
             const data = await routeService.getAll(compCode);
             setRouteList(data || []);
-        } catch(e) { console.error(e) }
+        } catch (e) { console.error(e) }
     };
 
     const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
@@ -54,11 +56,11 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             const data = await areaService.save(formData);
-            if (data.message === 'inserted') { showSuccessToast('Area created'); setFormData(prev => ({ ...prev, Code: data.code })); setIsEditMode(true); }
+            if (data.message === 'inserted') { showSuccessToast('Area created'); handleClear(); }
             else { showSuccessToast('Area updated'); }
-            
-            const freshAreas = await areaService.searchAreas(formData.Route_Code, formData.Company, ''); 
-            setAreaList(freshAreas || []); 
+
+            const freshAreas = await areaService.searchAreas(formData.Route_Code, formData.Company, '');
+            setAreaList(freshAreas || []);
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
     };
 
@@ -76,13 +78,13 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
         setIsEditMode(false);
         if (routeCode) {
             setLoading(true);
-            try { 
-                const data = await areaService.searchAreas(routeCode, formData.Company, ''); 
-                setAreaList(data || []); 
-            } catch (err) { 
-                showErrorToast('Failed to load areas'); 
-            } finally { 
-                setLoading(false); 
+            try {
+                const data = await areaService.searchAreas(routeCode, formData.Company, '');
+                setAreaList(data || []);
+            } catch (err) {
+                showErrorToast('Failed to load areas');
+            } finally {
+                setLoading(false);
             }
         } else {
             setAreaList([]);
@@ -103,8 +105,8 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Manage route area definitions" icon={null}
-                isOpen={isOpen} onClose={onClose} title="Area Profile"
+            <TransactionFormWrapper icon={null}
+                isOpen={isOpen} onClose={onClose} title="Area"
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
@@ -133,7 +135,7 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
                                         <option value="">Select route...</option>
                                         {routeList.map(r => <option key={r.code} value={r.code}>{r.code} - {r.name}</option>)}
                                     </select>
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => setShowRouteModal(true)}
                                         className="h-10 w-10 flex-shrink-0 bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-[3px] flex items-center justify-center transition-colors relative"

@@ -9,7 +9,7 @@ const ThankYouModal = ({ isOpen, onClose }) => {
         if (isOpen) {
             const redirectTimer = setTimeout(() => {
                 authService.logout();
-                localStorage.removeItem('selectedCompany');
+                sessionStorage.removeItem('selectedCompany');
                 window.location.href = '/login';
             }, 3200);
 

@@ -346,7 +346,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Sales Invoice"
@@ -637,7 +637,7 @@ const LookupModal = ({ isOpen, onClose, title, items, onSelect }) => {
     const hasPrice = items && items.length > 0 && items.some(i => i.selling !== undefined || i.sellingPrice !== undefined);
 
     return (
-        <TransactionFormWrapper subtitle="Transaction Management" icon={FileText} isOpen={isOpen} onClose={onClose} title={title} maxWidth={hasPrice ? "max-w-[800px]" : "max-w-[600px]"}>
+        <TransactionFormWrapper icon={FileText} isOpen={isOpen} onClose={onClose} title={title} maxWidth={hasPrice ? "max-w-[800px]" : "max-w-[600px]"}>
             <div className="space-y-4 font-['Tahoma']">
                 <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200">
                     <div className="relative flex-1">

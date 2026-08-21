@@ -210,7 +210,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Main Cash" icon={null}
+            <TransactionFormWrapper icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Main Cash Entry"

@@ -491,9 +491,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper
-                subtitle="Transaction Management"
-                icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Good Received Note"

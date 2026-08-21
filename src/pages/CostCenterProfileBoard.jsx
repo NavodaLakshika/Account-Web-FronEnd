@@ -27,8 +27,8 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             handleClear();
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = 'C001';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { companyCode = companyData; } }
             if (user) {
@@ -44,10 +44,10 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        const companyData = localStorage.getItem('selectedCompany');
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        const companyData = sessionStorage.getItem('selectedCompany');
         let companyCode = 'C001';
-        if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) {} }
+        if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { } }
         setFormData({ ...initialState, CurrentUser: user?.emp_Name || user?.empName || 'SYSTEM', Company: companyCode });
         setIsEditMode(false);
     };
@@ -76,8 +76,7 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
             });
             if (data.message === 'inserted') {
                 showSuccessToast('Cost Center added successfully');
-                setFormData(prev => ({ ...prev, Code: data.code }));
-                setIsEditMode(true);
+                handleClear();
                 fetchLookups(formData.Company);
             } else if (data.message === 'updated') {
                 showSuccessToast('Cost Center updated successfully');
@@ -112,10 +111,10 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Manage cost center codes & details" icon={Target}
+            <TransactionFormWrapper icon={Target}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Cost Center Profile"
+                title="Cost Center"
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">

@@ -38,7 +38,7 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
     const [selectedDocLoading, setSelectedDocLoading] = useState(false);
 
     let parsedCompany = '';
-    const selectedCompanyStr = localStorage.getItem('selectedCompany');
+    const selectedCompanyStr = sessionStorage.getItem('selectedCompany');
     if (selectedCompanyStr) {
         try {
             const companyObj = JSON.parse(selectedCompanyStr);
@@ -132,7 +132,7 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText} 
+            <TransactionFormWrapper icon={FileText} 
                 isOpen={isOpen} 
                 onClose={onClose} 
                 title="Document Search"

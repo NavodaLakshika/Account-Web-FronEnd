@@ -10,7 +10,7 @@ const SubscriptionExpiredModal = ({ isOpen, userStatus }) => {
 
     const handleLogout = () => {
         authService.logout();
-        localStorage.removeItem('selectedCompany');
+        sessionStorage.removeItem('selectedCompany');
         navigate('/login');
     };
 

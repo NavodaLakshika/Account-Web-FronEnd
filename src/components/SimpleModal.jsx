@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Helmet } from 'react-helmet-async';
 import { X } from 'lucide-react';
 
 const SimpleModal = ({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "max-w-4xl", zoom = 1, showHeaderClose = true, accentColor: accent = localStorage.getItem('topBarColor') || '#0285fd' }) => {
+    useEffect(() => {
+        if (isOpen) {
+            window.history.pushState({ modalOpen: title }, '');
+            const handlePopState = () => onClose();
+            window.addEventListener('popstate', handlePopState);
+            return () => window.removeEventListener('popstate', handlePopState);
+        }
+    }, [isOpen, onClose, title]);
+
     if (!isOpen) return null;
 
     return ReactDOM.createPortal(

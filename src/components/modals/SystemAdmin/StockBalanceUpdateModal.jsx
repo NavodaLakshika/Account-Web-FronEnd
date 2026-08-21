@@ -103,11 +103,10 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper
-                isOpen={isOpen}
+            <TransactionFormWrapper isOpen={isOpen}
                 onClose={onClose}
                 title="Stock Balance Update"
-                subtitle="Inventory Management"
+                
                 icon={Database}
                 maxWidth="max-w-4xl"
                 footer={

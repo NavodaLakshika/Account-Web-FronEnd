@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
+import { version as appVersion } from '../../package.json';
 import { useNavigate } from 'react-router-dom';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import '@dotlottie/react-player/dist/index.css';
@@ -127,7 +128,7 @@ import SubscriptionExpiredModal from '../components/modals/SubscriptionExpiredMo
 import SubmitReviewModal from '../components/modals/SubmitReviewModal';
 import FirstTimeGuide from '../components/FirstTimeGuide';
 import CompanyPromoBoard from '../components/CompanyPromoBoard';
-import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import { showSuccessToast, showErrorToast, showPermissionDeniedToast } from '../utils/toastUtils';
 import api from '../services/api';
 import SubscriptionAdminBoard from '../components/Admin/SubscriptionAdminBoard';
 import { biDashboardService } from '../services/biDashboard.service';
@@ -228,12 +229,204 @@ const LiveClock = () => {
     );
 };
 
+const PERMISSION_MAP = {
+    // ── Master File ──
+    'Open Company': 'MST_COMPANY',
+    'Cost Center Master': 'MST_COST_CENTER',
+    'Create Department': 'MST_DEPARTMENT',
+    'Create Category': 'MST_CATEGORY',
+    'Create Route': 'MST_ROUTE',
+    'Create Area': 'MST_AREA',
+    'Supplier Master': 'MST_SUPPLIER',
+    'Customer Master': 'MST_CUSTOMER',
+    'Customer Type Master': 'MST_CUSTOMER_TYPE',
+    'Vendor Types': 'MST_VENDOR_TYPE',
+    'Chart of Accounts': 'MST_CHART_OF_ACCOUNT',
+    'Card Sale Commission': 'MST_CARD_SALE',
+    'User Profile Maintenance': 'MST_USER_PROFILE',
+    'Change Password': 'SYS_CHANGE_PASSWORD',
+
+    // ── Transactions ──
+    'Create Invoices': 'TRN_INVOICE',
+    'Customer Invoices': 'TRN_INVOICE',
+    'Received Payment': 'TRN_RECEIPT',
+    'Customer Receipt': 'TRN_RECEIPT',
+    'Customer Advanced Receive': 'TRN_RECEIPT',
+    'Enter Bill': 'TRN_BILL',
+    'Enter Bills': 'TRN_BILL',
+    'Paybill': 'TRN_PAYMENT',
+    'Pay Bill': 'TRN_PAYMENT',
+    'Pay Bills': 'TRN_PAYMENT',
+    'Advanced Issued': 'TRN_PAYMENT',
+    'Opening Balance': 'TRN_OPENING_BALANCE',
+    'Petty Cash Entry': 'TRN_PETTY_CASH',
+    'Main Cash': 'TRN_PETTY_CASH',
+    'Make General Journal Entries': 'TRN_JOURNAL',
+    'Reversal Entry Form': 'TRN_REVERSAL',
+    'Payment Setoff': 'TRN_PAYMENT',
+    'Make Deposits': 'TRN_DEPOSIT',
+    'Direct Bank Transaction': 'TRN_DEPOSIT',
+    'Transfer Funds': 'TRN_TRANSFER',
+    'Reconcile': 'TRN_RECONCILE',
+    'Cheque Cancel': 'TRN_CHEQUE',
+    'Customer Cheque Return': 'TRN_CHEQUE',
+    'Enter Cheque Book Number': 'TRN_CHEQUE',
+    'Cheque Writing': 'TRN_CHEQUE',
+    'Cheque In Hand': 'TRN_CHEQUE',
+    'Not Presented Cheques': 'TRN_CHEQUE',
+
+    // ── Reports ──
+    'Profit and Loss': 'RPT_PROFIT_LOSS',
+    'Balance Sheet': 'RPT_BALANCE_SHEET',
+    'Trial Balance': 'RPT_TRIAL_BALANCE',
+    'Statement of Cash Flows': 'RPT_CASH_FLOW',
+    'Statement of Changes in Equity': 'RPT_BALANCE_SHEET',
+    'Business Snapshot': 'RPT_BUSINESS_SNAPSHOT',
+    'Profit and Loss Comparison': 'RPT_PROFIT_LOSS_COMPARISON',
+    'Balance Sheet Comparison': 'RPT_BALANCE_SHEET_COMPARISON',
+    'Custom Summary Report': 'RPT_CUSTOM_SUMMARY',
+    'Profit and Loss as % of total income': 'RPT_PROFIT_LOSS',
+    'Profit and Loss by Month': 'RPT_PROFIT_LOSS_MONTHLY',
+    'Profit and Loss Detail': 'RPT_PROFIT_LOSS_DETAIL',
+    'Profit and Loss year-to-date comparison': 'RPT_PROFIT_LOSS_MONTHLY',
+    'Quarterly Profit and Loss Summary': 'RPT_QUARTERLY_PROFIT_LOSS',
+    'Quotation Summary': 'RPT_ESTIMATES_BY_CUSTOMER',
+    'Sales by Customer Summary': 'RPT_SALES_BY_CUSTOMER',
+    'Sales by Customer Detail': 'RPT_SALES_BY_CUSTOMER_DETAIL',
+    'Sales by Product/Service Summary': 'RPT_SALES_BY_PRODUCT',
+    'Sales by Product/Service Detail': 'RPT_SALES_BY_PRODUCT',
+    'Income by Customer Summary': 'RPT_INCOME_BY_CUSTOMER',
+    'Customer Contact List': 'RPT_CUSTOMER_CONTACT',
+    'Transaction List by Customer': 'RPT_TRANSACTION_BY_CUSTOMER',
+    'Time Activities by Customer Detail': 'RPT_EMPLOYEE_TIME',
+    'Estimates by Customer': 'RPT_ESTIMATES_BY_CUSTOMER',
+    'Customer Phone List': 'RPT_CUSTOMER_CONTACT',
+    'Sales by Customer Type Detail': 'RPT_SALES_BY_CUSTOMER',
+    'Project Profitability Summary': 'RPT_PROFIT_LOSS',
+    'Product/Item Profitability by Customer': 'RPT_SALES_BY_PRODUCT',
+    'Customer Balance Summary': 'RPT_CUSTOMER_BALANCE',
+    'Customer Balance Detail': 'RPT_CUSTOMER_BALANCE_DETAIL',
+    'Open Invoices': 'RPT_OPEN_INVOICES',
+    'Accounts receivable ageing summary': 'RPT_AR_AGING_SUMMARY',
+    'Accounts receivable ageing detail': 'RPT_AR_AGING_DETAIL',
+    'Collections Report': 'RPT_COLLECTIONS',
+    'Invoice List': 'RPT_INVOICE_LIST',
+    'Statement List': 'RPT_CUSTOMER_BALANCE',
+    'Invoices and Received Payments': 'RPT_INVOICE_LIST',
+    'Purchase List': 'RPT_PURCHASE_LIST',
+    'Purchases by Product/Service Detail': 'RPT_PURCHASE_BY_PRODUCT',
+    'Purchases by Supplier Detail': 'RPT_PURCHASE_BY_SUPPLIER',
+    'Expenses by Supplier Summary': 'RPT_EXPENSE_BY_SUPPLIER',
+    'Transaction List by Supplier': 'RPT_TRANSACTION_BY_SUPPLIER',
+    'Supplier Contact List': 'RPT_SUPPLIER_CONTACT',
+    'Cheque Detail': 'RPT_CHEQUE_DETAIL',
+    'Bill Payment List': 'RPT_BILL_PAYMENT',
+    'Open Purchase Order Detail': 'RPT_PURCHASE_LIST',
+    'Open Purchase Order List': 'RPT_PURCHASE_LIST',
+    'Bills and Applied Payments': 'RPT_BILL_PAYMENT',
+    'Supplier Phone List': 'RPT_SUPPLIER_CONTACT',
+    'Bill Approval Status': 'RPT_PURCHASE_LIST',
+    'Invoice Approval Status': 'RPT_INVOICE_LIST',
+    'Supplier Balance Summary': 'RPT_SUPPLIER_BALANCE',
+    'Supplier Balance Detail': 'RPT_SUPPLIER_BALANCE_DETAIL',
+    'Unpaid Bills': 'RPT_UNPAID_BILLS',
+    'Accounts payable ageing summary': 'RPT_AP_AGING_SUMMARY',
+    'Accounts payable ageing detail': 'RPT_AP_AGING_DETAIL',
+    'General Ledger': 'RPT_GENERAL_LEDGER',
+    'General Ledger List': 'RPT_GENERAL_LEDGER',
+    'Transaction Detail by Account': 'RPT_TRANSACTION_DETAIL',
+    'Transaction List with Splits': 'RPT_TRANSACTION_LIST',
+    'Transaction List by Date': 'RPT_TRANSACTION_LIST',
+    'Recent Transactions': 'RPT_RECENT_TRANSACTIONS',
+    'Invalid Journal Transactions': 'RPT_JOURNAL',
+    'Account List': 'RPT_ACCOUNT_LIST',
+    'Reconciliation Reports': 'RPT_RECONCILIATION',
+    'Adjusted Trial Balance': 'RPT_ADJUSTED_TRIAL_BALANCE',
+    'Profit and Loss By Tag Group': 'RPT_PROFIT_LOSS',
+    'Transaction List by Tag Group': 'RPT_TRANSACTION_LIST',
+    'Inventory Valuation Summary': 'RPT_INVENTORY_VALUATION',
+    'Inventory Valuation Detail': 'RPT_INVENTORY_VALUATION_DETAIL',
+    'Stock Take Worksheet': 'RPT_STOCK_TAKE',
+    'Product/Service List': 'RPT_PRODUCT_LIST',
+    'Products Report': 'RPT_PRODUCT_LIST',
+    'GRN Report': 'RPT_PURCHASE_LIST',
+    'Unbilled time': 'RPT_UNBILLED_TIME',
+    'Unbilled charges': 'RPT_UNBILLED_TIME',
+    'Time Summary by Pay Type': 'RPT_TIMESHEET',
+    'Timesheet Detail by Employee': 'RPT_TIMESHEET',
+    'Time Activities by Employee Detail': 'RPT_EMPLOYEE_TIME',
+    'Employee Contact List': 'RPT_EMPLOYEE_CONTACT',
+    'Recent/Edited Time Activities': 'RPT_EMPLOYEE_TIME',
+    'Tax Liability Report': 'RPT_TAX_LIABILITY',
+    'Terms List': 'RPT_ACCOUNT_LIST',
+    'Payment Method List': 'RPT_ACCOUNT_LIST',
+    'Deposit Detail': 'RPT_TRANSACTION_DETAIL',
+    'Recurring Template List': 'RPT_TRANSACTION_LIST',
+    'Audit Log': 'RPT_AUDIT_LOG',
+
+    // ── System Admin ──
+    'Data Backup': 'SYS_BACKUP',
+    'Stock Balance Update': 'SYS_STOCK_UPDATE',
+    'Inventory Download': 'SYS_INVENTORY_DOWNLOAD',
+    'Delete Account': 'SYS_DELETE_ACCOUNT',
+    'Document Editor': 'SYS_DOC_EDITOR',
+    'Transaction Editor': 'SYS_TXN_EDITOR',
+    'System Update': 'SYS_SYSTEM_UPDATE',
+    'Clear Temp Data': 'SYS_CLEAR_TEMP',
+    'Period Lock Facility': 'SYS_PERIOD_LOCK',
+    'User & Role Management': 'SYS_USER_MANAGEMENT',
+    'Two-Factor Verification': 'SYS_2FA',
+
+    // ── Settings ──
+    'Company Setup': 'MST_COMPANY',
+    'Manage Users': 'SYS_USER_MANAGEMENT',
+    'Products & Categories': 'MST_CATEGORY',
+    'Cost Centers': 'MST_COST_CENTER',
+    'User Profile': 'MST_USER_PROFILE',
+
+    // ── Dashboard cards / Quick actions ──
+    'Customers': 'MST_CUSTOMER',
+    'Vendors': 'MST_SUPPLIER',
+    'Billing': 'TRN_BILL',
+    'Cheques': 'TRN_CHEQUE',
+    'Cash': 'TRN_PETTY_CASH',
+    'Deposit': 'TRN_DEPOSIT',
+    'Journal': 'TRN_JOURNAL',
+    'Rec.': 'TRN_RECONCILE',
+    'Report': 'RPT_TRIAL_BALANCE',
+    'Purchase Order': 'TRN_PURCHASE_ORDER',
+    'GRN': 'TRN_GRN',
+    'Bulk GRN': 'TRN_GRN',
+    'Estimate': 'TRN_ESTIMATE',
+    'Sales Order': 'TRN_SALES_ORDER',
+    'Create Invoice': 'TRN_INVOICE',
+    'Sales Receipt': 'TRN_RECEIPT',
+    'Receive Payment': 'TRN_RECEIPT',
+    'Petty Cash': 'TRN_PETTY_CASH',
+    'Collection Deposit': 'TRN_DEPOSIT',
+    'Cheque Register': 'TRN_CHEQUE',
+    'Write Cheque': 'TRN_CHEQUE',
+    'Journal Entry': 'TRN_JOURNAL',
+    'Bank Rec': 'TRN_RECONCILE',
+    'Department': 'MST_DEPARTMENT',
+    'Category': 'MST_CATEGORY',
+};
+
 const Dashboard = () => {
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const currentUser = authService.getCurrentUser();
+        if (currentUser && authService.isSuperAdmin(currentUser)) {
+            navigate('/super-admin', { replace: true });
+        }
+    }, [navigate]);
+
     const [user, setUser] = useState(null);
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [activeCategory, setActiveCategory] = useState('Overview');
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
 
     const [showBiDashboardView, setShowBiDashboardView] = useState(false);
 
@@ -369,6 +562,7 @@ const Dashboard = () => {
         }
         const itemId = reportName.toLowerCase().replace(/ /g, '-').replace(/\//g, '-');
         if (hiddenReports.includes(itemId) || hiddenReports.includes(reportName)) {
+            showPermissionDeniedToast('Access Denied', `You do not have permission to access "${reportName}".`);
             return;
         }
         _setSelectedReport(reportName);
@@ -744,13 +938,24 @@ const Dashboard = () => {
         const syncLocks = async () => {
             try {
                 const currentUser = authService.getCurrentUser();
-                const companyRaw = localStorage.getItem('selectedCompany');
+                const companyRaw = localStorage.getItem('selectedCompany') || sessionStorage.getItem('selectedCompany');
                 const company = companyRaw ? JSON.parse(companyRaw) : null;
 
                 const empCode = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo;
                 const companyCode = company?.Company_Id || company?.code || company?.companyCode;
 
                 if (empCode && companyCode) {
+                    // Fetch role-based function permissions
+                    try {
+                        const roleId = currentUser?.UserRoleId || currentUser?.userRoleId || currentUser?.role || currentUser?.Role || currentUser?.userrole_id;
+                        if (roleId) {
+                            const permRes = await api.get(`/UserRole/functions?userRoleId=${roleId}&company=${companyCode}`);
+                            setDeniedFunctions(permRes.data?.deniedFunctions || []);
+                        }
+                    } catch (e) {
+                        console.error("Failed to fetch role permissions", e);
+                    }
+
                     // Fetch locked modules
                     try {
                         const modulesRes = await api.get(`/SuperAdmin/modules/hidden?empCode=${empCode}&companyCode=${companyCode}`);
@@ -774,7 +979,7 @@ const Dashboard = () => {
         syncLocks();
 
         const currentUser = authService.getCurrentUser();
-        const company = localStorage.getItem('selectedCompany');
+        const company = localStorage.getItem('selectedCompany') || sessionStorage.getItem('selectedCompany');
         const savedIcons = localStorage.getItem('ribbon_icons');
 
         if (!currentUser) {
@@ -1070,13 +1275,14 @@ const Dashboard = () => {
     const handleLogout = () => {
         setPendingSnoozeTask(null);
         authService.logout();
-        localStorage.removeItem('selectedCompany');
+        sessionStorage.clear();
+        localStorage.clear();
         navigate('/login');
     };
 
     const handleOpenItemsServicesReport = () => {
-        const companyId = selectedCompany?.Company_Id || selectedCompany?.companyId || 'COM001';
-        const companyName = selectedCompany?.CompanyName || selectedCompany?.companyName || 'ONIMTA IT SOLUTIONS';
+        const companyId = selectedCompany?.Company_Id || selectedCompany?.companyId || '';
+        const companyName = selectedCompany?.CompanyName || selectedCompany?.companyName || '';
         window.open(`/report/items-services?company=${companyId}&name=${encodeURIComponent(companyName)}`, '_blank');
     };
 
@@ -1089,6 +1295,27 @@ const Dashboard = () => {
         return lockedModules.includes(lockId);
     };
 
+    // --- Role-based function permissions — fetched from ACC_Emp_SystemUserRole via /UserRole/functions ---
+    const [deniedFunctions, setDeniedFunctions] = useState([]);
+
+    const hasPermission = (code) => {
+        if (!code) return true;
+        // Super admins are never restricted
+        if (authService.isSuperAdmin(user)) return true;
+        return !deniedFunctions.includes(code);
+    };
+
+    const getItemPerm = (item) => item?.perm || PERMISSION_MAP[item?.label] || null;
+
+    const isItemDenied = (item) => {
+        const code = getItemPerm(item);
+        return !!code && !hasPermission(code);
+    };
+
+    const handleAccessDenied = (item) => {
+        showPermissionDeniedToast('Access Denied', `You do not have permission to access "${item?.label || 'this feature'}".`);
+    };
+
 
     const dashboardGroups = [
         {
@@ -1098,8 +1325,8 @@ const Dashboard = () => {
             textColor: "text-slate-600",
             items: [
                 { icon: UserPlus, gif: '/icons/new account2.gif', label: 'Accounts', onClick: () => setShowNewAccountModal(true), color: '#0891b2' },
-                { icon: Users, gif: '/icons/customer.gif', label: 'Customers', onClick: () => setShowCustomerModal(true), color: '#059669' },
-                { icon: Truck, gif: '/icons/vendors.gif', label: 'Vendors', onClick: () => setShowVendorModal(true), color: '#d97706' },
+                { icon: Users, gif: '/icons/customer.gif', label: 'Customers', onClick: () => setShowCustomerModal(true), color: '#059669', perm: 'MST_CUSTOMER' },
+                { icon: Truck, gif: '/icons/vendors.gif', label: 'Vendors', onClick: () => setShowVendorModal(true), color: '#d97706', perm: 'MST_SUPPLIER' },
                 { icon: FileText, gif: '/icons/billing.gif', label: 'Billing', onClick: () => setShowEnterBillModal(true), color: '#dc2626' },
                 { icon: CreditCard, gif: '/icons/paybill.gif', label: 'Pay Bills', onClick: () => setShowPayBillModal(true), color: '#ea580c' },
                 { icon: PenTool, gif: '/icons/cheque.gif', label: 'Cheques', onClick: () => setShowWriteChequeModal(true), color: '#7c3aed' },
@@ -1142,9 +1369,9 @@ const Dashboard = () => {
             color: "bg-indigo-500",
             textColor: "text-indigo-600",
             items: [
-                { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), color: '#3b82f6' },
+                { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), color: '#3b82f6', perm: 'MST_CUSTOMER' },
                 { icon: ArrowDownLeft, label: 'Receive Payment', onClick: () => setShowReceivePaymentModal(true), color: '#14b8a6' },
-                { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), color: '#f59e0b' },
+                { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), color: '#f59e0b', perm: 'MST_SUPPLIER' },
             ]
         },
         {
@@ -1189,32 +1416,32 @@ const Dashboard = () => {
             {
                 group: 'Organization Structure',
                 items: [
-                    { label: 'Create Department', onClick: () => setShowDepartmentModal(true), lockId: 'master_department' },
-                    { label: 'Create Category', onClick: () => setShowCategoryBoard(true), lockId: 'master_category' },
-                    { label: 'Create Route', onClick: () => setShowRouteBoard(true), lockId: 'master_route' },
-                    { label: 'Create Area', onClick: () => setShowAreaBoard(true), lockId: 'master_area' },
+                    { label: 'Create Department', onClick: () => setShowDepartmentModal(true), lockId: 'master_department', perm: 'MST_DEPARTMENT' },
+                    { label: 'Create Category', onClick: () => setShowCategoryBoard(true), lockId: 'master_category', perm: 'MST_CATEGORY' },
+                    { label: 'Create Route', onClick: () => setShowRouteBoard(true), lockId: 'master_route', perm: 'MST_ROUTE' },
+                    { label: 'Create Area', onClick: () => setShowAreaBoard(true), lockId: 'master_area', perm: 'MST_AREA' },
                 ]
             },
             {
                 group: 'Business Partners',
                 items: [
-                    { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true), lockId: 'master_supplier' },
-                    { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true), lockId: 'master_customer' },
-                    { label: 'Customer Type Master', onClick: () => setShowCustomerTypeBoard(true), lockId: 'master_customerType' },
-                    { label: 'Vendor Types', onClick: () => setShowVendorTypesBoard(true), lockId: 'master_vendorTypes' },
+                    { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true), lockId: 'master_supplier', perm: 'MST_SUPPLIER' },
+                    { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true), lockId: 'master_customer', perm: 'MST_CUSTOMER' },
+                    { label: 'Customer Type Master', onClick: () => setShowCustomerTypeBoard(true), lockId: 'master_customerType', perm: 'MST_CUSTOMER_TYPE' },
+                    { label: 'Vendor Types', onClick: () => setShowVendorTypesBoard(true), lockId: 'master_vendorTypes', perm: 'MST_VENDOR_TYPE' },
                 ]
             },
             {
                 group: 'Finance & Accounting',
                 items: [
-                    { label: 'Chart of Accountant', onClick: () => setShowChartOfAccountantModal(true), lockId: 'master_chartOfAccount' },
+                    { label: 'Chart of Accounts', onClick: () => setShowChartOfAccountantModal(true), lockId: 'master_chartOfAccount', perm: 'MST_CHART_OF_ACCOUNT' },
                     { label: 'Card Sale Commission', onClick: () => setShowCardCommissionBoard(true), lockId: 'master_cardSale' },
                 ]
             },
             {
                 group: 'System Administration',
                 items: [
-                    { label: 'User Profile Maintenance', onClick: () => setShowUserProfileBoard(true), lockId: 'master_userProfile' },
+                    { label: 'User Profile Maintenance', onClick: () => setShowUserProfileBoard(true), lockId: 'master_userProfile', perm: 'MST_USER_PROFILE' },
                     { label: 'Change Password', onClick: () => setShowChangePasswordBoard(true), lockId: 'master_changePassword' },
                 ]
             },
@@ -1357,7 +1584,7 @@ const Dashboard = () => {
             {
                 group: 'Accountant Reports',
                 items: [
-                    { label: 'Journal', onClick: () => setSelectedReport('Journal') },
+                    { label: 'Journal', onClick: () => setSelectedReport('Journal'), perm: 'RPT_JOURNAL' },
                     { label: 'General Ledger', onClick: () => setSelectedReport('General Ledger') },
                     { label: 'General Ledger List', onClick: () => setSelectedReport('General Ledger List') },
                     { label: 'Transaction Detail by Account', onClick: () => setSelectedReport('Transaction Detail by Account') },
@@ -1428,19 +1655,19 @@ const Dashboard = () => {
         {
             group: 'YOUR COMPANY',
             items: [
-                { label: 'Company Setup', onClick: () => setShowCompanyBoard(true), lockId: 'master_company' },
+                { label: 'Company Setup', onClick: () => setShowCompanyBoard(true), lockId: 'master_company', perm: 'MST_COMPANY' },
                 { label: 'Manage Users', onClick: () => setShowCompanyUsersModal(true), lockId: 'users' },
-                { label: 'Chart of Accounts', onClick: () => setShowChartOfAccountantModal(true), lockId: 'master_chartOfAccount' },
+                { label: 'Chart of Accounts', onClick: () => setShowChartOfAccountantModal(true), lockId: 'master_chartOfAccount', perm: 'MST_CHART_OF_ACCOUNT' },
                 { label: 'Change Password', onClick: () => setShowChangePasswordBoard(true), lockId: 'master_changePassword' },
             ]
         },
         {
             group: 'LISTS',
             items: [
-                { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true), lockId: 'master_customer' },
-                { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true), lockId: 'master_supplier' },
-                { label: 'Products & Categories', onClick: () => setShowCategoryBoard(true), lockId: 'master_category' },
-                { label: 'Cost Centers', onClick: () => setShowCostCenterBoard(true), lockId: 'master_costCenter' },
+                { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true), lockId: 'master_customer', perm: 'MST_CUSTOMER' },
+                { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true), lockId: 'master_supplier', perm: 'MST_SUPPLIER' },
+                { label: 'Products & Categories', onClick: () => setShowCategoryBoard(true), lockId: 'master_category', perm: 'MST_CATEGORY' },
+                { label: 'Cost Centers', onClick: () => setShowCostCenterBoard(true), lockId: 'master_costCenter', perm: 'MST_COST_CENTER' },
             ]
         },
         {
@@ -1555,24 +1782,24 @@ const Dashboard = () => {
             `}</style>
             )}
             {dashboardSettings?.borderStyle && dashboardSettings.borderStyle !== 'Default' && (
-            <style>{`
+                <style>{`
                 ${dashboardSettings.borderStyle === 'Sharp' ? '* { border-radius: 0px !important; }' : ''}
                 ${dashboardSettings.borderStyle === 'Round' ? 'button, input, select, textarea, [class~="rounded"], [class*="rounded-"] { border-radius: 10px !important; }' : ''}
                 ${dashboardSettings.borderStyle === 'Pill' ? 'button, input, select, textarea { border-radius: 9999px !important; }' : ''}
             `}</style>
-        )}
+            )}
             {dashboardSettings?.fullWidth && (
-            <style>{`
+                <style>{`
                 main > .p-8 { padding-left: 1rem !important; padding-right: 1rem !important; max-width: 100% !important; }
             `}</style>
-        )}
+            )}
             {dashboardSettings?.listLayout && (
-            <style>{`
+                <style>{`
                 div.grid[class*="sm\\:grid-cols-"] { 
                     grid-template-columns: 1fr !important; 
                 }
             `}</style>
-        )}
+            )}
             {dashboardSettings?.fontFamily && dashboardSettings?.fontFamily !== 'Default' && (
                 <style>{`
                 * {
@@ -1802,7 +2029,7 @@ const Dashboard = () => {
                     setShowTransactionModal(false);
                 }}
             />
-            {selectedReport && <ReportTemplate companyName={selectedCompany?.CompanyName || selectedCompany?.companyName || 'ONIMTA IT SOLUTIONS'} title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
+            {selectedReport && <ReportTemplate companyName={selectedCompany?.CompanyName || selectedCompany?.companyName || ''} title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
             <SubmitReviewModal isOpen={showReviewModal} onClose={() => setShowReviewModal(false)} currentUser={user} />
             <FirstTimeGuide
                 isOpen={showFirstTimeGuide}
@@ -2023,33 +2250,37 @@ const Dashboard = () => {
                 className={`relative z-[300] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-300 ease-in-out ${isTopBarCollapsed ? 'h-12 overflow-hidden' : ''}`}
             >
                 {/* Row 1: Logo + Centered Nav + User Area */}
-                <div className={`flex items-center justify-between px-6 border-b border-slate-100 transition-all duration-300 ${isTopBarCollapsed ? 'h-full border-transparent' : 'h-14'}`}>
+                <div className={`flex items-center justify-between px-4 md:px-6 border-b border-slate-100 transition-all duration-300 ${isTopBarCollapsed ? 'h-full border-transparent' : 'h-14'}`}>
                     {/* Left: ONIMTA Logo & Greeting */}
-                    <div className="flex items-center gap-3 shrink-0">
-                        <img src="/onimta_logo-modified.png" alt="ONIMTA" className="h-9 w-auto object-contain" />
-                        <div className="h-7 w-px bg-[#eceef1]" />
-                        <div>
-                            <div className="text-[16px] font-bold text-[#393a3d] leading-tight tracking-tight">Accounts</div>
+                    <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                        {/* Mobile Hamburger */}
+                        <button
+                            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg hover:bg-slate-100 transition-colors text-slate-600"
+                            onClick={() => setShowMobileMenu(!showMobileMenu)}
+                            aria-label="Menu"
+                        >
+                            {showMobileMenu
+                                ? <X size={20} />
+                                : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+                            }
+                        </button>
+                        <img src="/onimta_logo-modified.png" alt="ONIMTA" className="h-8 md:h-9 w-auto object-contain" />
+                        <div className="h-7 w-px bg-[#eceef1] hidden sm:block" />
+                        <div className="hidden sm:block">
+                            <div className="text-[15px] font-bold text-[#393a3d] leading-tight tracking-tight">Accounts</div>
                             <div className="text-[10px] font-bold text-[#6b6c72] uppercase tracking-wider">Enterprise Suite</div>
                         </div>
-                        {/* Dynamic Greeting removed from here */}
                     </div>
 
-                    {/* Center: Main Navigation Tabs */}
-                    <div className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2 z-[200]">
+                    {/* Center: Main Navigation Tabs — hidden on mobile */}
+                    <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 z-[200]">
                         {menuBar.map((item, idx) => {
                             const items = menuDropdownItems[item] || [];
                             return (
                                 <div
                                     key={idx}
                                     className="relative"
-                                    onMouseEnter={() => {
-                                        clearTimeout(menuTimeoutRef.current);
-                                        setActiveMenu(item);
-                                    }}
-                                    onMouseLeave={() => {
-                                        menuTimeoutRef.current = setTimeout(() => setActiveMenu(null), 200);
-                                    }}
+
                                 >
                                     <button
                                         onClick={() => setActiveMenu(activeMenu === item ? null : item)}
@@ -2074,40 +2305,54 @@ const Dashboard = () => {
                                                 ...items
                                             ]
                                             : items;
+                                        const permissionFilteredItems = baseItems
+                                            .map(g => {
+                                                if (g.group && Array.isArray(g.items)) {
+                                                    return { ...g, items: g.items };
+                                                }
+                                                return g;
+                                            })
+                                            .filter(Boolean);
                                         const filteredItems = isReports && navReportSearch.trim()
-                                            ? baseItems.map(g => ({
+                                            ? permissionFilteredItems.map(g => ({
                                                 ...g,
                                                 items: g.items.filter(sub =>
                                                     sub.label.toLowerCase().includes(navReportSearch.toLowerCase())
                                                 )
                                             })).filter(g => g.items.length > 0)
-                                            : baseItems;
+                                            : permissionFilteredItems;
                                         return (
                                             <div
-                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none py-4 sm:py-6 px-4 sm:px-6 z-[200] border border-gray-200 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none overflow-y-auto"
-                                                onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
-                                                onMouseLeave={() => {
-                                                    menuTimeoutRef.current = setTimeout(() => setActiveMenu(null), 200);
-                                                }}
+                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none p-4 sm:p-6 z-[200] border border-gray-200 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none flex flex-col"
+
                                             >
-                                                {isReports && (
-                                                    <div className="mb-4 flex items-center gap-2 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-[3px]">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" /></svg>
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search reports..."
-                                                            value={navReportSearch}
-                                                            onChange={e => setNavReportSearch(e.target.value)}
-                                                            onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
-                                                            autoFocus
-                                                            className="flex-1 text-[13px] font-medium text-gray-800 bg-transparent outline-none placeholder:text-gray-400 min-w-[220px]"
-                                                        />
-                                                        {navReportSearch && (
-                                                            <button onClick={() => setNavReportSearch('')} className="text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-wide">✕</button>
+
+                                                <div className="flex items-start justify-between gap-6 mb-4">
+                                                    <div className="flex-1 w-full">
+                                                        {isReports ? (
+                                                            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[3px] w-full">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" /></svg>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Search reports..."
+                                                                    value={navReportSearch}
+                                                                    onChange={e => setNavReportSearch(e.target.value)}
+                                                                    autoFocus
+                                                                    className="flex-1 text-[13px] font-medium text-gray-800 bg-transparent outline-none placeholder:text-gray-400 min-w-[220px]"
+                                                                />
+                                                                {navReportSearch && (
+                                                                    <button onClick={() => setNavReportSearch('')} className="text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-wide">?</button>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <div />
                                                         )}
                                                     </div>
-                                                )}
-                                                <div className="max-h-[75vh] overflow-y-auto overflow-x-hidden no-scrollbar">
+                                                    <button onClick={() => setActiveMenu(null)} className="text-slate-400 hover:text-red-500 transition-colors bg-transparent border-none p-1 cursor-pointer shrink-0 mt-0.5" title="Close">
+                                                        <X size={20} strokeWidth={2} />
+                                                    </button>
+                                                </div>
+                                                <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pr-2">
                                                     {filteredItems.length === 0 ? (
                                                         <div className="py-8 text-center text-[13px] text-gray-400 min-w-[220px]">
                                                             No reports match <span className="font-bold text-gray-600">"{navReportSearch}"</span>
@@ -2126,21 +2371,21 @@ const Dashboard = () => {
                                                                             <div className="flex flex-col gap-2 sm:gap-3">
                                                                                 {menuItem.items.map((subItem, j) => {
                                                                                     const isLockedReport = (isReports && (hiddenReports.includes(subItem.label) || hiddenReports.includes(subItem.label.toLowerCase().replace(/ /g, '-').replace(/\//g, '-')))) || (subItem.lockId && isModuleLocked(subItem.lockId));
+                                                                                    const isDeniedReport = isItemDenied(subItem);
                                                                                     return (
-                                                                                        <div key={j} className={`flex items-center group/item relative ${isLockedReport ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                                                                        <div key={j} className={`flex items-center group/item relative ${isLockedReport || isDeniedReport ? 'opacity-60 cursor-not-allowed' : ''}`}>
                                                                                             <button
                                                                                                 onClick={() => {
-                                                                                                    if (isLockedReport) return;
+                                                                                                    if (isDeniedReport || isLockedReport) { handleAccessDenied(subItem); setActiveMenu(null); setNavReportSearch(''); return; }
                                                                                                     subItem.onClick();
                                                                                                     setActiveMenu(null);
                                                                                                     setNavReportSearch('');
                                                                                                 }}
-                                                                                                disabled={isLockedReport}
-                                                                                                className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-[3px] transition-all flex items-start justify-between pr-8`}
-                                                                                                title={subItem.label}
+                                                                                                className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport || isDeniedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-[3px] transition-all flex items-start justify-between pr-8`}
+                                                                                                title={isDeniedReport || isLockedReport ? `You do not have access to ${subItem.label}` : subItem.label}
                                                                                             >
                                                                                                 <span className="whitespace-normal leading-snug pt-0.5">{subItem.label}</span>
-                                                                                                {isLockedReport && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2 mt-0.5" />}
+                                                                                                {(isLockedReport || isDeniedReport) && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2 mt-0.5" />}
                                                                                             </button>
                                                                                             {isReports && !isLockedReport && (
                                                                                                 <button
@@ -2211,10 +2456,10 @@ const Dashboard = () => {
 
                     </div>
 
-                    {/* Right: User + AI + Menu */}
-                    <div className="flex items-center gap-3">
-                        {/* Dashboard Display Settings Icon */}
-                        <div className="relative">
+                    {/* Right: User + AI + Icons */}
+                    <div className="flex items-center gap-1 md:gap-3">
+                        {/* Dashboard Display Settings Icon — hidden on mobile */}
+                        <div className="relative hidden sm:block">
                             <button
                                 onClick={() => setShowDashboardDisplayDropdown(!showDashboardDisplayDropdown)}
                                 className="flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-slate-100 transition-colors text-slate-500 hover:text-[#0078d4]"
@@ -2229,8 +2474,8 @@ const Dashboard = () => {
                                 onSettingsChange={updateDashboardSettings}
                             />
                         </div>
-                        {/* Help / Learn More Icon */}
-                        <div className="relative">
+                        {/* Help / Learn More Icon — hidden on mobile */}
+                        <div className="relative hidden sm:block">
                             <button
                                 onClick={() => setShowLearnMoreModal(true)}
                                 className="flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-slate-100 transition-colors text-slate-500 hover:text-[#0078d4]"
@@ -2253,31 +2498,36 @@ const Dashboard = () => {
                                     onMouseLeave={() => setShowSettingsDropdown(false)}
                                 >
                                     <div className="flex flex-row gap-12">
-                                        {settingsMenuItems.map((menuItem, i) => (
-                                            <div key={i} className="flex flex-col min-w-[140px]">
-                                                <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-4">{menuItem.group}</h3>
-                                                <div className="flex flex-col gap-3">
-                                                    {menuItem.items.map((subItem, j) => {
-                                                        const isLockedSettings = subItem.lockId && isModuleLocked(subItem.lockId);
-                                                        return (
-                                                            <button
-                                                                key={j}
-                                                                disabled={isLockedSettings}
-                                                                onClick={() => {
-                                                                    if (isLockedSettings) return;
-                                                                    subItem.onClick();
-                                                                    setShowSettingsDropdown(false);
-                                                                }}
-                                                                className={`w-full text-left text-[13px] ${isLockedSettings ? 'text-gray-400 cursor-not-allowed flex items-center justify-between' : 'text-gray-700 hover:text-[#0078d4] hover:underline transition-all block'}`}
-                                                            >
-                                                                <span>{subItem.label}</span>
-                                                                {isLockedSettings && <Lock size={12} className="text-red-400" />}
-                                                            </button>
-                                                        );
-                                                    })}
+                                        {settingsMenuItems.map((menuItem, i) => {
+                                            const permItems = menuItem.items;
+                                            if (permItems.length === 0) return null;
+                                            return (
+                                                <div key={i} className="flex flex-col min-w-[140px]">
+                                                    <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-4">{menuItem.group}</h3>
+                                                    <div className="flex flex-col gap-3">
+                                                        {permItems.map((subItem, j) => {
+                                                            const isLockedSettings = subItem.lockId && isModuleLocked(subItem.lockId);
+                                                            const isDeniedSettings = isItemDenied(subItem);
+                                                            return (
+                                                                <button
+                                                                    key={j}
+                                                                    onClick={() => {
+                                                                        if (isDeniedSettings || isLockedSettings) { handleAccessDenied(subItem); setShowSettingsDropdown(false); return; }
+                                                                        subItem.onClick();
+                                                                        setShowSettingsDropdown(false);
+                                                                    }}
+                                                                    title={isDeniedSettings || isLockedSettings ? `You do not have access to ${subItem.label}` : undefined}
+                                                                    className={`w-full text-left text-[13px] ${isLockedSettings || isDeniedSettings ? 'text-gray-400 cursor-not-allowed flex items-center justify-between' : 'text-gray-700 hover:text-[#0078d4] hover:underline transition-all block'}`}
+                                                                >
+                                                                    <span>{subItem.label}</span>
+                                                                    {(isLockedSettings || isDeniedSettings) && <Lock size={12} className={isDeniedSettings ? 'text-[#c0392b]' : 'text-red-400'} />}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
@@ -2335,16 +2585,13 @@ const Dashboard = () => {
                         <button
                             data-tour="ai-chatbot"
                             onClick={handleAIClick}
-                            className="relative flex items-center justify-center ml-1 group cursor-pointer transition-transform hover:scale-[1.02]"
+                            className="relative flex items-center justify-center ml-0.5 md:ml-1 group cursor-pointer transition-transform hover:scale-[1.02]"
                             title="AI Assistant"
                         >
                             {/* Animated Gradient Border */}
                             <div className="rounded-full p-[2px] bg-gradient-to-tr from-[#3b82f6] via-[#8b5cf6] to-[#06b6d4] bg-[length:200%_200%] animate-[gradient_3s_ease_infinite] shadow-[0_0_10px_rgba(59,130,246,0.2)] group-hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-shadow">
-                                <div className="h-[32px] px-3.5 bg-white rounded-full flex items-center overflow-hidden relative">
-                                    {/* Inner glowing pulse */}
+                                <div className="h-[32px] px-2 md:px-3.5 bg-white rounded-full flex items-center overflow-hidden relative">
                                     <div className="absolute inset-0 bg-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                                    {/* AI Lottie Icon */}
                                     <div className="w-[28px] h-[28px] flex items-center justify-center shrink-0">
                                         <DotLottiePlayer worker={false}
                                             src="/lottiefile/AI loading.lottie?v=1"
@@ -2353,9 +2600,8 @@ const Dashboard = () => {
                                             style={{ width: '100%', height: '100%' }}
                                         />
                                     </div>
-
-                                    {/* Animated Shimmering Text */}
-                                    <div className="ml-2.5 whitespace-nowrap text-[13.5px] font-medium tracking-tight w-[130px] flex items-center h-full">
+                                    {/* Hide typing text on mobile to save space */}
+                                    <div className="hidden md:flex ml-2.5 whitespace-nowrap text-[13.5px] font-medium tracking-tight w-[130px] items-center h-full">
                                         <AITypingText />
                                     </div>
                                 </div>
@@ -2373,14 +2619,52 @@ const Dashboard = () => {
 
             </header>
 
+            {/* Mobile Navigation Drawer */}
+            {showMobileMenu && (
+                <div className="md:hidden fixed inset-0 top-14 z-[400] bg-white flex flex-col overflow-y-auto">
+                    <div className="px-4 py-3 border-b border-slate-100">
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Navigation</p>
+                        {menuBar.map((item) => (
+                            <button
+                                key={item}
+                                onClick={() => { setActiveMenu(activeMenu === item ? null : item); }}
+                                className={`w-full text-left px-3 py-3 rounded-lg text-[14px] font-semibold mb-1 flex items-center justify-between transition-all ${activeMenu === item ? 'bg-blue-50 text-[#0078d4]' : 'text-slate-700 hover:bg-slate-50'
+                                    }`}
+                            >
+                                {item}
+                                <ChevronRight size={14} className={`transition-transform ${activeMenu === item ? 'rotate-90 text-[#0078d4]' : 'text-slate-400'}`} />
+                            </button>
+                        ))}
+                    </div>
+                    <div className="px-4 py-3 border-b border-slate-100 flex flex-col gap-2">
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tools</p>
+                        <button onClick={() => { setShowLearnMoreModal(true); setShowMobileMenu(false); }} className="text-left px-3 py-2.5 rounded-lg text-[14px] font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-2">
+                            <HelpCircle size={16} className="text-slate-400" /> Help & Learn More
+                        </button>
+                        <button onClick={() => { setShowDashboardDisplayDropdown(true); setShowMobileMenu(false); }} className="text-left px-3 py-2.5 rounded-lg text-[14px] font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-2">
+                            <SlidersHorizontal size={16} className="text-slate-400" /> Display Settings
+                        </button>
+                    </div>
+                    <div className="px-4 py-4 flex flex-col gap-3">
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Quick Access</p>
+                        <button onClick={() => { navigate('/bi-dashboard'); setShowMobileMenu(false); }} className="text-left px-3 py-2.5 rounded-lg text-[14px] font-medium text-[#0078d4] hover:bg-blue-50 flex items-center gap-2 border border-[#0078d4]/20">
+                            <LayoutGrid size={16} /> View Dashboards
+                        </button>
+                        <button onClick={() => { setShowGlobalSearchModal(true); setShowMobileMenu(false); }} className="text-left px-3 py-2.5 rounded-lg text-[14px] font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-2 border border-slate-200">
+                            <Search size={16} className="text-slate-400" /> Search
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Main Content Area */}
             <div className="flex-1 flex flex-row min-h-0 relative">
                 {/* 3. Main Workspace Area */}
-                <main className="flex-1 relative overflow-y-auto bg-slate-50">
-                    <div className="p-8 w-full flex flex-col gap-8">
+                <main className="flex-1 relative overflow-y-auto bg-slate-50 flex flex-col justify-between">
+                    <div className="flex-1 p-4 md:p-8 w-full flex flex-col gap-6 md:gap-8">
 
-                        {/* Header & BI Data Summary (QuickBooks Style) */}
-                        <div className="flex flex-row items-center justify-between w-full relative mb-6 z-[100]">
+                        {/* Header & BI Data Summary — stacks on mobile */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full relative mb-4 md:mb-6 z-[100] gap-3 md:gap-0">
 
                             {/* Left Side: Quick Actions */}
                             <div className="flex-1 flex justify-start">
@@ -2419,8 +2703,8 @@ const Dashboard = () => {
                                                     {ribbonIcons.map((iconId) => {
                                                         const iconData = {
                                                             new_account: { icon: UserPlus, label: 'New Account', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal, iconColor: '#2563eb', bg: '#eff6ff' },
-                                                            customer: { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4' },
-                                                            vendor: { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal, iconColor: '#d97706', bg: '#fffbeb' },
+                                                            customer: { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4', perm: 'MST_CUSTOMER' },
+                                                            vendor: { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal, iconColor: '#d97706', bg: '#fffbeb', perm: 'MST_SUPPLIER' },
                                                             enter_bill: { icon: FileText, label: 'Enter Bill', onClick: () => setShowEnterBillModal(true), active: showEnterBillModal, iconColor: '#dc2626', bg: '#fef2f2' },
                                                             pay_bill: { icon: CreditCard, label: 'Pay Bill', onClick: () => setShowPayBillModal(true), active: showPayBillModal, iconColor: '#ea580c', bg: '#fff7ed' },
                                                             write_chq: { icon: PenTool, label: 'Write Cheque', onClick: () => setShowWriteChequeModal(true), active: showWriteChequeModal, iconColor: '#7c3aed', bg: '#faf5ff' },
@@ -2431,21 +2715,26 @@ const Dashboard = () => {
                                                             trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal, iconColor: '#4f46e5', bg: '#eef2ff' },
                                                             // search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal, iconColor: '#64748b', bg: '#f8fafc' },
                                                             ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: '#db2777', bg: '#fdf2f8', isLottie: true },
-                                                            department: { icon: Building2, label: 'Department', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal, iconColor: '#1d4ed8', bg: '#eff6ff' },
+                                                            department: { icon: Building2, label: 'Department', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal, iconColor: '#1d4ed8', bg: '#eff6ff', perm: 'MST_DEPARTMENT' },
                                                             calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), iconColor: '#9333ea', bg: '#faf5ff' },
                                                             help: { icon: HelpCircle, label: 'Help', onClick: () => { }, iconColor: '#64748b', bg: '#f8fafc' },
-                                                            category: { icon: Layers, label: 'Category', onClick: () => setShowCategoryModal(true), active: showCategoryModal, iconColor: '#ea580c', bg: '#fff7ed' },
+                                                            category: { icon: Layers, label: 'Category', onClick: () => setShowCategoryModal(true), active: showCategoryModal, iconColor: '#ea580c', bg: '#fff7ed', perm: 'MST_CATEGORY' },
                                                             // reminder: { icon: Bell, label: 'Reminder', onClick: () => setShowReminderModal(true), active: showReminderModal, iconColor: '#ca8a04', bg: '#fefce8' },
                                                             // dashboard: { icon: LayoutDashboard, label: 'Get Things Done', onClick: () => setShowBiDashboardView(true), active: showBiDashboardView, iconColor: '#0891b2', bg: '#ecfeff' },
                                                         }[iconId];
                                                         if (!iconData) return null;
+                                                        const isDeniedIcon = isItemDenied(iconData);
                                                         const Icon = iconData.icon;
                                                         const isActive = iconData.active;
                                                         return (
                                                             <button
                                                                 key={iconId}
-                                                                onClick={() => { iconData.onClick(); setShowQuickActions(false); }}
-                                                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] transition-all duration-150 group/item ${isActive ? 'bg-blue-50/80 text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+                                                                onClick={() => {
+                                                                    if (isDeniedIcon) { handleAccessDenied(iconData); setShowQuickActions(false); return; }
+                                                                    iconData.onClick(); setShowQuickActions(false);
+                                                                }}
+                                                                title={isDeniedIcon ? `You do not have access to ${iconData.label}` : undefined}
+                                                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] transition-all duration-150 group/item ${isDeniedIcon ? 'opacity-60' : ''} ${isActive ? 'bg-blue-50/80 text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
                                                             >
                                                                 <div className="w-8 h-8 rounded-[3px] flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
                                                                     {iconData.isLottie ? (
@@ -2455,6 +2744,7 @@ const Dashboard = () => {
                                                                     )}
                                                                 </div>
                                                                 <span className="text-[12.5px] font-semibold flex-1 text-left">{iconData.label}</span>
+                                                                {isDeniedIcon && <Lock size={12} className="text-[#c0392b] shrink-0" />}
                                                                 {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
                                                             </button>
                                                         );
@@ -2466,8 +2756,8 @@ const Dashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Center: Dynamic Greeting */}
-                            <div className="flex flex-col items-center justify-center text-center px-8 z-0">
+                            {/* Center: Dynamic Greeting — hidden on mobile (shows above) */}
+                            <div className="hidden md:flex flex-col items-center justify-center text-center px-8 z-0">
                                 <h1 className="text-[36px] font-extrabold text-[#1e293b] leading-tight mb-1.5 text-center tracking-tight">
                                     {typedGreeting}
                                     <span className="inline-block w-[3px] h-[36px] ml-1 bg-[#0077c5] rounded-sm align-middle animate-pulse" style={{ opacity: typedGreeting.length > 0 && typedGreeting.endsWith('!') ? 0 : 1, transition: 'opacity 0.3s' }} />
@@ -2480,8 +2770,8 @@ const Dashboard = () => {
                                 </p>
                             </div>
 
-                            {/* Right Side: Tools & Clock */}
-                            <div className="flex-1 flex justify-end">
+                            {/* Right Side: Tools & Clock — hidden on mobile */}
+                            <div className="hidden md:flex flex-1 justify-end">
                                 <div className="flex items-end gap-3">
                                     <LiveClock />
                                     <div className="flex flex-col items-end gap-1">
@@ -2489,17 +2779,17 @@ const Dashboard = () => {
                                         <div className="flex items-center gap-3">
                                             <button
                                                 onClick={() => navigate('/bi-dashboard')}
-                                                className="flex items-center gap-2 px-4 h-[40px] bg-white border border-[#0078d4]/20 rounded-[8px] text-[13px] font-bold text-[#0078d4] hover:bg-blue-50 hover:border-[#0078d4]/40 hover:shadow-sm active:scale-95 transition-all duration-200"
+                                                className="group flex items-center gap-2 px-4 h-[40px] bg-white border border-[#0078d4]/20 rounded-[8px] text-[13px] font-bold text-[#0078d4] hover:bg-blue-50 hover:border-[#0078d4]/40 hover:shadow-sm active:scale-95 transition-all duration-200"
                                             >
-                                                <LayoutGrid size={14} />
+                                                <LayoutGrid size={14} className="transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500" />
                                                 View Dashboards
                                             </button>
                                             <button
                                                 data-tour="rate-system"
                                                 onClick={() => setShowReviewModal(true)}
-                                                className="flex items-center gap-2 px-4 h-[40px] bg-white border border-slate-200/80 rounded-[8px] text-[13px] font-bold text-slate-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 hover:shadow-sm active:scale-95 transition-all duration-200"
+                                                className="group flex items-center gap-2 px-4 h-[40px] bg-white border border-slate-200/80 rounded-[8px] text-[13px] font-bold text-slate-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 hover:shadow-sm active:scale-95 transition-all duration-200"
                                             >
-                                                <Star size={14} />
+                                                <Star size={14} className="transition-all duration-500 origin-center group-hover:rotate-[720deg] group-hover:fill-orange-400 group-hover:text-orange-500 group-hover:scale-125" />
                                                 Rate
                                             </button>
                                             <button
@@ -2547,13 +2837,85 @@ const Dashboard = () => {
                                     {group.items.map((item) => {
                                         const Icon = item.icon;
                                         const locked = isModuleLocked(item.lockId);
+                                        const denied = isItemDenied(item);
                                         return (
-                                            <ModuleCard key={item.label} item={item} Icon={Icon} setIsLoaderStopped={setIsLoaderStopped} isLocked={locked} />
+                                            <ModuleCard key={item.label} item={item} Icon={Icon} setIsLoaderStopped={setIsLoaderStopped} isLocked={locked} isDenied={denied} onDeniedClick={handleAccessDenied} />
                                         );
                                     })}
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    {/* ===== System Version and License Footer ===== */}
+                    <div style={{
+                        background: '#ffffff',
+                        borderTop: '1px solid #eceef1',
+                        padding: '8px 16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexShrink: 0,
+                        flexWrap: 'wrap',
+                        gap: '6px',
+                    }}>
+                        {/* Left: Onimta Logo + App Identity */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <img
+                                src="/onimta_logo-modified.png"
+                                alt="ONIMTA"
+                                style={{ height: '22px', width: 'auto', objectFit: 'contain' }}
+                            />
+                            <div style={{ width: '1px', height: '16px', background: '#eceef1' }} />
+                            <span style={{ fontSize: '12px', fontWeight: 700, color: '#393a3d', letterSpacing: '0.01em' }}>
+                                Accounts
+                            </span>
+                            <span style={{ fontSize: '10px', fontWeight: 600, color: '#6b6c72', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                                Enterprise Suite
+                            </span>
+                            <div style={{ width: '1px', height: '16px', background: '#eceef1' }} />
+                            <span style={{
+                                fontSize: '10px', fontWeight: 700, color: '#0078d4',
+                                background: '#eff6ff', border: '1px solid #bfdbfe',
+                                borderRadius: '20px', padding: '1px 8px', letterSpacing: '0.04em',
+                            }}>
+                                v{appVersion}
+                            </span>
+                        </div>
+
+                        {/* Center: License and Build */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                </svg>
+                                <span style={{ fontSize: '11px', color: '#6b6c72', fontWeight: 600 }}>Licensed Software</span>
+                            </div>
+                            <div style={{ width: '1px', height: '12px', background: '#eceef1' }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" />
+                                </svg>
+                                <span style={{ fontSize: '11px', color: '#6b6c72', fontWeight: 500 }}>
+                                    Build: {new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' })}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Right: Copyright + Edition Badge */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>
+                                © {new Date().getFullYear()} ONIMTA Information Technology. All rights reserved.
+                            </span>
+                            <div style={{ width: '1px', height: '12px', background: '#eceef1' }} />
+                            <span style={{
+                                fontSize: '10px', fontWeight: 700, color: '#16a34a',
+                                background: '#f0fdf4', border: '1px solid #bbf7d0',
+                                borderRadius: '20px', padding: '1px 8px', letterSpacing: '0.04em',
+                            }}>
+                                ENTERPRISE
+                            </span>
+                        </div>
                     </div>
                 </main>
 
@@ -2791,13 +3153,14 @@ const Dashboard = () => {
                 );
             })()}
 
+
         </div>
     );
 };
 
 // Custom Rectangular Bento Card Component
 // Module Card Component
-const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false }) => {
+const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false, isDenied = false, onDeniedClick }) => {
     const animatedLabels = ['Dashboard', 'Accounts', 'Customers', 'Vendors', 'Billing', 'Pay Bills', 'Cheques', 'Cash', 'Deposit', 'Journal', 'Rec.', 'Report'];
     const isAnimated = item.gif && animatedLabels.includes(item.label);
     const color = item.color || '#0078d4';
@@ -2820,10 +3183,33 @@ const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false }) => {
         }
     };
 
+    if (isDenied) {
+        return (
+            <button
+                onClick={() => onDeniedClick && onDeniedClick(item)}
+                className="w-full flex flex-col items-center justify-center p-4 sm:p-5 bg-slate-50 border border-slate-200/80 relative overflow-hidden h-auto min-h-[200px] opacity-60 cursor-pointer select-none group hover:-translate-y-2 active:scale-95 transition-all duration-300"
+                style={{ borderColor: 'rgba(0,0,0,0.06)', boxShadow: 'none' }}
+                title={`${item.label} - You do not have permission to access this feature`}
+            >
+                <div className="relative z-10 flex items-center justify-center mb-3">
+                    <div className="w-14 h-14 flex items-center justify-center bg-[#c0392b]/10 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                    </div>
+                </div>
+                <span className="text-[14px] font-bold text-slate-500 text-center leading-tight mt-2">{item.label}</span>
+                <span className="text-[11px] text-[#c0392b] font-semibold text-center mt-1.5">No Access</span>
+            </button>
+        );
+    }
+
     if (isLocked) {
         return (
-            <div
-                className="w-full flex flex-col items-center justify-center p-4 sm:p-5 bg-slate-50 border border-slate-200/80 relative overflow-hidden h-auto min-h-[200px] opacity-60 cursor-not-allowed select-none"
+            <button
+                onClick={() => onDeniedClick && onDeniedClick(item)}
+                className="w-full flex flex-col items-center justify-center p-4 sm:p-5 bg-slate-50 border border-slate-200/80 relative overflow-hidden h-auto min-h-[200px] opacity-60 cursor-pointer select-none group hover:-translate-y-2 active:scale-95 transition-all duration-300"
                 style={{ borderColor: 'rgba(0,0,0,0.06)', boxShadow: 'none' }}
                 title={`${item.label} is locked by the administrator`}
             >
@@ -2837,7 +3223,7 @@ const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false }) => {
                 </div>
                 <span className="text-[14px] font-bold text-slate-500 text-center leading-tight mt-2">{item.label}</span>
                 <span className="text-[11px] text-red-400 font-semibold text-center mt-1.5">Access Locked</span>
-            </div>
+            </button>
         );
     }
 

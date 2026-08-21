@@ -17,7 +17,8 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
     const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
     useEffect(() => {
-        if (isOpen) { fetchLookups(); }
+        if (isOpen) {
+            handleClear(); fetchLookups(); }
     }, [isOpen]);
 
     const fetchLookups = async () => {

@@ -18,8 +18,9 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user') || 'null');
-            const companyRaw = localStorage.getItem('selectedCompany');
+            handleClear();
+            const user = JSON.parse(sessionStorage.getItem('user') || 'null');
+            const companyRaw = sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyRaw) {
                 try { const p = JSON.parse(companyRaw); companyCode = p.companyCode || p.CompanyCode || p.company_Code || ''; } catch { companyCode = companyRaw; }

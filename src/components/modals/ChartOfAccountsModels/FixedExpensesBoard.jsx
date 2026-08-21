@@ -27,7 +27,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
+            const user = JSON.parse(sessionStorage.getItem('user'));
             const company = getCompanyCode() || '';
             
             setFormData(prev => ({ 
@@ -66,7 +66,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(sessionStorage.getItem('user'));
         const company = getCompanyCode() || '';
         setFormData({
             ...initialState,

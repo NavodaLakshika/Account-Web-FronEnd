@@ -8,7 +8,7 @@ const MainAccountTypeModal = ({ isOpen, onClose, onSelect }) => {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     let parsedCompany = '';
-    const selectedCompanyStr = localStorage.getItem('selectedCompany');
+    const selectedCompanyStr = sessionStorage.getItem('selectedCompany');
     if (selectedCompanyStr) {
         try {
             const companyObj = JSON.parse(selectedCompanyStr);

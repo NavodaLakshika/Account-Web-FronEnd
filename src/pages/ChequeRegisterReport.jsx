@@ -5,8 +5,9 @@ import { Loader2 } from 'lucide-react';
 
 const ChequeRegisterReport = ({ companyCodeProp, companyNameProp }) => {
     const [searchParams] = useSearchParams();
-    const companyId = companyCodeProp || searchParams.get('company') || 'COM001';
-    const companyName = companyNameProp || searchParams.get('name') || 'ONIMTA IT SOLUTIONS';
+    const storedCompany = (() => { try { return JSON.parse(localStorage.getItem('selectedCompany') || 'null'); } catch (e) { return null; } })();
+    const companyId = companyCodeProp || searchParams.get('company') || storedCompany?.Company_Id || storedCompany?.companyId || storedCompany?.code || storedCompany?.companyCode || '';
+    const companyName = companyNameProp || searchParams.get('name') || storedCompany?.CompanyName || storedCompany?.companyName || '';
     
     // The ReportTemplate component handles its own data fetching based on the title prop.
     // By passing "Cheque Register", it will automatically call /api/report/cheque-register

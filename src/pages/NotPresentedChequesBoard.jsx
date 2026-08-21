@@ -174,7 +174,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Not Presented Cheques" icon={null}
+            <TransactionFormWrapper icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Not Presented Cheques"

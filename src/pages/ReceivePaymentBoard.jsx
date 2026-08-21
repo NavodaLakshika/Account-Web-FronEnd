@@ -373,7 +373,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <style>{`@keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }`}</style>
-            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Receive Payment"

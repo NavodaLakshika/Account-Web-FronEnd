@@ -20,7 +20,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
+            const user = JSON.parse(sessionStorage.getItem('user'));
             setFormData(prev => ({ 
                 ...prev, 
                 CreateUser: user?.emp_Name || user?.empName || 'SYSTEM'

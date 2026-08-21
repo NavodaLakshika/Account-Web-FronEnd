@@ -21,8 +21,9 @@ const CategoryBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            handleClear();
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) {
                 try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
@@ -61,8 +62,8 @@ const CategoryBoard = ({ isOpen, onClose }) => {
             const data = await categoryService.save(formData);
             if (data.message === 'inserted') {
                 showSuccessToast('Category created');
-                setFormData(prev => ({ ...prev, Code: data.code }));
-                setIsEditMode(true);
+                
+                handleClear();
             } else {
                 showSuccessToast('Category updated');
             }
@@ -96,10 +97,10 @@ const CategoryBoard = ({ isOpen, onClose }) => {
         const deptCode = e.target.value;
         const dept = deptList.find(d => d.code === deptCode);
         if (dept) {
-            setFormData(prev => ({ ...prev, Dept_Code: dept.code, Dept_Name: dept.name, Code: '' }));
+            
             setIsEditMode(false);
         } else {
-            setFormData(prev => ({ ...prev, Dept_Code: '', Dept_Name: '', Code: '' }));
+            
         }
     };
 
@@ -107,8 +108,8 @@ const CategoryBoard = ({ isOpen, onClose }) => {
         const catCode = e.target.value;
         const cat = catList.find(c => c.code === catCode);
         if (cat) {
-            setFormData(prev => ({ ...prev, Code: cat.code, Cat_Name: cat.name, Dept_Code: cat.dept_Code || cat.deptCode || formData.Dept_Code }));
-            setIsEditMode(true);
+            
+            handleClear();
         } else {
             setFormData(prev => ({ ...prev, Code: '', Cat_Name: '' }));
             setIsEditMode(false);

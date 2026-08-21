@@ -65,8 +65,8 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
 
     useEffect(() => {
         if (mainAccountTypes.length > 0 && selectedType) {
-            const matched = mainAccountTypes.find(t => 
-                t.main_Acc_Name.toLowerCase() === selectedType.toLowerCase() || 
+            const matched = mainAccountTypes.find(t =>
+                t.main_Acc_Name.toLowerCase() === selectedType.toLowerCase() ||
                 t.main_Acc_Name.toLowerCase().includes(selectedType.toLowerCase())
             );
             if (matched && formData.accountType !== matched.main_Acc_Name) {
@@ -110,7 +110,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                 subAccountOfCode: parent.code,
                 subAccountOfName: parent.name
             }));
-            
+
             try {
                 const nextId = await accountService.getNextId(parent.code);
                 setFormData(prev => ({ ...prev, accountId: nextId }));
@@ -133,7 +133,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const handleModifierAccountSelect = async (e) => {
         const val = e.target.value;
         setFormData(prev => ({ ...prev, accountId: val }));
-        
+
         if (val) {
             setLoading(true);
             try {
@@ -158,7 +158,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const toggleModifierMode = async (e) => {
         const checked = e.target.checked;
         setFormData(prev => ({ ...prev, editSubAccount: checked }));
-        
+
         if (!checked && formData.subAccountOfCode) {
             // Reset to next ID
             try {
@@ -182,24 +182,24 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         try {
             await accountService.createAccount({ ...formData, companyCode });
             showSuccessToast('Account Saved Successfully');
-            
+
             // Refresh customer accounts for the current parent
             if (formData.subAccountOfCode) {
                 const customers = await accountService.getCustomerAccounts(formData.subAccountOfCode);
                 setCustomerAccounts(customers);
-                
+
                 // If not in edit mode, prep for the next entry
                 if (!formData.editSubAccount) {
                     try {
                         const nextId = await accountService.getNextId(formData.subAccountOfCode);
-                        setFormData(prev => ({ 
-                            ...prev, 
+                        setFormData(prev => ({
+                            ...prev,
                             accountId: nextId,
                             accountName: '',
                             description: '',
                             note: ''
                         }));
-                    } catch(e) {
+                    } catch (e) {
                         // ignore
                     }
                 }
@@ -227,7 +227,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         try {
             await accountService.deleteAccount(formData.accountId);
             showSuccessToast('Account Deleted Successfully');
-            
+
             // Refresh customer accounts for the current parent
             if (formData.subAccountOfCode) {
                 const customers = await accountService.getCustomerAccounts(formData.subAccountOfCode);
@@ -264,28 +264,28 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     return (
         <>
             <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
-            <TransactionFormWrapper subtitle="Account Master" icon={FileText}
+            <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Account Master Configuration — Definition Portal"
+                title="Account Master"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex items-center">
-                        <button
-                            onClick={handleClear}
-                            className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
-                        >
-                            <RotateCcw size={14} /> CLEAR
-                        </button>
-                        {formData.editSubAccount && (
                             <button
-                                onClick={handleDelete}
-                                disabled={loading || !formData.accountId}
-                                className="px-6 h-10 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ml-4"
+                                onClick={handleClear}
+                                className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                             >
-                                DELETE
+                                <RotateCcw size={14} /> CLEAR
                             </button>
-                        )}
+                            {formData.editSubAccount && (
+                                <button
+                                    onClick={handleDelete}
+                                    disabled={loading || !formData.accountId}
+                                    className="px-6 h-10 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ml-4"
+                                >
+                                    DELETE
+                                </button>
+                            )}
                         </div>
                         <button
                             onClick={handleSave}
@@ -411,14 +411,14 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                                 <textarea
                                     rows={2}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-[3px] text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] resize-none text-gray-700"
-                                    value={formData.description}                                                                                                                                                                                                                                                                                                                            
+                                    value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 />
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Internal Note</label>
                                 <input
-                                    type="text"     
+                                    type="text"
                                     className="w-full h-[61px] border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                     value={formData.note}
                                     onChange={(e) => setFormData({ ...formData, note: e.target.value })}
@@ -459,7 +459,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                 </div>
             </TransactionFormWrapper>
 
-            <ConfirmModal 
+            <ConfirmModal
                 isOpen={deleteModalOpen}
                 onClose={() => setDeleteModalOpen(false)}
                 onConfirm={confirmDelete}

@@ -129,11 +129,10 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper
-                isOpen={isOpen}
+            <TransactionFormWrapper isOpen={isOpen}
                 onClose={onClose}
                 title="Received Payment"
-                subtitle="Received Payments"
+                
                 icon={CreditCard}
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl gap-3">

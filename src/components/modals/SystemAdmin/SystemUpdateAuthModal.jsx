@@ -12,7 +12,7 @@ const SystemUpdateAuthModal = ({ isOpen, onClose, onVerified }) => {
         setIsVerifying(true);
 
         try {
-            const userData = JSON.parse(localStorage.getItem('user') || '{}');
+            const userData = JSON.parse(sessionStorage.getItem('user') || '{}');
             const empName = userData.empName || userData.EmpName;
             
             if (!empName) {

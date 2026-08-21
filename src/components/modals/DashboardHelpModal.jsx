@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Search, ChevronRight, ChevronDown, ThumbsUp, Clock, LayoutDashboard, Navigation, Bolt, BarChart3, Users } from 'lucide-react';
 
 const sections = [
@@ -89,9 +90,15 @@ const relatedLinks = [
 ];
 
 const DashboardHelpModal = ({ isOpen, onClose }) => {
+    const navigate = useNavigate();
     const [expandedSection, setExpandedSection] = useState(null);
     const [feedbackStatus, setFeedbackStatus] = useState(null);
     const [helpfulCount, setHelpfulCount] = useState(843);
+
+    const OpenContactus = () => {
+        onClose();
+        navigate('/support');
+    };
 
     const toggleSection = (id) => {
         setExpandedSection(prev => prev === id ? null : id);
@@ -103,7 +110,7 @@ const DashboardHelpModal = ({ isOpen, onClose }) => {
         <>
             {/* Backdrop */}
             <div className="fixed inset-0 z-[600] bg-transparent" onClick={onClose} />
-            
+
             {/* Side Panel Drawer */}
             <div className="fixed inset-y-0 right-0 z-[601] w-[450px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 font-sans border-l border-gray-200">
                 {/* Body Content */}
@@ -132,7 +139,7 @@ const DashboardHelpModal = ({ isOpen, onClose }) => {
                             <p>Discover how to maximize your efficiency using the ONIMTA Accounts Dashboard.</p>
                             <p>The dashboard provides real-time insights and one-click access to all your most important tasks, whether it's recording a payment or analyzing cash flow.</p>
                             <p>Use the Quick Actions grid to rapidly jump into forms, or use the top navigation menu for full access to all system features.</p>
-                            
+
                             <h3 className="font-bold text-[18px] text-gray-900 mt-8 mb-3">Dashboard Guide</h3>
                             <p>Explore the sections below to learn more about navigating your Dashboard:</p>
                         </div>
@@ -186,13 +193,13 @@ const DashboardHelpModal = ({ isOpen, onClose }) => {
                         </span>
                         {!feedbackStatus && (
                             <div className="flex gap-2">
-                                <button 
+                                <button
                                     onClick={() => { setFeedbackStatus('yes'); setHelpfulCount(prev => prev + 1); }}
                                     className="px-5 py-1.5 border border-gray-400 bg-white hover:bg-gray-50 hover:border-[#0077c5] hover:text-[#0077c5] rounded text-[13px] font-bold text-gray-700 transition-colors shadow-sm"
                                 >
                                     Yes
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setFeedbackStatus('no')}
                                     className="px-5 py-1.5 border border-gray-400 bg-white hover:bg-gray-50 hover:border-[#0077c5] hover:text-[#0077c5] rounded text-[13px] font-bold text-gray-700 transition-colors shadow-sm"
                                 >
@@ -202,7 +209,9 @@ const DashboardHelpModal = ({ isOpen, onClose }) => {
                         )}
                     </div>
                     <div className="w-full border-t border-gray-200 my-1" />
-                    <button className="px-5 h-10 bg-[#0285fd] hover:bg-[#0275e0] text-white rounded-[3px] font-bold text-[14px] transition-colors shadow-sm">
+                    <button
+                        onClick={() => { OpenContactus() }}
+                        className="px-5 h-10 bg-[#0285fd] hover:bg-[#0275e0] text-white rounded-[3px] font-bold text-[14px] transition-colors shadow-sm">
                         Contact Us
                     </button>
                 </div>

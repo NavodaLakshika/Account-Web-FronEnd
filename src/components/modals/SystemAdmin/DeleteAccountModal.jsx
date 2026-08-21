@@ -261,11 +261,10 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <TransactionFormWrapper
-            isOpen={isOpen}
+        <TransactionFormWrapper isOpen={isOpen}
             onClose={onClose}
             title="Delete Account"
-            subtitle="System Administration"
+            
             icon={Trash2}
             maxWidth="max-w-xl"
             footer={

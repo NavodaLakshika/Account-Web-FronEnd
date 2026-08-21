@@ -17,7 +17,7 @@ const UserSearchModal = ({ isOpen, onClose, onSelect }) => {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const companyData = localStorage.getItem('selectedCompany');
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) {
                 try {

@@ -43,6 +43,9 @@ const BIDashboardPage = () => {
     const [showAITyping, setShowAITyping] = useState(false);
     const [aiTypingText, setAiTypingText] = useState('');
 
+    const storedCompany = (() => { try { return JSON.parse(localStorage.getItem('selectedCompany') || 'null'); } catch (e) { return null; } })();
+    const watermarkText = selectedCompany?.CompanyName || selectedCompany?.companyName || storedCompany?.CompanyName || storedCompany?.companyName || storedCompany?.Company_Name || 'ONIMTA';
+
     // Modal States
     const [showEnterBillModal, setShowEnterBillModal] = useState(false);
     const [showPayBillModal, setShowPayBillModal] = useState(false);
@@ -76,7 +79,7 @@ const BIDashboardPage = () => {
 
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
-        const companyRaw = sessionStorage.getItem('selectedCompany');
+        const companyRaw = localStorage.getItem('selectedCompany') || sessionStorage.getItem('selectedCompany');
         
         if (!currentUser) {
             window.location.href = '/login';
@@ -192,7 +195,7 @@ const BIDashboardPage = () => {
                 <div className="whitespace-nowrap animate-slide-right flex">
                   {[...Array(4)].map((_, i) => (
                     <span key={i} className="text-[140px] md:text-[200px] lg:text-[280px] font-black text-black tracking-tighter pr-32">
-                      ONIMTA
+                      {watermarkText}
                     </span>
                   ))}
                 </div>
@@ -315,7 +318,7 @@ const BIDashboardPage = () => {
                 empCode={user?.EmpCode || user?.empCode || user?.emp_Code || user?.id_No || user?.Id_No || user?.IdNo}
                 companyCode={selectedCompany?.Company_Id || selectedCompany?.CompanyId || selectedCompany?.companyId || 'COM001'}
             />
-            {selectedReport && <ReportTemplate companyName={selectedCompany?.CompanyName || selectedCompany?.companyName || 'ONIMTA IT SOLUTIONS'} title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
+            {selectedReport && <ReportTemplate companyName={selectedCompany?.CompanyName || selectedCompany?.companyName || ''} title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
             <ViewUtilityModal isOpen={showViewUtilityModal} onClose={() => setShowViewUtilityModal(false)} />
             <SubscriptionModal isOpen={showPricingPlansModal} onClose={() => setShowPricingPlansModal(false)} />
         </div>

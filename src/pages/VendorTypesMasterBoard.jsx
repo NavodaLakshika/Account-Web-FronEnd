@@ -30,8 +30,8 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = 'C001';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { companyCode = companyData; } }
             setFormData(prev => ({ ...prev, CurrentUser: user ? (user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '') : '', Company: companyCode }));
@@ -88,8 +88,8 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Manage vendor type classifications" icon={null}
-                isOpen={isOpen} onClose={onClose} title="Vendor Types Master"
+            <TransactionFormWrapper icon={null}
+                isOpen={isOpen} onClose={onClose} title="Vendor Types"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">

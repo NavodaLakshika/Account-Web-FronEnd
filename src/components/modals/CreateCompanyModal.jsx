@@ -39,7 +39,7 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreated, user }) => {
                 User_Name: userName,
                 Address1: form.Address,
                 Phone: form.Phone,
-                Email: form.Email,
+                Email: form.Email || null,
                 Country: form.Country,
                 Industry: form.Industry
             };
@@ -54,11 +54,10 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreated, user }) => {
     };
 
     return (
-        <TransactionFormWrapper
-            isOpen={isOpen}
+        <TransactionFormWrapper isOpen={isOpen}
             onClose={onClose}
             title={done ? 'Company Created' : 'New Company'}
-            subtitle="Create Company"
+            
             icon={Building2}
             maxWidth="max-w-[700px]"
         >

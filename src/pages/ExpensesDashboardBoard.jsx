@@ -46,7 +46,7 @@ const ExpensesDashboardBoard = ({
 
   useEffect(() => {
     try {
-      const companyRaw = localStorage.getItem('selectedCompany');
+      const companyRaw = sessionStorage.getItem('selectedCompany');
       if (companyRaw) {
         const parsed = JSON.parse(companyRaw);
         setCompanyName(parsed.CompanyName || parsed.companyName || parsed.Company_Name || 'Expense Workspace');
@@ -192,10 +192,10 @@ const ExpensesDashboardBoard = ({
   };
 
   return (
-    <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
+    <TransactionFormWrapper icon={FileText}
       isOpen={isOpen}
       onClose={onClose}
-      title="Expenses Dashboard"
+      title="Expenses"
     >
       <div className="flex flex-col gap-6 select-none font-['Plus_Jakarta_Sans'] text-slate-800">
         

@@ -176,8 +176,8 @@ const AdminConfigPanel = ({ entityType, entityCode, company }) => {
         showSuccessToast(`${label} ${newValue ? 'Locked' : 'Unlocked'} Successfully`);
 
         try {
-            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-            const currentCompany = JSON.parse(localStorage.getItem('selectedCompany') || '{}');
+            const currentUser = JSON.parse(sessionStorage.getItem('user') || '{}');
+            const currentCompany = JSON.parse(sessionStorage.getItem('selectedCompany') || '{}');
             const empCode = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo;
             const companyCode = currentCompany?.Company_Id || currentCompany?.code || currentCompany?.companyCode;
 

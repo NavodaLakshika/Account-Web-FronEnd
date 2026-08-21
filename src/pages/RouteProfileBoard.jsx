@@ -17,11 +17,12 @@ const RouteProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; } }
-            setFormData(prev => ({ ...prev, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode }));
+            setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
+            setIsEditMode(false);
             fetchRoutes(companyCode);
         }
     }, [isOpen]);
@@ -39,7 +40,7 @@ const RouteProfileBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             const data = await routeService.save(formData);
-            if (data.message === 'inserted') { showSuccessToast('Route created'); setFormData(prev => ({ ...prev, Code: data.code })); setIsEditMode(true); }
+            if (data.message === 'inserted') { showSuccessToast('Route created'); handleClear(); }
             else { showSuccessToast('Route updated'); }
             fetchRoutes(formData.Company);
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
@@ -66,8 +67,8 @@ const RouteProfileBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper subtitle="Manage delivery route master data" icon={null}
-                isOpen={isOpen} onClose={onClose} title="Route Profile"
+            <TransactionFormWrapper icon={null}
+                isOpen={isOpen} onClose={onClose} title="Route"
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">

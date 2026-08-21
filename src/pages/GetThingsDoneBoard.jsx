@@ -954,7 +954,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   const companyName =
     selectedCompany?.CompanyName ||
     selectedCompany?.companyName ||
-    'ONIMTA IT SOLUTIONS';
+    '';
 
   const companyNameUpper = (companyName || '').toUpperCase();
   const [displayedCompanyText, setDisplayedCompanyText] = useState('');

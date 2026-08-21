@@ -32,7 +32,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         let activeCompany = '';
-        const selectedCompanyStr = localStorage.getItem('selectedCompany');
+        const selectedCompanyStr = sessionStorage.getItem('selectedCompany') || localStorage.getItem('selectedCompany') || localStorage.getItem('activeCompany') || localStorage.getItem('company');
         if (selectedCompanyStr) {
             try {
                 const companyObj = JSON.parse(selectedCompanyStr);
@@ -41,7 +41,6 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                 activeCompany = selectedCompanyStr;
             }
         }
-        if (!activeCompany) activeCompany = localStorage.getItem('activeCompany') || localStorage.getItem('company') || '';
 
         setCompanyCode(activeCompany);
 
@@ -75,6 +74,12 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
             fetchRoles();
             if (activeCompany) fetchEmployees(activeCompany);
             else setLoading(false);
+
+            // Auto clear form when reopened
+            setUsername('');
+            setPassword('');
+            setEmail('');
+            setPhone('');
         }
     }, [isOpen]);
 
@@ -154,11 +159,10 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <TransactionFormWrapper
-            isOpen={isOpen}
+        <TransactionFormWrapper isOpen={isOpen}
             onClose={onClose}
-            title="User & Role Management"
-            subtitle="System Administration"
+            title="User & Role"
+
             icon={Users}
             maxWidth="max-w-5xl"
             footer={

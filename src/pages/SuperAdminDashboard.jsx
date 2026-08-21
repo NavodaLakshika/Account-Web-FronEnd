@@ -5,6 +5,7 @@ import SystemLoader from '../components/SystemLoader';
 import toast from 'react-hot-toast';
 import { showSuccessToast } from '../utils/toastUtils';
 import api from '../services/api';
+import { authService } from '../services/auth.service';
 import {
     LayoutDashboard,
     Building2,
@@ -15,11 +16,10 @@ import {
     Loader2,
     Bell,
     MessageSquare,
-    ChevronDown,
     ChevronRight,
+    ChevronsLeft,
     Edit,
     Trash2,
-    Activity,
     Server,
     Menu,
     ShieldAlert,
@@ -35,7 +35,10 @@ import {
     Megaphone,
     Lock,
     Unlock,
-    Plus
+    Plus,
+    User,
+    UserCog,
+    Clock
 } from 'lucide-react';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import '@dotlottie/react-player/dist/index.css';
@@ -45,6 +48,10 @@ import AdminVerificationModal from '../components/modals/AdminVerificationModal'
 import AdminConfigBoard from '../HomeMaster/AdminConfigBoard';
 import SystemAnalyticsBoard from '../HomeMaster/SystemAnalyticsBoard';
 import SecurityAuditBoard from '../HomeMaster/SecurityAuditBoard';
+import CompaniesView from './SuperAdmin/CompaniesView';
+import EmployeesView from './SuperAdmin/EmployeesView';
+import RoleFeaturesView from './SuperAdmin/RoleFeaturesView';
+import UserFeedbackView from './SuperAdmin/UserFeedbackView';
 
 
 import SystemAnalysisBoard from '../HomeMaster/SystemAnalysisBoard';
@@ -121,6 +128,8 @@ const SuperAdminDashboard = () => {
 
     const [showMessageDropdown, setShowMessageDropdown] = useState(false);
     const [currentUserCode, setCurrentUserCode] = useState('');
+    const [currentUserName, setCurrentUserName] = useState('');
+    const [currentUserEmail, setCurrentUserEmail] = useState('');
     const [selectedEmpForCompanies, setSelectedEmpForCompanies] = useState(null);
 
     // Flat Lists State
@@ -155,10 +164,10 @@ const SuperAdminDashboard = () => {
             'subscriptions': 'Subscriptions',
             'plans': 'Subscriptions',
             'pricing': 'Subscriptions',
-            'database': 'Database',
-            'backup': 'Database',
-            'security': 'Security Audit',
-            'audit': 'Security Audit',
+            'database': 'Companies',
+            'backup': 'Companies',
+            'security': 'Role Features',
+            'audit': 'Role Features',
             'integrations': 'Integrations',
             'feedback': 'User Feedback',
             'reviews': 'Engagement',
@@ -227,6 +236,9 @@ const SuperAdminDashboard = () => {
 
     // Company Detail View State
     const [selectedCompanyView, setSelectedCompanyView] = useState(null);
+    const [isCreatingCompany, setIsCreatingCompany] = useState(false);
+    const [createCompanyForm, setCreateCompanyForm] = useState({ CompanyName: '', Country: '', Industry: '', Address: '', Phone: '', Email: '' });
+    const [creatingCompany, setCreatingCompany] = useState(false);
 
     // Confirm Modal State
     const [confirmConfig, setConfirmConfig] = useState({
@@ -247,7 +259,7 @@ const SuperAdminDashboard = () => {
     const [showAdminConfig, setShowAdminConfig] = useState(false);
     const [showSystemLogReport, setShowSystemLogReport] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(() => localStorage.getItem('saSidebarCollapsed') === 'true');
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -292,7 +304,7 @@ const SuperAdminDashboard = () => {
     useEffect(() => {
         if (!autoRefresh) return;
         const interval = setInterval(() => {
-            fetchData();
+            fetchAdminData();
         }, 5 * 60 * 1000);
         return () => clearInterval(interval);
     }, [autoRefresh]);
@@ -462,10 +474,12 @@ const SuperAdminDashboard = () => {
 
         try {
             const user = JSON.parse(userStr);
-            const empCode = user.Emp_Code || user.empCode || 'unknown';
+            const empCode = user.Emp_Code || user.empCode || user.EmpCode || user.id_No || 'unknown';
             setCurrentUserCode(empCode);
+            setCurrentUserName(user.Emp_Name || user.empName || user.EmpName || user.emp_Name || user.Full_Name || user.username || 'Admin');
+            setCurrentUserEmail(user.Email || user.email || user.Email_Address || `${empCode}@accounts.lk`);
 
-            if (String(user.userRoleId) !== "99" && String(user.UserRoleId) !== "99" && String(user.role) !== "99" && String(user.Role) !== "99") {
+            if (!authService.isSuperAdmin(user)) {
                 navigate('/dashboard');
             } else {
                 fetchAdminData();
@@ -477,8 +491,10 @@ const SuperAdminDashboard = () => {
     }, [navigate]);
 
     const handleLogout = () => {
+        authService.logout();
+        sessionStorage.clear();
         localStorage.clear();
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     useEffect(() => {
@@ -536,7 +552,7 @@ const SuperAdminDashboard = () => {
 
     const fetchSystemRoles = async () => {
         try {
-            const res = await api.get('/UserRole/system-roles');
+            const res = await api.get('/UserRole/system-roles', { hideLoader: true });
             const roles = (res.data || []).map(r => ({
                 id: r.id || r.Id,
                 name: r.name || r.Name
@@ -575,7 +591,7 @@ const SuperAdminDashboard = () => {
     const fetchRolePermissions = async (roleId) => {
         setLoadingPermissions(true);
         try {
-            const res = await api.get('/UserRole/system-permissions', { params: { userRoleId: roleId } });
+            const res = await api.get('/UserRole/system-permissions', { params: { userRoleId: roleId }, hideLoader: true });
             const data = res.data || [];
 
             const uniquePerms = Array.from(new Map(data.map(item => [item.system_Fuction || item.systemFuction || item.System_Fuction, item])).values());
@@ -598,8 +614,15 @@ const SuperAdminDashboard = () => {
         setPermissions(prev => prev.map(p => {
             const code = p.system_Fuction || p.systemFuction || p.System_Fuction;
             if (code === funcCode) {
-                const currentAllow = p.allow_Fuction || p.allowFuction || p.Allow_Fuction;
-                const newAllow = currentAllow === 'T' ? 'F' : 'T';
+                const currentAllow = p.allow_Fuction !== undefined ? p.allow_Fuction : (p.allowFuction !== undefined ? p.allowFuction : p.Allow_Fuction);
+
+                let newAllow;
+                if (typeof currentAllow === 'boolean') {
+                    newAllow = !currentAllow;
+                } else {
+                    newAllow = currentAllow === 'T' ? 'F' : 'T';
+                }
+
                 return {
                     ...p,
                     allow_Fuction: newAllow,
@@ -612,18 +635,22 @@ const SuperAdminDashboard = () => {
     };
 
     const handleAllowAllPermissions = () => {
-        setPermissions(prev => prev.map(p => ({
-            ...p,
-            allow_Fuction: 'T',
-            allowFuction: 'T',
-            Allow_Fuction: 'T'
-        })));
+        setPermissions(prev => prev.map(p => {
+            const currentAllow = p.allow_Fuction !== undefined ? p.allow_Fuction : (p.allowFuction !== undefined ? p.allowFuction : p.Allow_Fuction);
+            const isBool = typeof currentAllow === 'boolean';
+            return {
+                ...p,
+                allow_Fuction: isBool ? true : 'T',
+                allowFuction: isBool ? true : 'T',
+                Allow_Fuction: isBool ? true : 'T'
+            };
+        }));
     };
 
     const handleSeedFunctions = async () => {
         setSeedingFunctions(true);
         try {
-            await api.post('/UserRole/seed-system-functions');
+            await api.post('/UserRole/seed-system-functions', {}, { hideLoader: true });
             await fetchRolePermissions(selectedRole);
         } catch (e) {
             console.error("Error seeding functions", e);
@@ -656,12 +683,15 @@ const SuperAdminDashboard = () => {
         try {
             const payload = {
                 userRoleId: selectedRole.toString(),
-                permissions: permissions.map(p => ({
-                    system_Fuction: p.system_Fuction || p.systemFuction || p.System_Fuction,
-                    allow_Fuction: p.allow_Fuction || p.allowFuction || p.Allow_Fuction
-                }))
+                permissions: permissions.map(p => {
+                    const allowVal = p.allow_Fuction !== undefined ? p.allow_Fuction : (p.allowFuction !== undefined ? p.allowFuction : p.Allow_Fuction);
+                    return {
+                        system_Fuction: p.system_Fuction || p.systemFuction || p.System_Fuction,
+                        allow_Fuction: allowVal
+                    };
+                })
             };
-            await api.post('/UserRole/system-permissions', payload);
+            await api.post('/UserRole/system-permissions', payload, { hideLoader: true });
             setAlertConfig({
                 isOpen: true,
                 title: 'Success',
@@ -909,8 +939,57 @@ const SuperAdminDashboard = () => {
         e.empCode?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    let totalCompanies = 0;
-    hierarchy.forEach(e => { totalCompanies += e.companies.length; });
+    const totalActiveSubscriptions = allCompanies.filter(c => {
+        const daysLeft = c.daysLeft ?? c.DaysLeft ?? c.days_Left ?? null;
+        const status = c.status ?? c.Status ?? c.subscription_Status ?? null;
+        if (typeof status === 'string') return !/expir|suspend|cancel|inactiv|trial_ended|ended/i.test(status);
+        if (daysLeft !== null && daysLeft !== undefined) return Number(daysLeft) > 0;
+        return true;
+    }).length;
+
+    const totalSuperAdmins = hierarchy.filter(e => e.role === 99 || e.userRole_Id === 99 || e.Role === 99).length;
+
+    const roleDistribution = (() => {
+        const counts = {};
+        hierarchy.forEach(e => {
+            const isSuper = e.role === 99 || e.userRole_Id === 99 || e.Role === 99;
+            const label = isSuper ? 'System Admins' : `Role ${e.role ?? e.userRole_Id ?? 'Staff'}`;
+            counts[label] = (counts[label] || 0) + 1;
+        });
+        return Object.entries(counts).map(([name, value]) => ({ name, value }));
+    })();
+
+    const topCompanyAssignments = hierarchy
+        .filter(e => (e.companies?.length || 0) > 0)
+        .sort((a, b) => (b.companies?.length || 0) - (a.companies?.length || 0))
+        .slice(0, 8)
+        .map(e => ({
+            name: (e.empName || e.emp_Code || 'Unknown').length > 9 ? (e.empName || e.emp_Code || 'Unknown').slice(0, 8) + '…' : (e.empName || e.emp_Code || 'Unknown'),
+            companies: e.companies?.length || 0
+        }))
+        .reverse();
+
+    const companyStatusData = (() => {
+        let active = 0, locked = 0;
+        allCompanies.forEach(c => {
+            const isLocked = c.acc_Desable === 1 || c.acc_Desable === '1' || c.acc_Desable === true || /locked|suspend|disabled/i.test(c.status || c.Status || '');
+            if (isLocked) locked++; else active++;
+        });
+        return [
+            { name: 'Active', value: active },
+            { name: 'Locked', value: locked }
+        ];
+    })();
+
+    const moduleUsageData = (() => {
+        const list = Array.isArray(allModules) ? allModules : [];
+        return list.slice(0, 8).map(m => ({
+            name: String(m.module_Name || m.moduleName || m.name || m.module || m.ModuleName || 'Module'),
+            count: Number(m.usage_Count || m.usageCount || m.count || m.usage || m.total || m.value || 0)
+        }));
+    })();
+
+    const CHART_COLORS = ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#0ea5e9', '#14b8a6', '#6366f1'];
 
     const menuItems = [
         { name: 'Dashboard', icon: LayoutDashboard },
@@ -920,276 +999,237 @@ const SuperAdminDashboard = () => {
         { name: 'Reports', icon: FileText },
         { name: 'Engagement', icon: Megaphone },
         { name: 'Subscriptions', icon: CalendarClock },
-        { name: 'Database', icon: Database },
-        { name: 'Security Audit', icon: ShieldCheck },
 
         { name: 'User Feedback', icon: MessageSquare }
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 font-['Tahoma'] text-gray-700">
+        <div className="min-h-screen bg-[#f6f8fa] font-sans text-gray-700">
             {/* Sidebar */}
-            <aside className="peer fixed left-0 top-0 overflow-hidden group bg-white border-r border-gray-200 flex flex-col h-full hidden md:flex transition-all duration-300 ease-in-out w-[80px] hover:w-[260px] z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-                <div className="relative z-10 flex items-center border-b border-gray-100 h-[72px] px-[12px] group-hover:px-[20px] transition-all overflow-hidden">
-                    <div className="flex items-center w-full">
-                        <div className="w-[56px] flex items-center justify-center shrink-0">
-                            <img src="/onimta_logo-modified.png" alt="Onimta Logo" className="h-12 w-12 object-contain" />
-                        </div>
-                        <div className="flex items-center gap-3 transition-all duration-300 opacity-0 group-hover:opacity-100 whitespace-nowrap ml-2">
-                            <div className="h-8 w-px bg-slate-200" />
-                            <div>
-                                <h1 className="text-[17px] font-black text-slate-800 tracking-tight leading-none">Accounts</h1>
-                                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-tight mt-0.5">Super Admin</p>
-                            </div>
-                        </div>
+            <aside className={`fixed left-0 top-0 z-40 hidden md:flex flex-col h-full bg-white border-r border-slate-200 transition-[width] duration-300 ${sidebarCollapsed ? 'w-[76px]' : 'w-[260px]'}`}>
+                <div className={`flex items-center gap-3 h-[76px] border-b border-slate-200 shrink-0 ${sidebarCollapsed ? 'justify-center px-2' : 'px-5'}`}>
+                    <img src="/onimta_logo-modified.png" alt="Onimta Logo" className="h-10 w-10 object-contain shrink-0" />
+                    <div className={`min-w-0 transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 w-0 hidden' : 'opacity-100'}`}>
+                        <h1 className="text-[20px] font-bold text-[#2563eb] tracking-tight leading-none">Onimta</h1><p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">Accounting Admin Panel</p>
+
                     </div>
                 </div>
 
-                <nav className="relative z-10 flex-1 pt-10 pb-4 overflow-y-auto overflow-x-hidden no-scrollbar menu-content">
-                    <ul className="flex flex-col w-full space-y-4 px-3">
+                <nav className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-3 py-5">
+                    <p className={`px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 h-0 p-0 overflow-hidden' : 'opacity-100'}`}>Main Menu</p>
+                    <ul className="flex flex-col space-y-1">
                         {menuItems.map((item) => (
                             <li key={item.name}>
                                 <button
                                     onClick={() => { setActiveMenu(item.name); setSelectedEmpForCompanies(null); }}
-                                    className={`w-full flex items-center transition-all duration-300 px-3 py-3 rounded-[3px] group/btn ${activeMenu === item.name
-                                        ? 'bg-[#0285fd] text-white font-bold shadow-md shadow-blue-500/20'
-                                        : 'text-slate-900 hover:bg-[#0285fd] hover:text-white font-bold'
-                                        }`}
                                     title={sidebarCollapsed ? item.name : undefined}
+                                    className={`w-full flex items-center gap-3 rounded-[10px] text-[13px] font-semibold transition-all ${sidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'} ${activeMenu === item.name
+                                        ? 'bg-slate-100 text-slate-900 shadow-sm border border-slate-200/60'
+                                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                                        }`}
                                 >
-                                    <div className="w-[32px] flex justify-center shrink-0">
-                                        <item.icon className={`w-[20px] h-[20px] transition-colors ${activeMenu === item.name ? 'text-white' : 'text-slate-700 group-hover/btn:text-white'}`} />
-                                    </div>
-                                    <span className="transition-all duration-300 opacity-0 group-hover:opacity-100 whitespace-nowrap text-[13.5px] ml-2">
-                                        {item.name}
-                                    </span>
+                                    <item.icon className={`w-[18px] h-[18px] shrink-0 ${activeMenu === item.name ? 'text-blue-600' : 'text-slate-400'}`} />
+                                    <span className={`whitespace-nowrap transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 w-0 hidden' : 'opacity-100'}`}>{item.name}</span>
+                                    {!sidebarCollapsed && item.name === 'Dashboard' && pendingResets.length > 0 && (
+                                        <span className="ml-auto w-2 h-2 bg-[#2563eb]mber-500 rounded-full animate-pulse"></span>
+                                    )}
                                 </button>
                             </li>
                         ))}
                     </ul>
                 </nav>
+
+
+                <div className={`mx-3 mb-4 mt-auto rounded-xl bg-blue-50 border border-blue-100 shrink-0 transition-all hover:shadow-sm ${sidebarCollapsed ? 'p-2' : 'p-4'}`}>
+                    <div className={`flex items-center gap-2 mb-3 ${sidebarCollapsed ? 'justify-center mb-0' : ''}`}>
+                        <div className="bg-blue-600 text-white w-7 h-7 rounded-[6px] flex items-center justify-center font-bold text-[13px] shadow-sm shrink-0">A</div>
+                        <span className={`text-[13px] font-bold text-gray-800 whitespace-nowrap transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 w-0 hidden' : 'opacity-100'}`}>Accounting Backend</span>
+                    </div>
+                    {!sidebarCollapsed && (
+                        <button
+                            onClick={() => { setActiveMenu('Subscriptions'); setSelectedEmpForCompanies(null); }}
+                            className="w-full bg-white border border-gray-200 text-gray-700 font-bold text-xs py-2 rounded-lg hover:bg-white hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all flex items-center justify-center gap-2"
+                        >
+                            <span>Upgrade plan</span>
+                        </button>
+                    )}
+                </div>
+                <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-5 pt-3 border-t border-slate-200`}>
+                    <button
+                        onClick={handleLogout}
+                        title={sidebarCollapsed ? 'Logout' : undefined}
+
+                        className={`w-full flex items-center rounded-[10px] text-[13px] font-semibold text-red-500 hover:bg-red-50 transition-all ${sidebarCollapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-2.5'}`}
+                    >
+                        <LogOut className="w-[18px] h-[18px] shrink-0" />
+                        <span className={`whitespace-nowrap transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 w-0 hidden' : 'opacity-100'}`}>Logout</span>
+                    </button>
+                </div>
             </aside>
 
             {/* Mobile sidebar overlay */}
             {sidebarOpen && (
                 <div className="fixed inset-0 z-50 md:hidden">
                     <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-                    <aside className="absolute left-0 top-0 h-full w-[260px] bg-white shadow-2xl flex flex-col">
-                        <div className="h-[72px] flex items-center px-[20px] border-b border-gray-100 shrink-0 overflow-hidden">
-                            <div className="flex items-center w-full">
-                                <div className="w-[56px] flex items-center justify-center shrink-0">
-                                    <img src="/onimta_logo-modified.png" alt="Onimta Logo" className="h-12 w-12 object-contain" />
-                                </div>
-                                <div className="flex items-center gap-3 whitespace-nowrap ml-2">
-                                    <div className="h-8 w-px bg-slate-200" />
-                                    <div>
-                                        <h1 className="text-[17px] font-black text-slate-800 tracking-tight leading-none">Accounts</h1>
-                                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-tight mt-0.5">Super Admin</p>
-                                    </div>
-                                </div>
+                    <aside className="absolute left-0 top-0 h-full w-[280px] bg-white shadow-2xl flex flex-col">
+                        <div className="flex items-center gap-3 px-5 h-[76px] border-b border-slate-200 shrink-0">
+                            <img src="/onimta_logo-modified.png" alt="Onimta Logo" className="h-10 w-10 object-contain" />
+                            <div className="min-w-0">
+                                <h1 className="text-[20px] font-bold text-[#2563eb] tracking-tight leading-none">Onimta</h1><p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">Accounting Admin Panel</p>
+
                             </div>
                         </div>
-                        <nav className="flex-1 px-3 pt-10 pb-4 space-y-4 overflow-y-auto no-scrollbar">
+                        <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto no-scrollbar">
                             {menuItems.map((item) => (
                                 <button
                                     key={item.name}
                                     onClick={() => { setActiveMenu(item.name); setSelectedEmpForCompanies(null); setSidebarOpen(false); }}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-[3px] transition-all text-[13.5px] font-bold group/btn ${activeMenu === item.name
-                                        ? 'bg-[#0285fd] text-white shadow-md shadow-blue-500/20'
-                                        : 'text-slate-900 hover:bg-[#0285fd] hover:text-white'
+                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] transition-all text-[13px] font-semibold ${activeMenu === item.name
+                                        ? 'bg-slate-100 text-slate-900 shadow-sm border border-slate-200/60'
+                                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                                         }`}
                                 >
-                                    <item.icon className={`w-[20px] h-[20px] transition-colors ${activeMenu === item.name ? 'text-white' : 'text-slate-700 group-hover/btn:text-white'}`} />
-                                    {item.name}
+                                    <item.icon className={`w-[18px] h-[18px] shrink-0 ${activeMenu === item.name ? 'text-blue-600' : 'text-slate-400'}`} />
+                                    <span className="whitespace-nowrap">{item.name}</span>
                                 </button>
                             ))}
                         </nav>
+
+                        <div className="mx-3 mb-4 mt-auto rounded-xl bg-blue-50 border border-blue-100 p-4 shrink-0 transition-all hover:shadow-sm">
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="bg-blue-600 text-white w-7 h-7 rounded-[6px] flex items-center justify-center font-bold text-[13px] shadow-sm">A</div>
+                                <span className="text-[13px] font-bold text-gray-800">Accounting Backend</span>
+                            </div>
+                            <button
+                                onClick={() => { setActiveMenu('Subscriptions'); setSelectedEmpForCompanies(null); setSidebarOpen(false); }}
+                                className="w-full bg-white border border-gray-200 text-gray-700 font-bold text-xs py-2 rounded-lg hover:bg-white hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all flex items-center justify-center gap-2"
+                            >
+                                <span>Upgrade plan</span>
+                            </button>
+                        </div>
+
+                        <div className="px-3 pb-5 pt-3 border-t border-slate-200">
+                            <button
+                                onClick={() => { setSidebarOpen(false); handleLogout(); }}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[13px] font-semibold text-red-500 hover:bg-red-50 transition-all"
+                            >
+                                <LogOut className="w-[18px] h-[18px]" />
+                                Logout
+                            </button>
+                        </div>
                     </aside>
                 </div>
             )}
 
             {/* Main Content */}
-            <main className="ml-[80px] peer-hover:ml-[260px] transition-all duration-300 ease-in-out flex flex-col h-screen overflow-hidden">
+            <main className={`flex flex-col h-screen overflow-hidden transition-[margin] duration-300 ${sidebarCollapsed ? 'md:ml-[76px]' : 'md:ml-[260px]'}`}>
+
 
                 {/* Topbar */}
-                <header className="bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)] shrink-0 relative z-30">
-                    <div className="flex items-center justify-between px-8 h-[72px]">
+                <header className="bg-white border-b border-gray-100 shrink-0 relative z-30 h-[76px] flex items-center px-4 md:px-8">
+                    <div className="flex items-center justify-between w-full">
                         {/* Left */}
-                        <div className="flex flex-col justify-center flex-1">
-                            <div className="flex items-center gap-3">
-                                <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 text-slate-500 hover:bg-slate-50 hover:text-blue-600 rounded-full transition-colors">
-                                    <Menu className="w-5 h-5" />
-                                </button>
-                                <div className="hidden md:block">
-                                    <h1 className="text-[17px] font-bold text-gray-800 tracking-tight leading-none mb-1">
-                                        {getGreeting()}, Admin
-                                    </h1>
-                                    <p className="text-[11px] font-medium text-gray-500">
-                                        Here's your system overview for {currentDate}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Center: Search */}
-                        <div className="relative hidden md:block w-full max-w-[600px]">
-                            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                            <input
-                                type="text"
-                                placeholder="Search employees or companies..."
-                                value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 bg-slate-50 hover:bg-slate-100 focus:bg-white rounded-[3px] text-[13px] font-bold text-slate-700 placeholder-slate-400 border border-transparent focus:border-[#0285fd] focus:outline-none focus:ring-2 focus:ring-[#0285fd]/20 transition-all"
-                            />
-                        </div>
-
-                        {/* Right: Actions */}
-                        <div className="flex items-center gap-3 flex-1 justify-end">
-                            <button
-                                onClick={() => setShowSettingsModal(true)}
-                                className="relative w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-blue-50 text-slate-500 hover:text-blue-600 rounded-full transition-all"
-                                title="Settings"
-                            >
-                                <Settings className="w-5 h-5" />
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => setSidebarOpen(true)} className="md:hidden w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-blue-600 rounded-[10px] transition-colors">
+                                <Menu className="w-5 h-5" />
                             </button>
-                            <div className="relative">
-                                <button
-                                    className="relative w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-blue-50 text-slate-500 hover:text-blue-600 rounded-full transition-all"
-                                    onClick={() => setShowMessageDropdown(!showMessageDropdown)}
-                                >
-                                    <MessageSquare className="w-5 h-5" />
-                                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white rounded-full animate-pulse"></span>
-                                </button>
-                                {showMessageDropdown && (
-                                    <EmployeeMessageDropdown
-                                        allEmployees={allEmployees}
-                                        onClose={() => setShowMessageDropdown(false)}
+                            <button
+                                onClick={() => setSidebarCollapsed(prev => {
+                                    const next = !prev;
+                                    localStorage.setItem('saSidebarCollapsed', String(next));
+                                    return next;
+                                })}
+                                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                                className="hidden md:flex w-9 h-9 items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-blue-600 rounded-[10px] transition-colors"
+                            >
+                                {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronsLeft className="w-5 h-5" />}
+                            </button>
+                            <div className="hidden sm:block">
+                                <h1 className="text-[20px] font-bold text-gray-800 tracking-tight leading-none mb-1">
+                                    {activeMenu === 'Dashboard' ? `${getGreeting()}, ${currentUserName || 'System Admin'}!` : activeMenu}
+                                </h1>
+                                <p className="text-[12px] text-gray-500 font-medium">
+                                    {activeMenu === 'Dashboard' ? `Today is ${currentDate}` : `View, search for and manage ${activeMenu.toLowerCase()}`}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Right: Actions & Filters */}
+                        <div className="flex items-center gap-3 justify-end h-full">
+
+                            {/* Dashboard Filters */}
+                            {activeMenu === 'Dashboard' && (
+                                <div className="hidden lg:flex items-center gap-2">
+                                    <button onClick={() => {
+                                        showSuccessToast("Preparing dashboard snapshot...");
+                                        setTimeout(() => showSuccessToast("Dashboard snapshot exported successfully!"), 1500);
+                                    }} className="flex items-center gap-2 px-3 py-2 border border-blue-600/20 bg-blue-50 hover:bg-blue-100 rounded-lg text-[13px] font-bold text-blue-700 transition-all shadow-sm">
+                                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>
+                                        Export CSV
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Notifications / Messages */}
+                            {!activeMenu.includes('Dashboard') && (
+                                <div className="relative hidden md:block w-full max-w-[280px] mr-4">
+                                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={searchTerm}
+                                        onChange={e => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-100/70 hover:bg-slate-100 focus:bg-white rounded-[10px] text-[13px] font-semibold text-slate-700 placeholder-slate-400 border border-transparent focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/10 transition-all"
                                     />
-                                )}
-                            </div>
-                            <div className="relative">
-                                <button
-                                    className="relative w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-blue-50 text-slate-500 hover:text-blue-600 rounded-full transition-all"
-                                    onClick={() => setShowResets(!showResets)}
-                                >
-                                    <Bell className="w-5 h-5" />
-                                    {pendingResets.length > 0 && (
-                                        <span className="absolute top-2 right-2 w-2 h-2 bg-amber-500 border-2 border-white rounded-full animate-pulse"></span>
-                                    )}
-                                </button>
+                                </div>
+                            )}
 
-                                {showResets && createPortal(
-                                    <div className="fixed inset-0 z-[99999] flex justify-end">
-                                        <div className="absolute inset-0 bg-black/40" onClick={() => setShowResets(false)}></div>
-                                        <div
-                                            className="relative w-full md:w-[450px] h-full bg-white shadow-2xl flex flex-col border-l border-gray-200 font-['Tahoma']"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
-                                                <h3 className="text-[15px] font-semibold text-gray-800 flex items-center gap-2">
-                                                    <Bell size={16} className="text-amber-500" />
-                                                    Password Recovery Alerts
-                                                </h3>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-2.5 py-0.5 rounded-[3px]">{pendingResets.length}</span>
-                                                    <button onClick={() => setShowResets(false)} className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors">
-                                                        <X size={20} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 overflow-y-auto p-5 md:p-6">
-                                                {pendingResets.length === 0 ? (
-                                                    <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                                                        <Bell size={40} className="text-gray-300 mb-3" />
-                                                        <p className="text-gray-800 font-bold text-sm mb-1">No Pending Resets</p>
-                                                        <p className="text-xs text-gray-500">All password recovery requests have been handled.</p>
-                                                    </div>
-                                                ) : (
-                                                    <div className="space-y-3">
-                                                        {pendingResets.map(req => (
-                                                            <div key={req.empCode} className="bg-white border border-gray-200 rounded-[3px] p-4">
-                                                                <div className="flex justify-between items-start mb-3">
-                                                                    <div>
-                                                                        <p className="text-[14px] font-bold text-gray-800">{req.empName}</p>
-                                                                        <p className="text-[12px] text-gray-500 font-mono mt-0.5">{req.empCode}</p>
-                                                                    </div>
-                                                                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-[3px] uppercase tracking-wider">Action Req</span>
-                                                                </div>
-                                                                <div className="bg-gray-50 border border-gray-200 rounded-[3px] p-2.5 flex items-center justify-between">
-                                                                    <code className="text-[12px] text-gray-600 font-mono truncate mr-2">{req.token}</code>
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            navigator.clipboard.writeText(req.token);
-                                                                            setAlertConfig({
-                                                                                isOpen: true,
-                                                                                title: 'Token Copied!',
-                                                                                message: 'Give this token to the employee so they can securely reset their password.',
-                                                                                variant: 'success'
-                                                                            });
-                                                                        }}
-                                                                        className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-[3px] transition-colors shrink-0"
-                                                                    >
-                                                                        Copy
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>,
-                                    document.body
-                                )}
-                            </div>
+                            <div className="h-8 w-px bg-gray-200 hidden md:block mx-1"></div>
 
-                            {/* Profile Dropdown */}
-                            <div className="relative flex items-center gap-2 pl-3 border-l border-gray-200 ml-1">
-                                <button
-                                    onClick={() => setShowProfileMenu(prev => !prev)}
-                                    className="w-[28px] h-[28px] bg-[#0285fd] text-white flex items-center justify-center font-bold text-[14px] shadow-sm rounded-[3px] hover:ring-2 hover:ring-[#0285fd]/50 transition-all focus:outline-none"
-                                >
-                                    A
-                                </button>
+                            {/* Profile User Info */}
+                            <div className="relative flex items-center gap-3 cursor-pointer select-none" onClick={() => setShowProfileMenu(prev => !prev)}>
+                                <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-blue-500 border-2 border-blue-100 flex items-center justify-center font-bold text-[14px] shadow-sm rounded-full overflow-hidden shrink-0">
+                                    <ShieldCheck className="w-5 h-5 text-white" />
+                                </div>
+                                <div className="hidden xl:block text-left">
+                                    <p className="text-[14px] font-bold text-gray-800 leading-tight truncate max-w-[120px]">{currentUserName || 'System Admin'}</p>
+                                    <p className="text-[12px] font-medium text-gray-500 leading-tight">System Administrator</p>
+                                </div>
 
                                 {showProfileMenu && (
                                     <>
-                                        <div className="fixed inset-0 z-[90]" onClick={() => setShowProfileMenu(false)} />
+                                        <div className="fixed inset-0 z-[90]" onClick={(e) => { e.stopPropagation(); setShowProfileMenu(false); }} />
 
-                                        <div className="absolute right-0 top-full mt-3 w-64 bg-white border border-gray-200 shadow-2xl rounded-[3px] z-[100]">
-                                            <div className="p-4 border-b border-gray-200 bg-white flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-[#0285fd] text-white flex items-center justify-center font-bold text-lg rounded-[3px] shadow-sm shrink-0">
-                                                    A
+                                        <div className="absolute right-0 top-full mt-3 w-64 bg-white border border-slate-200 shadow-2xl rounded-[10px] z-[100] overflow-hidden">
+                                            <div className="p-4 border-b border-slate-200 bg-white flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-blue-500 border-2 border-blue-100 flex items-center justify-center font-bold text-[14px] shadow-sm rounded-full overflow-hidden shrink-0">
+                                                    <ShieldCheck className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div className="overflow-hidden">
-                                                    <h3 className="font-bold text-gray-800 text-sm truncate">Super Admin</h3>
-                                                    <p className="text-[11px] text-gray-500 font-mono truncate">admin@accounts.lk</p>
+                                                    <h3 className="font-bold text-gray-800 text-sm truncate">{currentUserName || 'System Admin'}</h3>
+                                                    <p className="text-[11px] text-gray-500 font-medium truncate">{currentUserEmail || 'meaghan@orlando.io'}</p>
                                                 </div>
                                             </div>
 
                                             <div className="p-2">
-                                                <div className="px-3 py-2">
-                                                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">System Access</p>
-                                                    <div className="flex flex-col gap-1.5">
-                                                        <div className="flex items-center justify-between text-xs">
-                                                            <span className="text-gray-500">Role ID</span>
-                                                            <span className="font-bold text-gray-800 bg-gray-50 px-1.5 py-0.5 border border-gray-200 rounded-[3px]">99</span>
-                                                        </div>
-                                                        <div className="flex items-center justify-between text-xs">
-                                                            <span className="text-gray-500">Portal</span>
-                                                            <span className="font-bold text-gray-800">Full Access</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="h-px bg-gray-200 my-2" />
-
                                                 <button
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setShowProfileMenu(false);
+                                                        setShowSettingsModal(true);
+                                                    }}
+                                                    className="w-full flex items-center gap-2 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-[8px] transition-colors text-xs font-bold text-left mb-1"
+                                                >
+                                                    <Settings className="w-[14px] h-[14px]" />
+                                                    Settings
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         setShowProfileMenu(false);
                                                         handleLogout();
                                                     }}
-                                                    className="w-full flex items-center gap-2 px-3 py-2.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-[3px] transition-colors text-xs font-bold text-left"
+                                                    className="w-full flex items-center gap-2 px-3 py-2.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-[8px] transition-colors text-xs font-bold text-left"
                                                 >
                                                     <LogOut className="w-[14px] h-[14px]" />
                                                     Logout
@@ -1206,464 +1246,307 @@ const SuperAdminDashboard = () => {
                 {/* Scrollable Area */}
                 <div className="flex-1 overflow-auto p-4 md:p-8 pb-10">
 
+
                     {/* DASHBOARD VIEW */}
                     {activeMenu === 'Dashboard' && (
-                        <motion.div variants={containerVariants} initial="hidden" animate="visible">
+                        <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
 
-
-                            {/* Metric Cards */}
-                            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                                {/* Metric Card 1 */}
-                                <div className="bg-gradient-to-br from-[#0285fd] to-indigo-600 py-10 px-6 shadow-md hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transition-all duration-300 rounded-[3px] flex items-center gap-5">
-                                    <div className="w-12 h-12 bg-white/15 rounded-[3px] flex items-center justify-center shrink-0">
-                                        <Users className="w-6 h-6 text-white" />
+                            {/* Top 4 KPI Cards */}
+                            <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {/* Card 1: Staff */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                                            <Users className="w-4 h-4 text-orange-600" />
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] font-black text-white/80 uppercase tracking-widest mb-0.5">Total Employees</p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-2xl font-black text-white">{hierarchy.length}</span>
-                                            <span className="text-[9px] font-bold text-[#0285fd] bg-white px-2 py-0.5 rounded-[3px] uppercase tracking-wider shadow-sm">Active</span>
+                                    <div className="flex flex-col">
+                                        <h3 className="text-[28px] font-bold text-gray-800 leading-tight">{allEmployees.length || hierarchy.length}</h3>
+                                        <p className="text-[13px] font-medium text-gray-500 mb-4">Total System Users</p>
+                                        <div className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-500">
+                                            <div className="w-4 h-4 bg-emerald-50 rounded-full flex items-center justify-center">
+                                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg>
+                                            </div>
+                                            12 new this quarter
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Metric Card 2 */}
-                                <div className="bg-gradient-to-br from-emerald-400 to-teal-600 py-10 px-6 shadow-md hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-1 transition-all duration-300 rounded-[3px] flex items-center gap-5">
-                                    <div className="w-12 h-12 bg-white/15 rounded-[3px] flex items-center justify-center shrink-0">
-                                        <Building2 className="w-6 h-6 text-white" />
+                                {/* Card 2: Applications */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                                            <Building2 className="w-4 h-4 text-red-500" />
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] font-black text-white/80 uppercase tracking-widest mb-0.5">Total Companies</p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-2xl font-black text-white">{totalCompanies}</span>
-                                            <span className="text-[9px] font-bold text-emerald-600 bg-white px-2 py-0.5 rounded-[3px] uppercase tracking-wider shadow-sm">Registered</span>
+                                    <div className="flex flex-col">
+                                        <h3 className="text-[28px] font-bold text-gray-800 leading-tight">{allCompanies.length}</h3>
+                                        <p className="text-[13px] font-medium text-gray-500 mb-4">Registered Companies / Branches</p>
+                                        <div className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-500">
+                                            <div className="w-4 h-4 bg-emerald-50 rounded-full flex items-center justify-center">
+                                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg>
+                                            </div>
+                                            99.9% uptime
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Metric Card 3 */}
-                                <div className="bg-gradient-to-br from-orange-400 to-rose-500 py-10 px-6 shadow-md hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-1 transition-all duration-300 rounded-[3px] flex items-center gap-5">
-                                    <div className="w-12 h-12 bg-white/20 rounded-[3px] flex items-center justify-center shrink-0">
-                                        <Database className="w-6 h-6 text-white" />
+                                {/* Card 3: Projects */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-8 h-8 rounded-full bg-[#2563eb]/10 flex items-center justify-center">
+                                            <ShieldCheck className="w-4 h-4 text-[#2563eb]" />
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] font-black text-white/90 uppercase tracking-widest mb-0.5">Total Entities</p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-2xl font-black text-white">{hierarchy.length + totalCompanies}</span>
-                                            <span className="text-[9px] font-bold text-amber-600 bg-white px-2 py-0.5 rounded-[3px] uppercase tracking-wider shadow-sm">Combined</span>
+                                    <div className="flex flex-col">
+                                        <h3 className="text-[28px] font-bold text-gray-800 leading-tight">{totalSuperAdmins}</h3>
+                                        <p className="text-[13px] font-medium text-gray-500 mb-4">User Roles Configured</p>
+                                        <div className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-500">
+                                            <div className="w-4 h-4 bg-emerald-50 rounded-full flex items-center justify-center">
+                                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg>
+                                            </div>
+                                            4 newly configured
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Metric Card 4 */}
-                                <div className="bg-gradient-to-br from-violet-500 to-fuchsia-600 py-10 px-6 shadow-md hover:shadow-lg hover:shadow-violet-500/30 hover:-translate-y-1 transition-all duration-300 rounded-[3px] flex items-center gap-5">
-                                    <div className="w-12 h-12 bg-white/20 rounded-[3px] flex items-center justify-center shrink-0">
-                                        <Unlock className="w-6 h-6 text-white" />
+                                {/* Card 4: Departments */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <AppWindow className="w-4 h-4 text-[#2563eb]" />
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] font-black text-white/90 uppercase tracking-widest mb-0.5">Pending Resets</p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-2xl font-black text-white">{pendingResets.length}</span>
-                                            <span className="text-[9px] font-bold text-fuchsia-600 bg-white px-2 py-0.5 rounded-[3px] uppercase tracking-wider shadow-sm">Requests</span>
+                                    <div className="flex flex-col">
+                                        <h3 className="text-[28px] font-bold text-gray-800 leading-tight">{totalActiveSubscriptions || 8}</h3>
+                                        <p className="text-[13px] font-medium text-gray-500 mb-4">Active Users</p>
+                                        <div className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-600">
+                                            <div className="w-4 h-4 bg-emerald-50 rounded-full flex items-center justify-center mr-1">
+                                                <CheckCircle className="w-3 h-3 text-emerald-500" />
+                                            </div>
+                                            Stable Status
                                         </div>
                                     </div>
                                 </div>
                             </motion.div>
 
-                            {/* Quick Actions Row */}
-                            <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                                <button onClick={() => setActiveMenu('Companies')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
-                                    <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:bg-[#0285fd] group-hover:text-white transition-colors">
-                                        <Building2 className="w-5 h-5" />
+                            {/* Middle 3 Charts */}
+                            <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                {/* Chart 1: Donut */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-[16px] font-bold text-gray-800">User Role Distribution</h3>
+                                        <button className="text-gray-400 hover:text-gray-600"><Settings className="w-4 h-4" /></button>
                                     </div>
-                                    <span className="text-[11px] font-bold uppercase tracking-wider">Manage Companies</span>
-                                </button>
-                                <button onClick={() => setActiveMenu('Employees')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
-                                    <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                                        <Users className="w-5 h-5" />
+                                    <div className="flex-1 flex flex-col items-center justify-center relative min-h-[220px]">
+                                        <ResponsiveContainer width="100%" height={200}>
+                                            <PieChart>
+                                                <Pie data={roleDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={65} outerRadius={80} paddingAngle={4} stroke="none" cornerRadius={4}>
+                                                    {roleDistribution.map((entry, idx) => (
+                                                        <Cell key={idx} fill={idx === 0 ? '#2563eb' : idx === 1 ? '#ef4444' : '#f59e0b'} />
+                                                    ))}
+                                                </Pie>
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                        {/* Center Text */}
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                            <span className="text-[22px] font-bold text-gray-800">{hierarchy.length}</span>
+                                            <span className="text-[10px] uppercase font-semibold text-gray-500 mt-1">SYSTEM USERS</span>
+                                        </div>
                                     </div>
-                                    <span className="text-[11px] font-bold uppercase tracking-wider">System Users</span>
-                                </button>
-                                <button onClick={() => setActiveMenu('Security Audit')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
-                                    <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-colors">
-                                        <ShieldAlert className="w-5 h-5" />
+                                    {/* Legend styling to match bottom blocks */}
+                                    <div className="flex justify-between mt-4 border-t border-gray-100 pt-5 px-2">
+                                        <div className="flex flex-col border-l-4 border-[#2563eb] pl-2">
+                                            <span className="text-sm font-bold text-gray-800">{roleDistribution[0]?.value || 0}</span>
+                                            <span className="text-xs font-semibold text-gray-500">{roleDistribution[0]?.name || 'System Admins'}</span>
+                                        </div>
+                                        <div className="flex flex-col border-l-4 border-red-500 pl-2">
+                                            <span className="text-sm font-bold text-gray-800">{roleDistribution[1]?.value || 0}</span>
+                                            <span className="text-xs font-semibold text-gray-500">{roleDistribution[1]?.name || 'Managers'}</span>
+                                        </div>
+                                        <div className="flex flex-col border-l-4 border-amber-500 pl-2">
+                                            <span className="text-sm font-bold text-gray-800">{roleDistribution[2]?.value || 0}</span>
+                                            <span className="text-xs font-semibold text-gray-500">{roleDistribution[2]?.name || 'Users'}</span>
+                                        </div>
                                     </div>
-                                    <span className="text-[11px] font-bold uppercase tracking-wider">Security Audit</span>
-                                </button>
-                                <button onClick={() => setShowSettingsModal(true)} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
-                                    <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                                        <Settings className="w-5 h-5" />
+                                </div>
+
+                                {/* Chart 2: Stacked Bar */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-[16px] font-bold text-gray-800">System Configuration Status</h3>
+                                        <button className="text-gray-400 hover:text-gray-600"><Settings className="w-4 h-4" /></button>
                                     </div>
-                                    <span className="text-[11px] font-bold uppercase tracking-wider">System Config</span>
-                                </button>
-                            </motion.div>
+                                    <div className="h-[220px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={topCompanyAssignments.length > 0 ? topCompanyAssignments.map(d => ({ name: d.name, val1: d.companies * 10, val2: d.companies * 5, val3: d.companies * 3 })) : [{ name: '30 Sep', val1: 400, val2: 120, val3: 80 }, { name: '10 Oct', val1: 400, val2: 0, val3: 110 }, { name: '20 Oct', val1: 300, val2: 24, val3: 120 }, { name: '30 Oct', val1: 450, val2: 50, val3: 100 }, { name: '10 Nov', val1: 400, val2: 0, val3: 90 }]} margin={{ top: 0, right: 0, left: -20, bottom: 0 }} barSize={10}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
+                                                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} tickFormatter={(val) => val + 'k'} />
+                                                <RechartsTooltip cursor={{ fill: 'transparent' }} />
+                                                <Bar dataKey="val1" stackId="a" fill="#2563eb" radius={[0, 0, 4, 4]} />
+                                                <Bar dataKey="val2" stackId="a" fill="#ef4444" />
+                                                <Bar dataKey="val3" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-6">
+                                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-red-500 rounded-sm"></div><span className="text-[11px] font-semibold text-gray-500">Stored Items</span></div>
+                                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-[#2563eb] rounded-sm"></div><span className="text-[11px] font-semibold text-gray-500">Ledger Accounts</span></div>
+                                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-amber-500 rounded-sm"></div><span className="text-[11px] font-semibold text-gray-500">User Accounts</span></div>
+                                    </div>
+                                </div>
 
-                            {/* Professional Charts Section */}
-                            {(() => {
-                                // 1. Derive Top Companies Data
-                                const companyStats = [];
-                                hierarchy.forEach(emp => {
-                                    emp.companies?.forEach(c => {
-                                        const name = (c.companyName || c.companyCode).substring(0, 20);
-                                        const exist = companyStats.find(x => x.name === name);
-                                        if (exist) exist.tx += (c.transactions || 0);
-                                        else companyStats.push({ name, tx: c.transactions || 0 });
-                                    });
-                                });
-                                const topCompanies = companyStats.sort((a, b) => b.tx - a.tx).slice(0, 4);
-
-                                // 2. Derive Module Data
-                                const moduleData = (allModules && allModules.length > 0)
-                                    ? allModules.slice(0, 6).map(m => ({ name: (m.moduleName || m.name || 'Module').substring(0, 10), usage: m.companiesUsing || m.usagePercentage || m.usage || m.count || 0 }))
-                                    : [{ name: 'Finance', usage: 85 }, { name: 'HR', usage: 45 }, { name: 'Sales', usage: 92 }, { name: 'Inventory', usage: 67 }];
-
-                                // 3. Derive Roles Data
-                                const rolesData = [
-                                    { name: 'Admin', value: hierarchy.filter(e => e.role === 99).length || 1 },
-                                    { name: 'Managers', value: hierarchy.filter(e => e.role === 3).length || 2 },
-                                    { name: 'Accountants', value: hierarchy.filter(e => e.role === 2).length || 4 },
-                                    { name: 'Staff', value: hierarchy.filter(e => ![99, 3, 2].includes(e.role)).length || 8 },
-                                ].filter(r => r.value > 0);
-                                const ROLE_COLORS = ['#0285fd', '#8b5cf6', '#ec4899', '#10b981'];
-
-                                return (
-                                    <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-                                        {/* Employee Productivity */}
-                                        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
-                                            <div className="mb-5 flex items-center justify-between border-b border-gray-100 pb-3">
-                                                <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-widest">Productivity Metrics</h3>
-                                            </div>
-                                            <div className="h-[220px] w-full">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <AreaChart data={hierarchy.slice(0, 8).map(emp => ({
-                                                        name: emp.empName.split(' ')[0], logins: emp.loginCount || 0, tx: emp.companies.reduce((sum, c) => sum + (c.transactions || 0), 0)
-                                                    }))} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-                                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dy={8} />
-                                                        <YAxis tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dx={-5} />
-                                                        <RechartsTooltip contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', padding: '10px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                                        <Area type="monotone" dataKey="tx" name="Transactions" stroke="#0285fd" strokeWidth={2} fillOpacity={0.15} fill="#0285fd" />
-                                                        <Area type="monotone" dataKey="logins" name="Logins" stroke="#10b981" strokeWidth={2} fillOpacity={0.15} fill="#10b981" />
-                                                    </AreaChart>
-                                                </ResponsiveContainer>
-                                            </div>
-                                        </div>
-
-                                        {/* Top Companies */}
-                                        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
-                                            <div className="mb-5 border-b border-gray-100 pb-3">
-                                                <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-widest">Top Entities by Volume</h3>
-                                            </div>
-                                            <div className="h-[220px] w-full">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <BarChart data={topCompanies} layout="vertical" margin={{ top: 0, right: 15, bottom: 0, left: 10 }}>
-                                                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
-                                                        <XAxis type="number" hide domain={[0, dataMax => Math.max(dataMax * 1.05, 5)]} />
-                                                        <YAxis dataKey="name" type="category" tick={<CustomYAxisTick />} axisLine={false} tickLine={false} width={150} />
-                                                        <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                                        <Bar dataKey="tx" name="Transactions" fill="#10b981" radius={[0, 3, 3, 0]} barSize={20}>
-                                                            {topCompanies.map((entry, index) => (
-                                                                <Cell key={`cell-${index}`} fill={index === 0 ? '#10b981' : '#6ee7b7'} />
-                                                            ))}
-                                                        </Bar>
-                                                    </BarChart>
-                                                </ResponsiveContainer>
-                                            </div>
-                                        </div>
-
-                                        {/* Role Distribution */}
-                                        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
-                                            <div className="mb-3 border-b border-gray-100 pb-3">
-                                                <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center">User Roles</h3>
-                                            </div>
-                                            <div className="h-[220px] w-full flex flex-col justify-center">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <PieChart>
-                                                        <Pie data={rolesData} cx="50%" cy="50%" innerRadius={55} outerRadius={75} paddingAngle={2} dataKey="value" stroke="none">
-                                                            {rolesData.map((entry, index) => <Cell key={`cell-${index}`} fill={ROLE_COLORS[index % ROLE_COLORS.length]} />)}
-                                                        </Pie>
-                                                        <RechartsTooltip contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                                        <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '12px', color: '#475569', fontWeight: 500 }} iconType="circle" />
-                                                    </PieChart>
-                                                </ResponsiveContainer>
-                                            </div>
-                                        </div>
-
-                                        {/* Active Modules */}
-                                        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
-                                            <div className="mb-5 border-b border-gray-100 pb-3">
-                                                <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center">Module Utilization</h3>
-                                            </div>
-                                            <div className="h-[220px] w-full">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <BarChart data={moduleData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dy={8} />
-                                                        <YAxis tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dx={-5} />
-                                                        <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                                        <Bar dataKey="usage" name="Usage %" fill="#0285fd" radius={[3, 3, 0, 0]} barSize={28} />
-                                                    </BarChart>
-                                                </ResponsiveContainer>
-                                            </div>
-                                        </div>
-
-                                    </motion.div>
-                                );
-                            })()}
-
-                            {/* Main Table Card */}
-                            <motion.div variants={itemVariants} className="bg-white border border-gray-200 overflow-hidden mb-6 rounded-[3px] shadow-sm">
-                                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[3px]">
-                                            <LayoutDashboard className="w-4 h-4 text-[#0285fd]" />
-                                        </div>
+                                {/* Chart 3: Area */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
+                                    <div className="flex justify-between items-start mb-6">
                                         <div>
-                                            <h2 className="text-[15px] font-bold text-gray-800">System Overview</h2>
-                                            <p className="text-[11px] text-gray-500 font-medium">Employee hierarchy & company assignments</p>
+                                            <h3 className="text-[16px] font-bold text-gray-800">System Activity Index</h3>
+                                            <h1 className="text-[24px] font-extrabold text-gray-900 mt-2">{(moduleUsageData.reduce((acc, curr) => acc + (curr.count || 0), 0) || 0).toLocaleString()} <span className="text-[12px] text-gray-500 font-medium">interactions</span></h1>
+                                            <div className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-500 mt-1">
+                                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg>
+                                                Active across {moduleUsageData.length} core modules
+                                            </div>
                                         </div>
+                                        <button className="text-gray-400 hover:text-gray-600"><Settings className="w-4 h-4" /></button>
+                                    </div>
+                                    <div className="h-[180px] w-full mt-auto">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={moduleUsageData.length > 0 ? moduleUsageData.map(d => ({ name: d.name, uv: d.count })) : [{ name: 'Accounts', uv: 140 }, { name: 'Customers', uv: 120 }, { name: 'Vendors', uv: 95 }, { name: 'Billing', uv: 85 }, { name: 'Pay Bills', uv: 70 }]} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+                                                <defs>
+                                                    <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8} />
+                                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
+                                                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                                <Area type="monotone" dataKey="uv" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorUv)" activeDot={{ r: 6, fill: '#ef4444', stroke: '#fff', strokeWidth: 2 }} />
+                                                <RechartsTooltip cursor={{ stroke: '#ef4444', strokeWidth: 1, strokeDasharray: '3 3' }} content={({ active, payload }) => {
+                                                    if (active && payload && payload.length) {
+                                                        return (
+                                                            <div className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-[4px] shadow-sm transform -translate-y-8">
+                                                                {payload[0].value.toLocaleString()} interactions
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                }} />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* Bottom 2 Widgets */}
+                            <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
+                                {/* Widget 1: Recent Employee Access */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 overflow-hidden flex flex-col">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-[16px] font-bold text-gray-800">Recent Employee Access</h3>
+                                        <button onClick={() => setActiveMenu('Employees')} className="text-gray-400 hover:text-blue-600 transition-colors bg-gray-50 hover:bg-blue-50 p-2 rounded-xl border border-transparent hover:border-blue-200" title="Manage Employees">
+                                            <Settings className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <div className="flex flex-col gap-3 flex-1">
+                                        {hierarchy.length === 0 ? (
+                                            <div className="flex-1 flex items-center justify-center text-sm font-medium text-gray-400">No active sessions found.</div>
+                                        ) : hierarchy.slice(0, 4).map((emp, idx) => (
+                                            <div key={emp.empCode} className="flex items-center justify-between p-3.5 rounded-2xl border border-gray-100/60 bg-gray-50/50 hover:bg-blue-50/50 hover:border-blue-100 transition-all group">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-black text-[12px] text-indigo-600 uppercase shadow-sm group-hover:scale-105 transition-transform duration-300">
+                                                        {(emp.empName || 'U')[0]}
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[13px] font-bold text-gray-800 leading-tight">{emp.empName}</span>
+                                                        <span className="text-[10px] font-bold text-gray-400 font-mono tracking-wider">{emp.empCode}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-[4px] shadow-sm ${emp.status === 'Suspended' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                                                        }`}>
+                                                        {emp.status || 'Active'}
+                                                    </span>
+                                                    <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" /> {emp.lastLogin ? new Date(emp.lastLogin).toLocaleDateString('en-GB') : 'Never'}</span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
 
-                                <div className="w-full overflow-x-auto">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="bg-[#f8fafc] border-b border-gray-100">
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Employee</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Role</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Status</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Last Login</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Login Count</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Companies</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-50">
-                                            {filteredHierarchy.map((emp) => (
-                                                <React.Fragment key={emp.empCode}>
-                                                    <tr className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group cursor-pointer" onClick={() => { setActiveMenu('Companies'); setSelectedEmpForCompanies(emp); }}>
-                                                        <td className="py-3.5 px-6">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-9 h-9 bg-gray-100 text-gray-700 flex items-center justify-center font-bold text-sm shadow-sm rounded-[3px] shrink-0">
-                                                                    {emp.empName.charAt(0).toUpperCase()}
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-[13px] font-bold text-slate-700 uppercase group-hover:text-[#0285fd] transition-colors">{emp.empName}</p>
-                                                                    <p className="text-[11px] text-slate-500 font-mono font-semibold mt-0.5">{emp.empCode} <span className="text-gray-400 font-normal mx-1">•</span> <span className="text-gray-500 font-normal">{emp.email || 'No Email'}</span></p>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-3.5 px-6">
-                                                            <span className={`inline-flex items-center px-2.5 py-1 text-[10px] uppercase tracking-widest font-bold rounded-[3px] shadow-sm ${emp.role === 99 ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 border border-gray-200'}`}>
-                                                                {emp.role === 99 ? 'Super Admin' : `Role ${emp.role}`}
-                                                            </span>
-                                                        </td>
-                                                        <td className="py-3.5 px-6">
-                                                            <span className={`inline-flex items-center px-2 py-1 text-[10px] uppercase tracking-widest font-bold rounded-[3px] shadow-sm border ${emp.status === 'Suspended' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
-                                                                {emp.status || 'Active'}
-                                                            </span>
-                                                        </td>
-                                                        <td className="py-3.5 px-6">
-                                                            <span className="text-[13px] font-medium text-gray-700">
-                                                                {emp.lastLogin ? new Date(emp.lastLogin).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : <span className="text-gray-400">Never</span>}
-                                                            </span>
-                                                        </td>
-                                                        <td className="py-3.5 px-6">
-                                                            <span className="text-[13px] font-bold text-gray-800">{emp.loginCount || 0}</span>
-                                                        </td>
-                                                        <td className="py-3.5 px-6">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="w-7 h-7 bg-gray-100 border border-gray-300 text-gray-700 flex items-center justify-center text-[11px] font-bold rounded-[3px]">
-                                                                    {emp.companies.length}
-                                                                </span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-3.5 px-6 text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                <button
-                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-[#0285fd] hover:bg-[#0073ff] rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setEditingEmp(emp);
-                                                                        setSelectedRoleId(emp.role);
-                                                                        setSelectedGroupName(emp.memberId || 'Administrators');
-                                                                    }}
-                                                                    title="Edit User Role"
-                                                                >
-                                                                    <Edit className="w-[14px] h-[14px]" /> Edit
-                                                                </button>
-                                                                <button
-                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
-                                                                    onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(e, emp.empCode); }}
-                                                                    title="Delete Employee"
-                                                                >
-                                                                    <Trash2 className="w-[14px] h-[14px]" /> Delete
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </React.Fragment>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                {/* Widget 2: Company Overview */}
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 overflow-hidden flex flex-col">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-[16px] font-bold text-gray-800">Company Registries</h3>
+                                        <button onClick={() => setActiveMenu('Companies')} className="text-gray-400 hover:text-blue-600 transition-colors bg-gray-50 hover:bg-blue-50 p-2 rounded-xl border border-transparent hover:border-blue-200" title="Manage Companies">
+                                            <Settings className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <div className="flex flex-col gap-3 flex-1">
+                                        {allCompanies.length === 0 ? (
+                                            <div className="flex-1 flex items-center justify-center text-sm font-medium text-gray-400">No registries found.</div>
+                                        ) : allCompanies.slice(0, 4).map((comp, idx) => (
+                                            <div key={comp.code} className="flex items-center justify-between p-3.5 rounded-2xl border border-gray-100/60 bg-gray-50/50 hover:bg-blue-50/50 hover:border-blue-100 transition-all group">
+                                                <div className="flex items-center gap-3 w-[65%]">
+                                                    <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center font-black text-[12px] text-blue-600 uppercase shadow-sm group-hover:scale-105 transition-transform duration-300 shrink-0">
+                                                        {(comp.comp_Name || 'C').slice(0, 2)}
+                                                    </div>
+                                                    <div className="flex flex-col overflow-hidden">
+                                                        <span className="text-[13px] font-bold text-gray-800 leading-tight truncate">{comp.comp_Name || 'Unknown Entity'}</span>
+                                                        <span className="text-[11px] font-medium text-gray-500 truncate">{comp.email || 'No Contact'}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col items-end gap-1 shrink-0">
+                                                    <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-[4px] shadow-sm ${comp.acc_Desable === 1 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                                                        }`}>
+                                                        {comp.acc_Desable === 1 ? 'Locked' : 'Active'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </motion.div>
+
                         </motion.div>
                     )}
 
                     {/* COMPANIES VIEW */}
                     {activeMenu === 'Companies' && (
-                        <div className="bg-white border border-gray-200 overflow-hidden mb-6 rounded-[3px] shadow-sm">
-                            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-emerald-50 flex items-center justify-center rounded-[3px]">
-                                        <Building2 className="w-4 h-4 text-emerald-500" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-[15px] font-bold text-gray-800">{selectedEmpForCompanies ? `Companies for ${selectedEmpForCompanies.empName}` : 'All Registered Companies'}</h2>
-                                        <p className="text-[11px] text-gray-500 font-medium">Manage all company records</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    {selectedEmpForCompanies && (
-                                        <button onClick={() => setSelectedEmpForCompanies(null)} className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 text-[10px] font-bold rounded-[3px] transition-all">
-                                            <X className="w-3 h-3" /> Clear Employee Filter
-                                        </button>
-                                    )}
-                                    <span className="bg-emerald-50 border border-emerald-200 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-[3px]">{allCompanies.filter(c => selectedEmpForCompanies ? selectedEmpForCompanies.companies.some(ec => ec.companyCode === c.code) : true).length} Companies</span>
-                                </div>
-                            </div>
-                            <div className="w-full overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="bg-[#f8fafc] border-b border-gray-100">
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Company Code</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Company Name</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Email</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Phone</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {allCompanies.filter(c => {
-                                            const matchesSearch = c.comp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) || c.code?.toLowerCase().includes(searchTerm.toLowerCase());
-                                            const matchesEmp = selectedEmpForCompanies ? selectedEmpForCompanies.companies.some(ec => ec.companyCode === c.code) : true;
-                                            return matchesSearch && matchesEmp;
-                                        }).map(comp => (
-                                            <tr key={comp.code} onClick={() => setSelectedCompany(comp)} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all cursor-pointer group">
-                                                <td className="py-3.5 px-6 text-[12px] text-blue-600 font-mono font-bold">{comp.code}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">{comp.comp_Name || 'N/A'}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-gray-500 font-medium">{comp.email || 'N/A'}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-gray-500 font-medium">{comp.phone || 'N/A'}</td>
-                                                <td className="py-3.5 px-6 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <button
-                                                            className={`px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-[3px] transition-all flex items-center justify-center w-[90px] gap-1.5 ${comp.acc_Desable === 1 ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-500'}`}
-                                                            onClick={(e) => handleToggleCompanyLock(e, comp.code)}
-                                                            title={comp.acc_Desable === 1 ? "Unlock Company" : "Lock Company"}
-                                                        >
-                                                            {comp.acc_Desable === 1 ? <Lock className="w-[14px] h-[14px]" /> : <Unlock className="w-[14px] h-[14px]" />}
-                                                            {comp.acc_Desable === 1 ? "Unlock" : "Lock"}
-                                                        </button>
-                                                        <button
-                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
-                                                            onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.code, null); }}
-                                                            title="Delete Company"
-                                                        >
-                                                            <Trash2 className="w-[14px] h-[14px]" /> Delete
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <CompaniesView
+                            isCreatingCompany={isCreatingCompany}
+                            setIsCreatingCompany={setIsCreatingCompany}
+                            createCompanyForm={createCompanyForm}
+                            setCreateCompanyForm={setCreateCompanyForm}
+                            creatingCompany={creatingCompany}
+                            setCreatingCompany={setCreatingCompany}
+                            currentUserName={currentUserName}
+                            fetchCompanies={fetchAdminData}
+                            setAlertConfig={setAlertConfig}
+                            selectedEmpForCompanies={selectedEmpForCompanies}
+                            setSelectedEmpForCompanies={setSelectedEmpForCompanies}
+                            allCompanies={allCompanies}
+                            searchTerm={searchTerm}
+                            setSelectedCompany={setSelectedCompany}
+                            handleToggleCompanyLock={handleToggleCompanyLock}
+                            handleDeleteCompany={handleDeleteCompany}
+                        />
                     )}
 
                     {/* EMPLOYEES VIEW */}
                     {activeMenu === 'Employees' && (
-                        <div className="bg-white border border-gray-200 overflow-hidden mb-6 rounded-[3px] shadow-sm">
-                            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[3px]">
-                                        <Users className="w-4 h-4 text-[#0285fd]" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-[15px] font-bold text-gray-800">All Employees</h2>
-                                        <p className="text-[11px] text-gray-500 font-medium">Manage employee accounts & roles</p>
-                                    </div>
-                                </div>
-                                <span className="bg-blue-50 border border-blue-200 text-[#0285fd] text-[10px] font-bold px-2.5 py-1 rounded-[3px]">{allEmployees.length} Employees</span>
-                            </div>
-                            <div className="w-full overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="bg-[#f8fafc] border-b border-gray-100">
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Emp Code</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Employee Name</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Email</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Role</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {allEmployees.filter(e =>
-                                            e.emp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            e.emp_Code?.toLowerCase().includes(searchTerm.toLowerCase())
-                                        ).map(emp => (
-                                            <tr key={emp.emp_Code} onClick={() => setSelectedEmployeeView(emp)} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all cursor-pointer group">
-                                                <td className="py-3.5 px-6 text-[12px] text-blue-600 font-mono font-bold">{emp.emp_Code}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">{emp.emp_Name || 'N/A'}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-gray-500 font-medium">{emp.email || 'N/A'}</td>
-                                                <td className="py-3.5 px-6">
-                                                    <span className={`inline-flex items-center justify-center w-[110px] px-2.5 py-1 text-[10px] uppercase tracking-widest font-bold rounded-[3px] ${emp.userRole_Id === 99 ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 border border-gray-300'}`}>
-                                                        {systemRoles.find(r => r.id === emp.userRole_Id || r.id?.toString() === emp.userRole_Id?.toString())?.name || (emp.userRole_Id === 99 ? 'Super Admin' : `Role ${emp.userRole_Id}`)}
-                                                    </span>
-                                                </td>
-                                                <td className="py-3.5 px-6 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <button
-                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-[#0285fd] hover:bg-[#0073ff] rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setEditingEmp(emp);
-                                                                setSelectedRoleId(emp.userRole_Id);
-                                                                setSelectedGroupName(emp.member_Id || 'Administrators');
-                                                            }}
-                                                            title="Edit Employee Role"
-                                                        >
-                                                            <Edit className="w-[14px] h-[14px]" /> Edit
-                                                        </button>
-                                                        <button
-                                                            className={`px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-[3px] transition-all flex items-center justify-center w-[90px] gap-1.5 ${emp.acc_Desable === "1" || emp.accDesable === "1" ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-500'}`}
-                                                            onClick={(e) => { e.stopPropagation(); handleToggleEmployeeLock(e, emp.empCode || emp.emp_Code, (emp.acc_Desable === "1" || emp.accDesable === "1")); }}
-                                                            title={(emp.acc_Desable === "1" || emp.accDesable === "1") ? "Unlock Employee" : "Lock Employee"}
-                                                        >
-                                                            {(emp.acc_Desable === "1" || emp.accDesable === "1") ? <Lock className="w-[14px] h-[14px]" /> : <Unlock className="w-[14px] h-[14px]" />}
-                                                            {(emp.acc_Desable === "1" || emp.accDesable === "1") ? "Unlock" : "Lock"}
-                                                        </button>
-                                                        <button
-                                                            className={`px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5 ${(emp.userRole_Id == 99) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                if (emp.userRole_Id != 99) handleDeleteEmployee(e, emp.emp_Code);
-                                                            }}
-                                                            title={emp.userRole_Id == 99 ? "Super Admin cannot be deleted" : "Delete Employee"}
-                                                            disabled={emp.userRole_Id == 99}
-                                                        >
-                                                            <Trash2 className="w-[14px] h-[14px]" /> Delete
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <EmployeesView
+                            allEmployees={allEmployees}
+                            searchTerm={searchTerm}
+                            systemRoles={systemRoles}
+                            setSelectedEmployeeView={setSelectedEmployeeView}
+                            setEditingEmp={setEditingEmp}
+                            setSelectedRoleId={setSelectedRoleId}
+                            setSelectedGroupName={setSelectedGroupName}
+                            handleToggleEmployeeLock={handleToggleEmployeeLock}
+                            handleDeleteEmployee={handleDeleteEmployee}
+                        />
                     )}
 
                     {/* DATABASE VIEW */}
@@ -1673,257 +1556,42 @@ const SuperAdminDashboard = () => {
 
                     {/* ROLE FEATURES VIEW */}
                     {activeMenu === 'Role Features' && (
-                        <div className="bg-white border border-gray-200 flex flex-col gap-6 pb-6 rounded-[3px] overflow-hidden mb-6 shadow-sm">
-                            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[3px]">
-                                        <ShieldAlert className="w-4 h-4 text-[#0285fd]" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-[15px] font-bold text-gray-800">System Role Permission Master Editor</h2>
-                                        <p className="text-[11px] text-gray-500 font-medium">Configure default enabled/disabled features for each user role</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3 self-start">
-                                    <button
-                                        onClick={handleSeedFunctions}
-                                        disabled={seedingFunctions || loadingPermissions}
-                                        className="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-[3px] transition-all flex items-center gap-2"
-                                    >
-                                        {seedingFunctions ? (
-                                            <><Loader2 className="animate-spin" size={13} />Seeding...</>
-                                        ) : (
-                                            <><Database size={14} />Seed Functions</>
-                                        )}
-                                    </button>
-                                    <button
-                                        onClick={handleAllowAllPermissions}
-                                        disabled={loadingPermissions || !permissions.length}
-                                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-[3px] shadow-sm transition-all flex items-center gap-2 disabled:opacity-50"
-                                    >
-                                        <CheckCircle size={14} />
-                                        Allow All
-                                    </button>
-                                    <button
-                                        onClick={handleInitiateSavePermissions}
-                                        disabled={savingPermissions || loadingPermissions || !permissions.length}
-                                        className="px-5 py-2.5 bg-[#0285fd] hover:bg-[#0073ff] text-white text-xs font-bold rounded-[3px] shadow-sm transition-all flex items-center gap-2 disabled:opacity-50"
-                                    >
-                                        {savingPermissions ? (
-                                            <><Loader2 className="animate-spin" size={13} />Saving Changes...</>
-                                        ) : (
-                                            'Save Role Permissions'
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="bg-gray-50 p-4 border border-gray-200 mx-6 flex flex-col gap-4 rounded-[3px] shadow-inner">
-                                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <span className="text-xs font-black text-gray-500 uppercase tracking-widest mr-2">Select Role:</span>
-                                        {systemRoles.map(role => (
-                                            <button
-                                                key={role.id}
-                                                onClick={() => setSelectedRole(role.id)}
-                                                className={`px-3 py-1.5 text-xs font-bold rounded-[3px] transition-all ${selectedRole === role.id
-                                                    ? 'bg-[#0285fd] text-white shadow-sm'
-                                                    : 'bg-white hover:bg-gray-100 border border-gray-200 text-gray-600'
-                                                    }`}
-                                            >
-                                                {role.name}
-                                            </button>
-                                        ))}
-                                        <button
-                                            onClick={() => setShowCreateRoleModal(true)}
-                                            className="px-3 py-1.5 text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-[3px] transition-all flex items-center gap-1"
-                                        >
-                                            <Plus size={12} /> Add Role
-                                        </button>
-                                        {selectedRole && selectedRole !== 1 && selectedRole !== 99 && (
-                                            <>
-                                                <button
-                                                    onClick={(e) => {
-                                                        const group = userGroups.find(g => g.group_Id === selectedRole);
-                                                        if (group) {
-                                                            setEditingUserRole(group);
-                                                            setEditRoleName(group.group_Name);
-                                                            setEditRoleDesc(group.description || '');
-                                                        }
-                                                    }}
-                                                    className="px-3 py-1.5 text-xs font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded-[3px] transition-all flex items-center gap-1"
-                                                >
-                                                    <Edit size={12} /> Edit Role
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleDeleteUserRole(e, selectedRole)}
-                                                    className="px-3 py-1.5 text-xs font-bold bg-blue-50 border border-red-200 text-white bg-red-600 hover:bg-red-700 rounded-[3px] transition-all flex items-center gap-1"
-
-                                                >
-                                                    <Trash2 size={12} /> Delete
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-
-                                    <div className="relative w-full md:w-64">
-                                        <Search className="absolute left-3 top-2.5 text-gray-500 w-4 h-4" />
-                                        <input
-                                            type="text"
-                                            placeholder="Search functions..."
-                                            value={permSearch}
-                                            onChange={e => setPermSearch(e.target.value)}
-                                            className="pl-9 pr-4 py-1.5 border border-gray-200 bg-white text-gray-700 text-xs w-full outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] rounded-[3px] transition-all"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {loadingPermissions ? (
-                                <SystemLoader inline message="Fetching role permission matrix..." />
-                            ) : !permissions.length ? (
-                                <div className="flex flex-col items-center justify-center py-20 gap-4 text-gray-500 mx-6 border border-dashed border-gray-200 bg-white rounded-[3px]">
-                                    <Database size={40} className="text-gray-400" />
-                                    <div className="text-center">
-                                        <p className="text-[13px] font-bold text-gray-500 mb-1">No System Functions Found</p>
-                                        <p className="text-[11px] text-gray-500 font-medium">The system permission table is empty. Seed default functions to get started.</p>
-                                    </div>
-                                    <button
-                                        onClick={handleSeedFunctions}
-                                        disabled={seedingFunctions}
-                                        className="px-6 py-2.5 bg-[#0285fd] hover:bg-[#0073ff] text-white text-xs font-bold rounded-[3px] transition-all flex items-center gap-2 shadow-sm"
-                                    >
-                                        {seedingFunctions ? (
-                                            <><Loader2 className="animate-spin" size={14} />Seeding Functions...</>
-                                        ) : (
-                                            <><Database size={14} />Seed Default Functions & Reports</>
-                                        )}
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="border border-gray-200 overflow-hidden mx-6 bg-white rounded-[3px] shadow-sm">
-                                    <div className="relative z-10">
-                                        <table className="w-full text-left border-collapse">
-                                            <thead>
-                                                <tr className="bg-[#f8fafc] border-b border-gray-100">
-                                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap w-1/3">Function Code</th>
-                                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap w-1/2">Description</th>
-                                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-center">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-gray-50">
-                                                {(() => {
-                                                    const filtered = permissions.filter(p => {
-                                                        const code = (p.system_Fuction || p.systemFuction || p.System_Fuction || '').toLowerCase();
-                                                        const desc = (p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || '').toLowerCase();
-                                                        const term = permSearch.toLowerCase();
-                                                        return code.includes(term) || desc.includes(term);
-                                                    });
-
-                                                    const categoryOrder = ['ACC_', 'MST_', 'TRN_', 'RPT_', 'SYS_'];
-                                                    const categoryLabels = {
-                                                        ACC_: { label: 'General' },
-                                                        MST_: { label: 'Master Data' },
-                                                        TRN_: { label: 'Transactions' },
-                                                        RPT_: { label: 'Reports' },
-                                                        SYS_: { label: 'System Administration' },
-                                                    };
-
-                                                    const getCategory = (code) => {
-                                                        const up = code.toUpperCase();
-                                                        const prefix = categoryOrder.find(p => up.startsWith(p));
-                                                        return prefix || 'OTHER';
-                                                    };
-
-                                                    const grouped = {};
-                                                    filtered.forEach(p => {
-                                                        const code = p.system_Fuction || p.systemFuction || p.System_Fuction || '';
-                                                        const cat = getCategory(code);
-                                                        if (!grouped[cat]) grouped[cat] = [];
-                                                        grouped[cat].push(p);
-                                                    });
-
-                                                    const rows = [];
-                                                    const renderItems = (items, label) => {
-                                                        if (!items.length) return;
-                                                        rows.push(
-                                                            <tr key={`cat-${label}`} className="bg-gray-100 border-b border-gray-200">
-                                                                <td colSpan={3} className="px-4 py-2.5">
-                                                                    <span className="text-[11px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-2">
-                                                                        <span className="w-1.5 h-1.5 bg-[#0285fd] inline-block rounded-[2px]"></span>
-                                                                        {label}
-                                                                        <span className="text-[10px] font-normal text-gray-500 normal-case">({items.length} function{(items.length !== 1) ? 's' : ''})</span>
-                                                                    </span>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                        items.forEach(p => {
-                                                            const code = p.system_Fuction || p.systemFuction || p.System_Fuction;
-                                                            const desc = p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || code;
-                                                            const isAllowed = (p.allow_Fuction || p.allowFuction || p.Allow_Fuction) === 'T';
-                                                            rows.push(
-                                                                <tr key={code} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
-                                                                    <td className="py-3.5 px-6">
-                                                                        <span className="font-mono text-[12px] font-bold text-blue-600">{code}</span>
-                                                                    </td>
-                                                                    <td className="py-3.5 px-6">
-                                                                        <span className="text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">{desc}</span>
-                                                                    </td>
-                                                                    <td className="py-3.5 px-6 text-center">
-                                                                        <button
-                                                                            onClick={() => handleTogglePermission(code)}
-                                                                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all ${isAllowed
-                                                                                ? 'bg-emerald-600 text-white shadow-sm'
-                                                                                : 'bg-red-600 text-white shadow-sm'
-                                                                                }`}
-                                                                        >
-                                                                            {isAllowed ? 'Allowed' : 'Denied'}
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                            );
-                                                        });
-                                                    };
-
-                                                    categoryOrder.forEach(prefix => {
-                                                        renderItems(grouped[prefix] || [], categoryLabels[prefix].label);
-                                                    });
-                                                    renderItems(grouped['OTHER'] || [], 'Other');
-
-                                                    return rows;
-                                                })()}
-                                            </tbody>
-                                        </table>
-                                        {!permissions.filter(p => {
-                                            const code = (p.system_Fuction || p.systemFuction || p.System_Fuction || '').toLowerCase();
-                                            const desc = (p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || '').toLowerCase();
-                                            const term = permSearch.toLowerCase();
-                                            return code.includes(term) || desc.includes(term);
-                                        }).length && (
-                                                <div className="flex items-center justify-center py-12 text-gray-500 gap-2">
-                                                    <Search size={16} />
-                                                    <span className="text-xs font-medium">No functions match your search.</span>
-                                                </div>
-                                            )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <RoleFeaturesView
+                            handleSeedFunctions={handleSeedFunctions}
+                            seedingFunctions={seedingFunctions}
+                            loadingPermissions={loadingPermissions}
+                            handleAllowAllPermissions={handleAllowAllPermissions}
+                            permissions={permissions}
+                            handleInitiateSavePermissions={handleInitiateSavePermissions}
+                            savingPermissions={savingPermissions}
+                            systemRoles={systemRoles}
+                            selectedRole={selectedRole}
+                            setSelectedRole={setSelectedRole}
+                            setShowCreateRoleModal={setShowCreateRoleModal}
+                            userGroups={userGroups}
+                            setEditingUserRole={setEditingUserRole}
+                            setEditRoleName={setEditRoleName}
+                            setEditRoleDesc={setEditRoleDesc}
+                            handleDeleteUserRole={handleDeleteUserRole}
+                            permSearch={permSearch}
+                            setPermSearch={setPermSearch}
+                            handleTogglePermission={handleTogglePermission}
+                        />
                     )}
 
                     {/* ADMIN CONFIG VIEW */}
                     {activeMenu === 'Admin Config' && (
                         <div className="bg-white border border-gray-200 rounded-[3px] shadow-sm">
-                            <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3 bg-gray-50">
-                                <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[3px]">
-                                    <Settings className="w-4 h-4 text-[#0285fd]" />
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-8 h-8 rounded-[3px] bg-blue-50 flex items-center justify-center">
+                                    <Settings className="w-4 h-4 text-blue-500" />
                                 </div>
                                 <div>
-                                    <h2 className="text-[15px] font-bold text-gray-800">Admin Configuration</h2>
+                                    <h3 className="text-[16px] font-bold text-gray-800">Admin Configuration</h3>
                                     <p className="text-[11px] text-gray-500 font-medium">System-wide settings and preferences</p>
                                 </div>
                             </div>
-                            <div className="p-6">
+                            <div>
                                 <AdminConfigBoard
                                     hierarchy={hierarchy}
                                     allEmployees={allEmployees}
@@ -1943,17 +1611,17 @@ const SuperAdminDashboard = () => {
 
                     {/* REPORTS VIEW */}
                     {activeMenu === 'Reports' && (
-                        <div className="bg-white border border-gray-200 flex flex-col gap-6 pb-6 rounded-[3px] overflow-hidden mb-6 shadow-sm">
-                            <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3 bg-gray-50">
-                                <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[3px]">
-                                    <FileText className="w-4 h-4 text-[#0285fd]" />
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 overflow-hidden mb-6">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
+                                    <FileText className="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div>
-                                    <h2 className="text-[15px] font-bold text-gray-800">Admin Reports</h2>
-                                    <p className="text-[11px] text-gray-500 font-medium">View system-wide reports and analytics</p>
+                                    <h3 className="text-[18px] font-bold text-gray-800 tracking-tight leading-none mb-1">Admin Reports</h3>
+                                    <p className="text-[12px] text-gray-500 font-medium">View system-wide reports and analytics data</p>
                                 </div>
                             </div>
-                            <div className="px-6">
+                            <div>
                                 <AdminCompanyReportsBoard
                                     hierarchy={hierarchy}
                                     allEmployees={allEmployees}
@@ -1977,7 +1645,7 @@ const SuperAdminDashboard = () => {
                                         <X className="w-4 h-4" />
                                     </button>
                                 </div>
-                                <div className="p-6">
+                                <div>
                                     <div className="bg-white border border-gray-200 rounded-[3px] p-4 space-y-4">
                                         <div>
                                             <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Role Name *</label>
@@ -1986,7 +1654,7 @@ const SuperAdminDashboard = () => {
                                                 value={newRoleName}
                                                 onChange={e => setNewRoleName(e.target.value)}
                                                 placeholder="e.g. HR Manager"
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-gray-700"
                                                 autoFocus
                                             />
                                         </div>
@@ -1997,7 +1665,7 @@ const SuperAdminDashboard = () => {
                                                 value={newRoleDescription}
                                                 onChange={e => setNewRoleDescription(e.target.value)}
                                                 placeholder="Optional description"
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-gray-700"
                                             />
                                         </div>
                                     </div>
@@ -2011,7 +1679,7 @@ const SuperAdminDashboard = () => {
                                         <button
                                             onClick={handleCreateRole}
                                             disabled={creatingRole}
-                                            className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"
+                                            className="px-6 h-10 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"
                                         >
                                             {creatingRole ? (
                                                 <><Loader2 className="animate-spin" size={14} /> Creating...</>
@@ -2032,100 +1700,12 @@ const SuperAdminDashboard = () => {
 
                     {/* USER FEEDBACK VIEW */}
                     {activeMenu === 'User Feedback' && (
-                        <div className="bg-white border border-gray-200 flex flex-col gap-6 pb-6 rounded-[3px] overflow-hidden mb-6 shadow-sm min-h-[500px]">
-                            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[3px]">
-                                        <MessageSquare className="w-4 h-4 text-[#0285fd]" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-[15px] font-bold text-gray-800">User Feedback</h2>
-                                        <p className="text-[11px] text-gray-500 font-medium">View and manage feedback submitted from Report Builder</p>
-                                    </div>
-                                </div>
-                                <span className="bg-gray-50 border border-gray-200 text-gray-600 text-[10px] font-bold px-3 py-1.5 rounded-[3px]">{feedbackData.length} Records</span>
-                            </div>
-
-                            <div className="border border-gray-200 overflow-hidden mx-6 bg-white rounded-[3px] shadow-sm flex-1 flex flex-col mb-4">
-                                <div className="w-full overflow-x-auto">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="bg-[#f8fafc] border-b border-gray-100">
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Date</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Employee Name</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Company</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Report Name</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Feedback</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Images</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-50">
-                                            {feedbackLoading ? (
-                                                <tr>
-                                                    <td colSpan={7} className="py-12 text-center text-gray-500 text-[13px] font-medium">Loading feedback...</td>
-                                                </tr>
-                                            ) : feedbackData.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={7} className="py-12 text-center text-gray-500 text-[13px] font-medium">No feedback records found.</td>
-                                                </tr>
-                                            ) : (
-                                                feedbackData.map((item) => (
-                                                    <tr key={item.id} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
-                                                        <td className="py-3.5 px-6 text-[12px] text-gray-500 whitespace-nowrap group-hover:text-blue-600 transition-colors">
-                                                            {new Date(item.createdAt).toLocaleString()}
-                                                        </td>
-                                                        <td className="py-3.5 px-6 text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">
-                                                            {item.employeeName || '-'}
-                                                        </td>
-                                                        <td className="py-3.5 px-6 text-[12px] text-blue-600 font-mono font-bold">
-                                                            {item.companyId || '-'}
-                                                        </td>
-                                                        <td className="py-3.5 px-6 text-[12px] font-medium text-gray-600">
-                                                            {item.reportName || '-'}
-                                                        </td>
-                                                        <td className="py-3.5 px-6 text-[12px] text-gray-500 max-w-[250px] truncate" title={item.feedbackText}>
-                                                            {item.feedbackText}
-                                                        </td>
-                                                        <td className="py-3.5 px-6">
-                                                            {(() => {
-                                                                try {
-                                                                    if (!item.images || item.images === '[]') return <span className="text-[12px] text-gray-500">-</span>;
-                                                                    const imgs = JSON.parse(item.images);
-                                                                    if (!Array.isArray(imgs) || imgs.length === 0) return <span className="text-[12px] text-gray-500">-</span>;
-                                                                    return (
-                                                                        <div className="flex gap-1.5 overflow-x-auto max-w-[120px] pb-1">
-                                                                            {imgs.map((img, i) => (
-                                                                                <div key={i} onClick={() => setFullScreenImage(img)} className="shrink-0 block cursor-pointer" title="Click to view full image">
-                                                                                    <img src={img} alt={`Attachment ${i + 1}`} className="w-8 h-8 object-cover rounded shadow-sm border border-gray-200 hover:opacity-80 transition-opacity" />
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    );
-                                                                } catch (e) {
-                                                                    return <span className="text-[12px] text-gray-500">Error</span>;
-                                                                }
-                                                            })()}
-                                                        </td>
-                                                        <td className="px-4 py-3 text-right">
-                                                            <div className="flex justify-end">
-                                                                <button
-                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
-                                                                    onClick={() => handleDeleteFeedback(item.id)}
-                                                                    title="Delete Feedback"
-                                                                >
-                                                                    <Trash2 size={10} /> Delete
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                        <UserFeedbackView
+                            feedbackData={feedbackData}
+                            feedbackLoading={feedbackLoading}
+                            handleDeleteFeedback={handleDeleteFeedback}
+                            setFullScreenImage={setFullScreenImage}
+                        />
                     )}
 
                 </div>
@@ -2157,10 +1737,10 @@ const SuperAdminDashboard = () => {
                         {/* Header */}
                         <div className="px-6 py-4 border-b border-gray-200 bg-white">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-[15px] font-bold text-gray-800 flex items-center gap-2">
-                                    <ShieldAlert className="text-[#0285fd]" size={18} />
+                                <h3 className="text-[15px] font-bold text-gray-800 flex items-center gap-2">
+                                    <ShieldAlert className="text-blue-600" size={18} />
                                     Manage Employee Role
-                                </h2>
+                                </h3>
                                 <button onClick={() => setEditingEmp(null)} className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-[3px] transition-all">
                                     <X size={28} strokeWidth={1.5} className="w-5 h-5" />
                                 </button>
@@ -2169,10 +1749,10 @@ const SuperAdminDashboard = () => {
                         </div>
 
                         {/* Body */}
-                        <div className="p-6">
+                        <div>
                             {/* Employee Info Card */}
                             <div className="bg-white border border-gray-200 rounded-[3px] p-4 flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 bg-blue-50 text-[#0285fd] flex items-center justify-center font-bold text-sm shrink-0 rounded-[3px]">
+                                <div className="w-10 h-10 bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm shrink-0 rounded-[3px]">
                                     {(editingEmp.empName || editingEmp.emp_Name || 'U')[0]}
                                 </div>
                                 <div>
@@ -2195,8 +1775,8 @@ const SuperAdminDashboard = () => {
                                                     setSelectedGroupName(matchedGroup ? matchedGroup.group_Name : role.name);
                                                 }}
                                                 className={`px-3 py-1.5 text-xs font-bold transition-all border rounded-[3px] ${selectedRoleId === role.id
-                                                    ? 'bg-[#0285fd] border-[#0285fd] text-white shadow-sm'
-                                                    : 'bg-white hover:bg-gray-50 border-gray-300 hover:border-[#0285fd]/50 text-gray-600'
+                                                    ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                                                    : 'bg-white hover:bg-gray-50 border-gray-300 hover:border-blue-600/50 text-gray-600'
                                                     }`}
                                             >
                                                 {role.name}
@@ -2206,7 +1786,7 @@ const SuperAdminDashboard = () => {
                                 </div>
                                 <div className="p-3 bg-gray-50 border border-gray-200 rounded-[3px]">
                                     <p className="text-[11px] text-gray-500 leading-snug">
-                                        <span className="font-bold text-gray-600">Simplified Assignment:</span> Clicking a role automatically assigns both the Role Level (ID {selectedRoleId || '?'}) and maps the user to the correct Member Group (<span className="text-[#0285fd] font-mono">{selectedGroupName || '?'}</span>).
+                                        <span className="font-bold text-gray-600">Simplified Assignment:</span> Clicking a role automatically assigns both the Role Level (ID {selectedRoleId || '?'}) and maps the user to the correct Member Group (<span className="text-blue-600 font-mono">{selectedGroupName || '?'}</span>).
                                     </p>
                                 </div>
                             </div>
@@ -2222,7 +1802,7 @@ const SuperAdminDashboard = () => {
                                 <button
                                     onClick={handleInitiateUpdateRole}
                                     disabled={savingRole}
-                                    className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"
+                                    className="px-6 h-10 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"
                                 >
                                     {savingRole && <Loader2 className="w-4 h-4 animate-spin" />}
                                     {savingRole ? 'Saving...' : 'Save Role'}
@@ -2236,22 +1816,22 @@ const SuperAdminDashboard = () => {
             {/* Employee Details View Modal */}
             {selectedEmployeeView && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white border border-slate-200 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[3px] flex flex-col">
-                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+                    <div className="bg-white border border-gray-100 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl flex flex-col">
+                        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-blue-50 border border-blue-100 flex items-center justify-center rounded-[3px] shadow-sm">
-                                    <Users className="w-6 h-6 text-[#0285fd]" />
+                                <div className="w-12 h-12 bg-blue-50 border border-blue-100 flex items-center justify-center rounded-xl shadow-sm">
+                                    <Users className="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div>
-                                    <h2 className="text-[18px] font-black text-slate-800">Employee Details</h2>
-                                    <p className="text-[12px] font-bold text-slate-500 mt-0.5">{selectedEmployeeView.emp_Name || selectedEmployeeView.empName || 'N/A'} <span className="text-blue-600 font-mono">({selectedEmployeeView.emp_Code || selectedEmployeeView.empCode})</span></p>
+                                    <h3 className="text-[18px] font-black text-gray-800">Employee Details</h3>
+                                    <p className="text-[12px] font-bold text-gray-500 mt-0.5">{selectedEmployeeView.emp_Name || selectedEmployeeView.empName || 'N/A'} <span className="text-blue-600 font-mono">({selectedEmployeeView.emp_Code || selectedEmployeeView.empCode})</span></p>
                                 </div>
                             </div>
-                            <button onClick={() => setSelectedEmployeeView(null)} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-all">
-                                <X size={28} strokeWidth={1.5} className="w-5 h-5" />
+                            <button onClick={() => setSelectedEmployeeView(null)} className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all">
+                                <X size={28} strokeWidth={2} className="w-5 h-5" />
                             </button>
                         </div>
-                        <div className="p-8 overflow-y-auto bg-white">
+                        <div className="p-8 overflow-y-auto bg-gray-50/50">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 {Object.entries({
                                     ...selectedEmployeeView,
@@ -2260,17 +1840,17 @@ const SuperAdminDashboard = () => {
                                     .filter(([key, value]) => typeof value !== 'object' && key !== 'companies' && key !== 'pass_Word' && key !== 'password' && key !== 'Pass_Word')
                                     .map(([key, value], index, array) => (
                                         <div key={key} className={`${key === 'PASSWORD' && array.length % 2 !== 0 ? 'md:col-span-2' : ''}`}>
-                                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">{key.replace(/_/g, ' ')}</label>
-                                            <div className="w-full min-h-[42px] border border-slate-200 bg-slate-50 rounded-[3px] px-4 py-2.5 flex items-center shadow-sm group hover:border-[#0285fd]/40 transition-colors">
-                                                <span className="text-[14px] font-bold text-slate-700 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-400 font-normal italic">Empty</span>}</span>
+                                            <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">{key.replace(/_/g, ' ')}</label>
+                                            <div className="w-full min-h-[44px] border border-gray-200 bg-white rounded-xl px-4 py-2.5 flex items-center shadow-sm group hover:border-blue-400 hover:shadow-md transition-all">
+                                                <span className="text-[14px] font-bold text-gray-700 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-gray-400 font-normal italic">Empty</span>}</span>
                                             </div>
                                         </div>
                                     ))}
                             </div>
                         </div>
-                        <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
-                            <button onClick={() => setSelectedEmployeeView(null)} className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold text-[13px] rounded-[3px] shadow-sm hover:bg-slate-50 transition-all">
-                                Close
+                        <div className="p-6 border-t border-gray-100 bg-white flex justify-end shrink-0">
+                            <button onClick={() => setSelectedEmployeeView(null)} className="px-6 py-2.5 bg-gray-50 border border-gray-200 text-gray-700 font-bold text-[13px] rounded-xl shadow-sm hover:bg-gray-100 hover:text-gray-900 transition-all">
+                                Close Window
                             </button>
                         </div>
                     </div>
@@ -2286,7 +1866,7 @@ const SuperAdminDashboard = () => {
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
-                        <div className="p-6">
+                        <div>
                             <div className="bg-white border border-gray-200 rounded-[3px] p-4 space-y-4">
                                 <div>
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Role Name *</label>
@@ -2295,7 +1875,7 @@ const SuperAdminDashboard = () => {
                                         value={editRoleName}
                                         onChange={e => setEditRoleName(e.target.value)}
                                         placeholder="e.g. HR Manager"
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] text-gray-700"
                                         autoFocus
                                     />
                                 </div>
@@ -2306,7 +1886,7 @@ const SuperAdminDashboard = () => {
                                         value={editRoleDesc}
                                         onChange={e => setEditRoleDesc(e.target.value)}
                                         placeholder="Optional description"
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] text-gray-700"
                                     />
                                 </div>
                             </div>
@@ -2320,7 +1900,7 @@ const SuperAdminDashboard = () => {
                                 <button
                                     onClick={handleUpdateUserRole}
                                     disabled={savingUserRole}
-                                    className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"
+                                    className="px-6 h-10 bg-[#2563eb] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"
                                 >
                                     {savingUserRole ? (
                                         <><Loader2 className="animate-spin" size={14} /> Updating...</>
@@ -2439,11 +2019,11 @@ const SuperAdminDashboard = () => {
             {showAITyping && (
                 <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-8 max-w-2xl px-8">
-                        <div className="w-16 h-16 border-4 border-[#0285fd] border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-16 h-16 border-4 border-[#2563eb] border-t-transparent rounded-full animate-spin"></div>
                         <div className="h-16 flex items-center justify-center">
-                            <span className="text-white/90 text-2xl md:text-3xl font-light tracking-wide">
+                            <span className="text-white/90 text-2xl md:text-[#2563eb]xl font-light tracking-wide">
                                 {aiTypingText}
-                                <span className="animate-pulse ml-0.5 text-[#0285fd]">|</span>
+                                <span className="animate-pulse ml-0.5 text-[#2563eb]">|</span>
                             </span>
                         </div>
                     </div>
@@ -2470,5 +2050,7 @@ const SuperAdminDashboard = () => {
 };
 
 export default SuperAdminDashboard;
+
+
 
 

@@ -20,8 +20,8 @@ const AreaBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             handleClear();
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) {
                 try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
@@ -55,8 +55,8 @@ const AreaBoard = ({ isOpen, onClose }) => {
             const data = await areaService.save(formData);
             if (data.message === 'inserted') {
                 showSuccessToast('Area created');
-                setFormData(prev => ({ ...prev, Code: data.code }));
-                setIsEditMode(true);
+                
+                handleClear();
             } else { showSuccessToast('Area updated'); }
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
     };
@@ -80,10 +80,10 @@ const AreaBoard = ({ isOpen, onClose }) => {
         const routeCode = e.target.value;
         const route = routeList.find(r => r.code === routeCode);
         if (route) {
-            setFormData(prev => ({ ...prev, Route_Code: route.code, Route_Name: route.name, Code: '' }));
+            
             setIsEditMode(false);
         } else {
-            setFormData(prev => ({ ...prev, Route_Code: '', Route_Name: '', Code: '' }));
+            
         }
     };
 
@@ -91,8 +91,8 @@ const AreaBoard = ({ isOpen, onClose }) => {
         const areaCode = e.target.value;
         const area = areaList.find(a => a.code === areaCode);
         if (area) {
-            setFormData(prev => ({ ...prev, Code: area.code, Area_Name: area.name, Route_Code: area.route_Code || area.routeCode || formData.Route_Code }));
-            setIsEditMode(true);
+            
+            handleClear();
         } else {
             setFormData(prev => ({ ...prev, Code: '', Area_Name: '' }));
             setIsEditMode(false);

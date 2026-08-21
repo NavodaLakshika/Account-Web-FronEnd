@@ -18,8 +18,9 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const companyData = localStorage.getItem('selectedCompany');
+            handleClear();
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const companyData = sessionStorage.getItem('selectedCompany');
             let companyCode = 'C001';
             if (companyData) {
                 try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
@@ -39,6 +40,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
         if (formData.Loca_Id && isOpen) {
             loadDepartments(formData.Loca_Id);
         } else if (isOpen) {
+            handleClear();
             setDeptList([]);
         }
     }, [formData.Loca_Id, isOpen]);
@@ -93,8 +95,8 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
             const data = await departmentService.save(formData);
             if (data.message === 'inserted') {
                 showSuccessToast('Department created');
-                setFormData(prev => ({ ...prev, Code: data.code }));
-                setIsEditMode(true);
+                
+                handleClear();
             } else {
                 showSuccessToast('Department updated');
             }
