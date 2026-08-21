@@ -21,7 +21,7 @@ const SimpleModal = ({ isOpen, onClose, title, subtitle, children, footer, maxWi
                 <title>{title ? `Onimta Accounting | ${title}` : 'Onimta Accounting'}</title>
             </Helmet>
             <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
-            <div className={`relative w-full ${maxWidth} bg-white shadow-2xl rounded-[3px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400`} style={{ zoom }}>
+            <div className={`relative w-full ${maxWidth} bg-white shadow-2xl rounded-[3px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400`} style={{ transform: zoom !== 1 ? `scale(${zoom})` : 'none', transformOrigin: 'top center' }}>
                 <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-slate-200 select-none relative shrink-0">
                     <div className="flex flex-col gap-0.5 overflow-hidden">
                         <span className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate">

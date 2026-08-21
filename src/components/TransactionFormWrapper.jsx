@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { Helmet } from 'react-helmet-async';
-import { X, MessageSquare, Settings, HelpCircle, History } from 'lucide-react';
+import { X, MessageSquare, Settings, HelpCircle, History, ExternalLink } from 'lucide-react';
 import SubmitReviewModal from './modals/SubmitReviewModal';
 import FormHelpModal from './modals/FormHelpModal';
 import FeatureLockedModal from './modals/FeatureLockedModal';
@@ -12,6 +13,11 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
   const [showLockedModal, setShowLockedModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [lockedMessage, setLockedMessage] = useState("");
+  const [isPoppedOut, setIsPoppedOut] = useState(false);
+
+  const externalWindowRef = useRef(null);
+  const containerRef = useRef(null);
+
   const [formSettings, setFormSettings] = useState(() => {
     const saved = localStorage.getItem('transactionFormSettings');
     let parsed = saved ? JSON.parse(saved) : { darkMode: false, compactLayout: false, showTooltips: true, highContrast: false, fullWidth: false, disableAnimations: false, grayscale: false, fontFamily: 'Default', borderStyle: 'Default', sepiaMode: false, vibrantMode: false };
@@ -32,25 +38,69 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
   };
 
   useEffect(() => {
-    if (isOpen) {
-      // Push state strictly so we can catch popstate
+    if (isOpen && !isPoppedOut) {
       window.history.pushState({ modalOpen: title }, '');
-
-      const handlePopState = (e) => {
-        onClose();
-      };
+      const handlePopState = () => onClose();
       window.addEventListener('popstate', handlePopState);
       return () => {
         window.removeEventListener('popstate', handlePopState);
-        // Only pop history if we are the ones who pushed it? 
-        // React Router might handle the rest, but it's safe to just remove listener
       };
     }
-  }, [isOpen, onClose, title]);
+  }, [isOpen, onClose, title, isPoppedOut]);
+
+  const [containerNode, setContainerNode] = useState(null);
+
+  const handlePopOut = () => {
+    if (isPoppedOut) return;
+
+    const win = window.open('', '_blank');
+    if (win) {
+      externalWindowRef.current = win;
+      win.document.title = title || 'Onimta Form';
+
+      // Copy styles
+      const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+      styles.forEach(style => {
+        win.document.head.appendChild(style.cloneNode(true));
+      });
+
+      // Set body background
+      win.document.body.className = `bg-[#f4f5f8] overflow-x-hidden ${formSettings.darkMode ? 'bg-slate-900' : ''}`;
+
+      // CRITICAL: The container MUST be created using the original window's document
+      // to avoid React rendering bugs related to cross-window instanceof checks!
+      const div = document.createElement('div');
+      div.style.minHeight = '100vh';
+      div.style.width = '100vw';
+      div.style.overflow = 'hidden';
+
+      win.document.body.appendChild(div);
+
+      setContainerNode(div);
+      setIsPoppedOut(true);
+
+      win.addEventListener('beforeunload', () => {
+        setIsPoppedOut(false);
+        setContainerNode(null);
+        externalWindowRef.current = null;
+      });
+    } else {
+      alert('Please allow popups to open forms in a new tab.');
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (externalWindowRef.current) {
+        externalWindowRef.current.close();
+      }
+    };
+  }, []);
+
 
   if (!isOpen) return null;
 
-  return (
+  const contentToRender = (
     <div className={`fixed inset-0 z-[500] flex bg-[#f4f5f8] overflow-hidden text-gray-800 ${formSettings.fontFamily === 'Monospace' ? 'font-mono' : 'font-sans'} ${formSettings.darkMode ? 'bg-slate-900' : ''}`}>
       <Helmet>
         <title>{title ? `Onimta Accounting | ${title}` : 'Onimta Accounting'}</title>
@@ -153,6 +203,14 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
             >
               <HelpCircle size={20} strokeWidth={2} />
             </button>
+            <button
+              onClick={handlePopOut}
+              disabled={isPoppedOut}
+              className="text-gray-500 hover:text-gray-800 transition-colors bg-transparent border-none p-1 disabled:opacity-50"
+              title="Open in new tab"
+            >
+              <ExternalLink size={20} strokeWidth={2} />
+            </button>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors bg-transparent border-none p-1 ml-2">
               <X size={24} strokeWidth={2} />
             </button>
@@ -180,6 +238,12 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
       <FeatureLockedModal isOpen={showLockedModal} onClose={() => setShowLockedModal(false)} message={lockedMessage} />
     </div>
   );
+
+  if (isPoppedOut && containerNode) {
+    return ReactDOM.createPortal(contentToRender, containerNode);
+  }
+
+  return contentToRender;
 };
 
 export default TransactionFormWrapper;
