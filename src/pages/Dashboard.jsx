@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { version as appVersion } from '../../package.json';
 import { useNavigate } from 'react-router-dom';
 import { DotLottiePlayer } from '@dotlottie/react-player';
@@ -230,7 +230,7 @@ const LiveClock = () => {
 };
 
 const PERMISSION_MAP = {
-    // ── Master File ──
+    // -- Master File --
     'Open Company': 'MST_COMPANY',
     'Cost Center Master': 'MST_COST_CENTER',
     'Create Department': 'MST_DEPARTMENT',
@@ -246,7 +246,7 @@ const PERMISSION_MAP = {
     'User Profile Maintenance': 'MST_USER_PROFILE',
     'Change Password': 'SYS_CHANGE_PASSWORD',
 
-    // ── Transactions ──
+    // -- Transactions --
     'Create Invoices': 'TRN_INVOICE',
     'Customer Invoices': 'TRN_INVOICE',
     'Received Payment': 'TRN_RECEIPT',
@@ -275,7 +275,7 @@ const PERMISSION_MAP = {
     'Cheque In Hand': 'TRN_CHEQUE',
     'Not Presented Cheques': 'TRN_CHEQUE',
 
-    // ── Reports ──
+    // -- Reports --
     'Profit and Loss': 'RPT_PROFIT_LOSS',
     'Balance Sheet': 'RPT_BALANCE_SHEET',
     'Trial Balance': 'RPT_TRIAL_BALANCE',
@@ -364,7 +364,7 @@ const PERMISSION_MAP = {
     'Recurring Template List': 'RPT_TRANSACTION_LIST',
     'Audit Log': 'RPT_AUDIT_LOG',
 
-    // ── System Admin ──
+    // -- System Admin --
     'Data Backup': 'SYS_BACKUP',
     'Stock Balance Update': 'SYS_STOCK_UPDATE',
     'Inventory Download': 'SYS_INVENTORY_DOWNLOAD',
@@ -377,14 +377,14 @@ const PERMISSION_MAP = {
     'User & Role Management': 'SYS_USER_MANAGEMENT',
     'Two-Factor Verification': 'SYS_2FA',
 
-    // ── Settings ──
+    // -- Settings --
     'Company Setup': 'MST_COMPANY',
     'Manage Users': 'SYS_USER_MANAGEMENT',
     'Products & Categories': 'MST_CATEGORY',
     'Cost Centers': 'MST_COST_CENTER',
     'User Profile': 'MST_USER_PROFILE',
 
-    // ── Dashboard cards / Quick actions ──
+    // -- Dashboard cards / Quick actions --
     'Customers': 'MST_CUSTOMER',
     'Vendors': 'MST_SUPPLIER',
     'Billing': 'TRN_BILL',
@@ -736,7 +736,7 @@ const Dashboard = () => {
         {
             id: 'subscription',
             title: 'Unlock the full power of Accounts',
-            body: 'You are on a limited plan. Upgrade now to get unlimited users, multiple companies, priority support, and access to all premium features — all in one place.',
+            body: 'You are on a limited plan. Upgrade now to get unlimited users, multiple companies, priority support, and access to all premium features � all in one place.',
             action: 'View Subscription Plans',
             onAction: () => setShowPricingPlansModal(true),
             image: '/subscription.png',
@@ -988,7 +988,7 @@ const Dashboard = () => {
             setUser(currentUser);
             setSelectedCompany(company ? JSON.parse(company) : null);
 
-            // Check subscription status — block expired accounts
+            // Check subscription status � block expired accounts
             const subStatus = currentUser?.SubscriptionStatus || currentUser?.subscriptionStatus || currentUser?.subscription_Status || '';
             const subEndDateStr = currentUser?.SubscriptionEndDate || currentUser?.subscriptionEndDate || currentUser?.subscription_End_Date;
             let isExpired = subStatus.toLowerCase() === 'expired';
@@ -999,7 +999,7 @@ const Dashboard = () => {
             }
 
             if (isExpired) {
-                // Only show the subscription expired modal — do NOT show the onboarding guide
+                // Only show the subscription expired modal � do NOT show the onboarding guide
                 setShowSubscriptionExpiredModal(true);
             } else {
                 // Show first-time onboarding guide based on DB login count
@@ -1235,15 +1235,15 @@ const Dashboard = () => {
         setTimeout(() => {
             switch (actionKey) {
                 case 'new_account': setShowNewAccountModal(true); break;
-                case 'customers': setShowCustomerModal(true); break;
+                case 'customers': window.open('/board?name=CustomerMasterBoard', '_blank'); break;
                 case 'vendors': setShowVendorModal(true); break;
                 case 'enter_bill': setShowEnterBillModal(true); break;
                 case 'pay_bill': setShowPayBillModal(true); break;
                 case 'invoice': setShowSalesOrderModal(true); break;
                 case 'sales_order': setShowSalesOrderModal(true); break;
                 case 'journal': setShowJournalEntryModal(true); break;
-                case 'customer_master': setShowCustomerMasterBoard(true); break;
-                case 'supplier_master': setShowSupplierMasterBoard(true); break;
+                case 'customer_master': window.open('/board?name=CustomerMasterBoard', '_blank'); break;
+                case 'supplier_master': window.open('/board?name=SupplierMasterBoard', '_blank'); break;
                 case 'chart_of_accounts': setShowChartOfAccountantModal(true); break;
                 case 'reports': setShowReportsCenterModal(true); break;
                 case 'search': setShowSearchModal(true); break;
@@ -1286,7 +1286,7 @@ const Dashboard = () => {
         window.open(`/report/items-services?company=${companyId}&name=${encodeURIComponent(companyName)}`, '_blank');
     };
 
-    // --- Module lock state — fetched from ACC_Hidden_Modules API ---
+    // --- Module lock state � fetched from ACC_Hidden_Modules API ---
     const [lockedModules, setLockedModules] = useState([]);
 
     const isModuleLocked = (lockId) => {
@@ -1295,7 +1295,7 @@ const Dashboard = () => {
         return lockedModules.includes(lockId);
     };
 
-    // --- Role-based function permissions — fetched from ACC_Emp_SystemUserRole via /UserRole/functions ---
+    // --- Role-based function permissions � fetched from ACC_Emp_SystemUserRole via /UserRole/functions ---
     const [deniedFunctions, setDeniedFunctions] = useState([]);
 
     const hasPermission = (code) => {
@@ -1325,7 +1325,7 @@ const Dashboard = () => {
             textColor: "text-slate-600",
             items: [
                 { icon: UserPlus, gif: '/icons/new account2.gif', label: 'Accounts', onClick: () => setShowNewAccountModal(true), color: '#0891b2' },
-                { icon: Users, gif: '/icons/customer.gif', label: 'Customers', onClick: () => setShowCustomerModal(true), color: '#059669', perm: 'MST_CUSTOMER' },
+                { icon: Users, gif: '/icons/customer.gif', label: 'Customers', onClick: () => window.open('/board?name=CustomerMasterBoard', '_blank'), color: '#059669', perm: 'MST_CUSTOMER' },
                 { icon: Truck, gif: '/icons/vendors.gif', label: 'Vendors', onClick: () => setShowVendorModal(true), color: '#d97706', perm: 'MST_SUPPLIER' },
                 { icon: FileText, gif: '/icons/billing.gif', label: 'Billing', onClick: () => setShowEnterBillModal(true), color: '#dc2626' },
                 { icon: CreditCard, gif: '/icons/paybill.gif', label: 'Pay Bills', onClick: () => setShowPayBillModal(true), color: '#ea580c' },
@@ -1369,7 +1369,7 @@ const Dashboard = () => {
             color: "bg-indigo-500",
             textColor: "text-indigo-600",
             items: [
-                { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), color: '#3b82f6', perm: 'MST_CUSTOMER' },
+                { icon: Users, label: 'Customers', onClick: () => window.open('/board?name=CustomerMasterBoard', '_blank'), color: '#3b82f6', perm: 'MST_CUSTOMER' },
                 { icon: ArrowDownLeft, label: 'Receive Payment', onClick: () => setShowReceivePaymentModal(true), color: '#14b8a6' },
                 { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), color: '#f59e0b', perm: 'MST_SUPPLIER' },
             ]
@@ -1425,8 +1425,8 @@ const Dashboard = () => {
             {
                 group: 'Business Partners',
                 items: [
-                    { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true), lockId: 'master_supplier', perm: 'MST_SUPPLIER' },
-                    { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true), lockId: 'master_customer', perm: 'MST_CUSTOMER' },
+                    { label: 'Supplier Master', onClick: () => window.open('/board?name=SupplierMasterBoard', '_blank'), lockId: 'master_supplier', perm: 'MST_SUPPLIER' },
+                    { label: 'Customer Master', onClick: () => window.open('/board?name=CustomerMasterBoard', '_blank'), lockId: 'master_customer', perm: 'MST_CUSTOMER' },
                     { label: 'Customer Type Master', onClick: () => setShowCustomerTypeBoard(true), lockId: 'master_customerType', perm: 'MST_CUSTOMER_TYPE' },
                     { label: 'Vendor Types', onClick: () => setShowVendorTypesBoard(true), lockId: 'master_vendorTypes', perm: 'MST_VENDOR_TYPE' },
                 ]
@@ -1664,8 +1664,8 @@ const Dashboard = () => {
         {
             group: 'LISTS',
             items: [
-                { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true), lockId: 'master_customer', perm: 'MST_CUSTOMER' },
-                { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true), lockId: 'master_supplier', perm: 'MST_SUPPLIER' },
+                { label: 'Customer Master', onClick: () => window.open('/board?name=CustomerMasterBoard', '_blank'), lockId: 'master_customer', perm: 'MST_CUSTOMER' },
+                { label: 'Supplier Master', onClick: () => window.open('/board?name=SupplierMasterBoard', '_blank'), lockId: 'master_supplier', perm: 'MST_SUPPLIER' },
                 { label: 'Products & Categories', onClick: () => setShowCategoryBoard(true), lockId: 'master_category', perm: 'MST_CATEGORY' },
                 { label: 'Cost Centers', onClick: () => setShowCostCenterBoard(true), lockId: 'master_costCenter', perm: 'MST_COST_CENTER' },
             ]
@@ -1838,7 +1838,7 @@ const Dashboard = () => {
             )}
 
             {/* 1. Modal Overlays */}
-            {/* Ad Block Alert Banner — Full-width top strip */}
+            {/* Ad Block Alert Banner � Full-width top strip */}
             {showAdBlockAlert && (
                 <div className="fixed top-0 left-0 right-0 z-[9999] h-9 flex items-center justify-between gap-4 px-5 bg-slate-900 border-b border-slate-700 shadow-lg animate-in slide-in-from-top-2 duration-300">
                     {/* Left: Text only */}
@@ -2272,7 +2272,7 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Center: Main Navigation Tabs — hidden on mobile */}
+                    {/* Center: Main Navigation Tabs � hidden on mobile */}
                     <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 z-[200]">
                         {menuBar.map((item, idx) => {
                             const items = menuDropdownItems[item] || [];
@@ -2458,7 +2458,7 @@ const Dashboard = () => {
 
                     {/* Right: User + AI + Icons */}
                     <div className="flex items-center gap-1 md:gap-3">
-                        {/* Dashboard Display Settings Icon — hidden on mobile */}
+                        {/* Dashboard Display Settings Icon � hidden on mobile */}
                         <div className="relative hidden sm:block">
                             <button
                                 onClick={() => setShowDashboardDisplayDropdown(!showDashboardDisplayDropdown)}
@@ -2474,7 +2474,7 @@ const Dashboard = () => {
                                 onSettingsChange={updateDashboardSettings}
                             />
                         </div>
-                        {/* Help / Learn More Icon — hidden on mobile */}
+                        {/* Help / Learn More Icon � hidden on mobile */}
                         <div className="relative hidden sm:block">
                             <button
                                 onClick={() => setShowLearnMoreModal(true)}
@@ -2663,7 +2663,7 @@ const Dashboard = () => {
                 <main className="flex-1 relative overflow-y-auto bg-slate-50 flex flex-col justify-between">
                     <div className="flex-1 p-4 md:p-8 w-full flex flex-col gap-6 md:gap-8">
 
-                        {/* Header & BI Data Summary — stacks on mobile */}
+                        {/* Header & BI Data Summary � stacks on mobile */}
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full relative mb-4 md:mb-6 z-[100] gap-3 md:gap-0">
 
                             {/* Left Side: Quick Actions */}
@@ -2703,7 +2703,7 @@ const Dashboard = () => {
                                                     {ribbonIcons.map((iconId) => {
                                                         const iconData = {
                                                             new_account: { icon: UserPlus, label: 'New Account', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal, iconColor: '#2563eb', bg: '#eff6ff' },
-                                                            customer: { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4', perm: 'MST_CUSTOMER' },
+                                                            customer: { icon: Users, label: 'Customers', onClick: () => window.open('/board?name=CustomerMasterBoard', '_blank'), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4', perm: 'MST_CUSTOMER' },
                                                             vendor: { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal, iconColor: '#d97706', bg: '#fffbeb', perm: 'MST_SUPPLIER' },
                                                             enter_bill: { icon: FileText, label: 'Enter Bill', onClick: () => setShowEnterBillModal(true), active: showEnterBillModal, iconColor: '#dc2626', bg: '#fef2f2' },
                                                             pay_bill: { icon: CreditCard, label: 'Pay Bill', onClick: () => setShowPayBillModal(true), active: showPayBillModal, iconColor: '#ea580c', bg: '#fff7ed' },
@@ -2756,7 +2756,7 @@ const Dashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Center: Dynamic Greeting — hidden on mobile (shows above) */}
+                            {/* Center: Dynamic Greeting � hidden on mobile (shows above) */}
                             <div className="hidden md:flex flex-col items-center justify-center text-center px-8 z-0">
                                 <h1 className="text-[36px] font-extrabold text-[#1e293b] leading-tight mb-1.5 text-center tracking-tight">
                                     {typedGreeting}
@@ -2770,7 +2770,7 @@ const Dashboard = () => {
                                 </p>
                             </div>
 
-                            {/* Right Side: Tools & Clock — hidden on mobile */}
+                            {/* Right Side: Tools & Clock � hidden on mobile */}
                             <div className="hidden md:flex flex-1 justify-end">
                                 <div className="flex items-end gap-3">
                                     <LiveClock />
@@ -2829,7 +2829,7 @@ const Dashboard = () => {
                                     <div className="flex items-center gap-2">
                                         <div className={`w-2 h-2 rounded-full ${group.color}`} />
                                         <span className={`text-[11px] font-bold ${group.textColor} uppercase tracking-wider`}>{group.category}</span>
-                                        <span className="text-[10px] text-slate-400 ml-1">— {group.desc}</span>
+                                        <span className="text-[10px] text-slate-400 ml-1">� {group.desc}</span>
                                     </div>
                                     <span className="text-[10px] text-slate-400 font-medium">{group.items.length} modules</span>
                                 </div>
@@ -2905,7 +2905,7 @@ const Dashboard = () => {
                         {/* Right: Copyright + Edition Badge */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>
-                                © {new Date().getFullYear()} ONIMTA Information Technology. All rights reserved.
+                                � {new Date().getFullYear()} ONIMTA Information Technology. All rights reserved.
                             </span>
                             <div style={{ width: '1px', height: '12px', background: '#eceef1' }} />
                             <span style={{
@@ -2936,7 +2936,7 @@ const Dashboard = () => {
                                 }
                                 switch (id) {
                                     case 'new_account': setShowNewAccountModal(true); break;
-                                    case 'customer': setShowCustomerModal(true); break;
+                                    case 'customer': window.open('/board?name=CustomerMasterBoard', '_blank'); break;
                                     case 'vendor': setShowVendorModal(true); break;
                                     case 'enter_bill':
                                     case 'record_expense': setShowEnterBillModal(true); break;
@@ -2971,7 +2971,7 @@ const Dashboard = () => {
                                     case 'header_subscribe': setShowPricingPlansModal(true); break;
                                     case 'header_ai': handleAIClick(); break;
                                     case 'header_help': setShowSoftwareAboutModal(true); break;
-                                    case 'add_customer': setShowCustomerModal(true); break;
+                                    case 'add_customer': window.open('/board?name=CustomerMasterBoard', '_blank'); break;
                                     case 'customer_advance': setShowCustomerAdvanceModal(true); break;
                                     case 'customer_receipt': setShowCustomerReceiptModal(true); break;
                                     case 'estimate': setShowEstimateModal(true); break;
