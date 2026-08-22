@@ -178,7 +178,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="OpeningBalanceBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Opening Balance"

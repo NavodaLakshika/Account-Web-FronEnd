@@ -192,7 +192,7 @@ const ExpensesDashboardBoard = ({
   };
 
   return (
-    <TransactionFormWrapper icon={FileText}
+    <TransactionFormWrapper boardName="ExpensesDashboardBoard" icon={FileText}
       isOpen={isOpen}
       onClose={onClose}
       title="Expenses"

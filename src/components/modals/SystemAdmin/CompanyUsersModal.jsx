@@ -159,7 +159,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <TransactionFormWrapper isOpen={isOpen}
+        <TransactionFormWrapper boardName="CompanyUsersModal" isOpen={isOpen}
             onClose={onClose}
             title="User & Role"
 

@@ -386,7 +386,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="PurchaseOrderBoard" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Purchase Order"

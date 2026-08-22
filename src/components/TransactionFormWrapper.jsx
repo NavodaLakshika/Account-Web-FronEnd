@@ -7,7 +7,7 @@ import FormHelpModal from './modals/FormHelpModal';
 import FeatureLockedModal from './modals/FeatureLockedModal';
 import FormSettingsModal from './modals/FormSettingsModal';
 
-const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, children, footer, maxWidth = 'max-w-7xl' }) => {
+const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, children, footer, maxWidth = 'max-w-7xl', boardName }) => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showLockedModal, setShowLockedModal] = useState(false);
@@ -51,6 +51,11 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
   const [containerNode, setContainerNode] = useState(null);
 
   const handlePopOut = () => {
+    if (boardName) {
+      window.open(`/board?name=${boardName}`, '_blank');
+      if (onClose) onClose();
+      return;
+    }
     if (isPoppedOut) return;
 
     const win = window.open('', '_blank');

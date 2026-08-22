@@ -74,7 +74,7 @@ const ProfitLossDashboardBoard = ({
   const profitBg = netProfit >= 0 ? 'from-emerald-500 to-emerald-600' : 'from-rose-500 to-rose-600';
 
   return (
-    <TransactionFormWrapper icon={FileText}
+    <TransactionFormWrapper boardName="ProfitLossDashboardBoard" icon={FileText}
       isOpen={isOpen}
       onClose={onClose}
       title="Profit & Loss"

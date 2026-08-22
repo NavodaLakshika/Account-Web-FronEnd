@@ -54,7 +54,7 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreated, user }) => {
     };
 
     return (
-        <TransactionFormWrapper isOpen={isOpen}
+        <TransactionFormWrapper boardName="CreateCompanyModal" isOpen={isOpen}
             onClose={onClose}
             title={done ? 'Company Created' : 'New Company'}
             

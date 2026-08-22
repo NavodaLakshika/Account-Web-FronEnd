@@ -7,7 +7,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
     const [selectedTab, setSelectedTab] = useState('Customer Search');
 
     return (
-        <TransactionFormWrapper icon={FileText}
+        <TransactionFormWrapper boardName="CustomerBoard" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
             title="Customer Center"

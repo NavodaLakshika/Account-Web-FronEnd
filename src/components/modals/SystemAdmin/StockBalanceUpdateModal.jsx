@@ -103,7 +103,7 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="StockBalanceUpdateModal" isOpen={isOpen}
                 onClose={onClose}
                 title="Stock Balance Update"
                 

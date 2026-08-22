@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-    X, Send, Trash2, Plus, ChevronLeft, ChevronRight, Paperclip, 
-    File, Image as ImageIcon, Mic, Maximize2, Minimize2, Square, 
-    Sparkles, Clock, MoreVertical, Edit, PanelLeftClose, PanelLeft, 
+import {
+    X, Send, Trash2, Plus, ChevronLeft, ChevronRight, Paperclip,
+    File, Image as ImageIcon, Mic, Maximize2, Minimize2, Square,
+    Sparkles, Clock, MoreVertical, Edit, PanelLeftClose, PanelLeft,
     PanelRightClose, PanelRight, MessageCircle,
     ThumbsUp, ThumbsDown, Download, Copy, Check
 } from 'lucide-react';
@@ -16,33 +16,33 @@ import { DotLottiePlayer } from '@dotlottie/react-player';
 import '@dotlottie/react-player/dist/index.css';
 
 const AVAILABLE_ACTIONS = {
-  'new_account': { label: 'Open New Account', action: 'new_account' },
-  'customers': { label: 'Open Customers', action: 'customers' },
-  'vendors': { label: 'Open Vendors', action: 'vendors' },
-  'enter_bill': { label: 'Enter Bill', action: 'enter_bill' },
-  'pay_bill': { label: 'Pay Bill', action: 'pay_bill' },
-  'invoice': { label: 'Create Invoice', action: 'invoice' },
-  'sales_order': { label: 'Create Sales Order', action: 'sales_order' },
-  'journal': { label: 'Journal Entry', action: 'journal' },
-  'customer_master': { label: 'Customer Master', action: 'customer_master' },
-  'supplier_master': { label: 'Supplier Master', action: 'supplier_master' },
-  'chart_of_accounts': { label: 'Chart of Accounts', action: 'chart_of_accounts' },
-  'reports': { label: 'View Reports', action: 'reports' },
-  'search': { label: 'Search Transactions', action: 'search' },
-  'bank_reconcile': { label: 'Bank Reconciliation', action: 'bank_reconcile' },
-  'make_deposit': { label: 'Make Deposit', action: 'make_deposit' },
-  'write_cheque': { label: 'Write Cheque', action: 'write_cheque' },
-  'purchase_order': { label: 'Purchase Order', action: 'purchase_order' },
-  'grn': { label: 'Goods Receipt Note', action: 'grn' },
-  'sales_receipt': { label: 'Sales Receipt', action: 'sales_receipt' },
-  'receive_payment': { label: 'Receive Payment', action: 'receive_payment' },
-  'petty_cash': { label: 'Petty Cash', action: 'petty_cash' },
-  'trial_balance': { label: 'Trial Balance', action: 'trial_balance' },
-  'backup': { label: 'Data Backup', action: 'backup' },
-  'expenses': { label: 'Expenses Dashboard', action: 'expenses' },
-  'marketing': { label: 'Marketing Tool', action: 'marketing' },
-  'reversal': { label: 'Reversal Entry', action: 'reversal' },
-  'payment_setoff': { label: 'Payment Setoff', action: 'payment_setoff' },
+    'new_account': { label: 'Open New Account', action: 'new_account' },
+    'customers': { label: 'Open Customers', action: 'customers' },
+    'vendors': { label: 'Open Vendors', action: 'vendors' },
+    'enter_bill': { label: 'Enter Bill', action: 'enter_bill' },
+    'pay_bill': { label: 'Pay Bill', action: 'pay_bill' },
+    'invoice': { label: 'Create Invoice', action: 'invoice' },
+    'sales_order': { label: 'Create Sales Order', action: 'sales_order' },
+    'journal': { label: 'Journal Entry', action: 'journal' },
+    'customer_master': { label: 'Customer Master', action: 'customer_master' },
+    'supplier_master': { label: 'Supplier Master', action: 'supplier_master' },
+    'chart_of_accounts': { label: 'Chart of Accounts', action: 'chart_of_accounts' },
+    'reports': { label: 'View Reports', action: 'reports' },
+    'search': { label: 'Search Transactions', action: 'search' },
+    'bank_reconcile': { label: 'Bank Reconciliation', action: 'bank_reconcile' },
+    'make_deposit': { label: 'Make Deposit', action: 'make_deposit' },
+    'write_cheque': { label: 'Write Cheque', action: 'write_cheque' },
+    'purchase_order': { label: 'Purchase Order', action: 'purchase_order' },
+    'grn': { label: 'Goods Receipt Note', action: 'grn' },
+    'sales_receipt': { label: 'Sales Receipt', action: 'sales_receipt' },
+    'receive_payment': { label: 'Receive Payment', action: 'receive_payment' },
+    'petty_cash': { label: 'Petty Cash', action: 'petty_cash' },
+    'trial_balance': { label: 'Trial Balance', action: 'trial_balance' },
+    'backup': { label: 'Data Backup', action: 'backup' },
+    'expenses': { label: 'Expenses Dashboard', action: 'expenses' },
+    'marketing': { label: 'Marketing Tool', action: 'marketing' },
+    'reversal': { label: 'Reversal Entry', action: 'reversal' },
+    'payment_setoff': { label: 'Payment Setoff', action: 'payment_setoff' },
 };
 
 const AIChatbotBoard = ({ isOpen, onClose, position = 'center', onAction }) => {
@@ -59,7 +59,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center', onAction }) => {
     const [isTyping, setIsTyping] = useState(false);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [historyExpanded, setHistoryExpanded] = useState(false);
-    
+
     // We determine if we are showing the sidebar in the inline-right mode
     const [sidebarCollapsed, setSidebarCollapsed] = useState(position === 'right' || position === 'inline-right');
     const [copiedIndex, setCopiedIndex] = useState(null);
@@ -69,7 +69,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center', onAction }) => {
     const [chatSize, setChatSize] = useState('standard'); // 'standard', 'wide', 'compact'
     const [showAIInfoModal, setShowAIInfoModal] = useState(false);
     const abortControllerRef = useRef(null);
-    
+
     // Auto-scroll on new message
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -126,7 +126,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center', onAction }) => {
             const knowledgeContext = relevantModules.length > 0
                 ? `\nRELEVANT MODULES FOR THIS QUERY:\n${relevantModules.map(m =>
                     `- ${m.name}: ${m.description}\n  Workflow: ${m.workflow || 'See navigation above.'}`
-                  ).join('\n\n')}`
+                ).join('\n\n')}`
                 : '';
 
             let dataContext = '';
@@ -212,7 +212,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                     "Authorization": `Bearer ${API_KEY}`
                 },
                 body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile",
+                    model: "openai/gpt-oss-120b",
                     messages: apiMessages,
                     temperature: 0.7
                 }),
@@ -336,7 +336,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
 
     const handleDownload = (text, idx) => {
         const element = document.createElement("a");
-        const file = new Blob([text], {type: 'text/plain'});
+        const file = new Blob([text], { type: 'text/plain' });
         element.href = URL.createObjectURL(file);
         element.download = `Onimta_AI_Response_${idx + 1}.txt`;
         document.body.appendChild(element);
@@ -374,9 +374,9 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
     // Outer layout wrapper
     // In inline-right mode, we assume it's part of the dashboard layout (e.g. flex flex-col h-full bg-white)
     // We will render our Intuit UI entirely inside it.
-    
+
     return (
-        <div className={isInlineRight 
+        <div className={isInlineRight
             ? `relative overflow-hidden flex flex-col h-full bg-white border-l border-slate-100 transition-all duration-500 ease-out shrink-0 ${chatSize === 'wide' ? 'w-full md:w-[800px] lg:w-[900px]' : 'w-full md:w-[450px] lg:w-[450px]'}`
             : "fixed inset-0 z-[9999] bg-white flex flex-col animate-in zoom-in-95 duration-200"
         }>
@@ -396,13 +396,13 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
 
                 <div className="flex items-center gap-1 relative">
                     <div className="relative">
-                        <button 
+                        <button
                             onClick={() => setShowMenu(!showMenu)}
                             className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors"
                         >
                             <MoreVertical size={20} />
                         </button>
-                        
+
                         {showMenu && (
                             <>
                                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)}></div>
@@ -419,7 +419,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                     </div>
 
                     {isInlineRight && (
-                        <button 
+                        <button
                             onClick={() => setChatSize(prev => prev === 'standard' ? 'wide' : 'standard')}
                             className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors"
                             title={chatSize === 'standard' ? "Wide view" : "Standard view"}
@@ -427,15 +427,15 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                             {chatSize === 'wide' ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
                         </button>
                     )}
-                    
-                    <button 
+
+                    <button
                         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                         className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors ml-1 hidden md:block"
                         title={sidebarCollapsed ? "Show history bar" : "Hide history bar"}
                     >
                         {sidebarCollapsed ? <PanelRight size={20} /> : <PanelRightClose size={20} />}
                     </button>
-                    <button 
+                    <button
                         onClick={onClose}
                         className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors ml-1"
                     >
@@ -446,10 +446,10 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
 
             {/* Main Content Area (Sidebar + Chat) */}
             <div className="flex-1 flex overflow-hidden bg-white relative">
-                
+
                 {/* Chat Area */}
                 <div className="flex-1 flex flex-col relative">
-                    
+
                     {/* Scrollable Messages / Empty State */}
                     <div className="flex-1 overflow-y-auto p-6 flex flex-col">
                         {messages.length === 0 ? (
@@ -512,31 +512,31 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                                     <div className="text-slate-700 text-[13px] leading-relaxed whitespace-pre-wrap">
                                                         {formatMessageText(msg.text)}
                                                     </div>
-                                                    
+
                                                     {/* AI Message Actions */}
                                                     <div className="flex items-center gap-2 mt-2">
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleCopy(msg.text, idx)}
                                                             className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-[3px] transition-colors"
                                                             title="Copy to clipboard"
                                                         >
                                                             {copiedIndex === idx ? <Check size={14} className="text-green-500" /> : <Copy size={14} />} {copiedIndex === idx ? 'Copied' : 'Copy'}
                                                         </button>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleReaction(idx, 'like')}
                                                             className={`p-1.5 rounded-[3px] transition-colors ${reactions[idx] === 'like' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
                                                             title="Helpful"
                                                         >
                                                             <ThumbsUp size={16} className={reactions[idx] === 'like' ? 'fill-indigo-600' : ''} />
                                                         </button>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleReaction(idx, 'dislike')}
                                                             className={`p-1.5 rounded-[3px] transition-colors ${reactions[idx] === 'dislike' ? 'text-red-600 bg-red-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
                                                             title="Not helpful"
                                                         >
                                                             <ThumbsDown size={16} className={reactions[idx] === 'dislike' ? 'fill-red-600' : ''} />
                                                         </button>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleDownload(msg.text, idx)}
                                                             className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-[3px] transition-colors ml-auto"
                                                             title="Download response"
@@ -573,7 +573,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                         )}
                                     </div>
                                 ))}
-                                
+
                                 {isTyping && (
                                     <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2">
                                         <div className="flex gap-4 max-w-[90%]">
@@ -608,7 +608,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                         <div className="max-w-[700px] w-full mx-auto relative group">
                             {/* Gradient Border Effect Wrapper */}
                             <div className="absolute -inset-[1px] bg-gradient-to-r from-emerald-200 via-blue-200 to-indigo-200 rounded-2xl opacity-70 group-focus-within:opacity-100 group-focus-within:from-emerald-400 group-focus-within:via-blue-400 group-focus-within:to-indigo-400 transition-all duration-500"></div>
-                            
+
                             <form onSubmit={handleSendMessage} className="relative bg-white rounded-2xl flex flex-col min-h-[100px] p-1 shadow-sm">
                                 <input
                                     type="file"
@@ -617,7 +617,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                     className="hidden"
                                     accept="image/*,.pdf,.doc,.docx,.txt"
                                 />
-                                <textarea 
+                                <textarea
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     onKeyDown={(e) => {
@@ -631,15 +631,15 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                     rows={1}
                                 />
                                 <div className="flex items-center justify-between px-3 pb-3 mt-auto">
-                                    <button 
-                                        type="button" 
+                                    <button
+                                        type="button"
                                         onClick={() => fileInputRef.current.click()}
                                         className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-[3px] transition-colors"
                                     >
                                         <Plus size={20} />
                                     </button>
                                     <div className="flex items-center gap-2">
-                                        <button 
+                                        <button
                                             type="button"
                                             onClick={() => setIsRecording(!isRecording)}
                                             className={`p-2 rounded-[3px] transition-colors ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
@@ -648,7 +648,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                             <Mic size={20} />
                                         </button>
                                         {isTyping ? (
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={handleStopGeneration}
                                                 className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
@@ -656,7 +656,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                                 <Square size={12} fill="currentColor" /> Stop
                                             </button>
                                         ) : (inputValue.trim() || attachedFile) ? (
-                                            <button 
+                                            <button
                                                 type="submit"
                                                 className="px-4 py-1.5 bg-indigo-600 text-white text-[13px] font-bold rounded-[3px] hover:bg-indigo-700 transition-colors animate-in fade-in zoom-in-95"
                                             >
@@ -667,7 +667,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                 </div>
                             </form>
                         </div>
-                        
+
                         <div className="max-w-[700px] mx-auto text-center mt-3">
                             <p className="text-[11px] text-slate-400 font-medium">
                                 Onimta Intelligence can make mistakes. Onimta protects privacy and adheres to responsible AI principles. <button type="button" onClick={() => setShowAIInfoModal(true)} className="text-[#0077c5] hover:underline cursor-pointer">How we use AI.</button>
@@ -711,7 +711,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                         </div>
                         <div className="p-3 flex-1 overflow-y-auto bg-slate-50/50">
                             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1 mt-2">Recent Conversations</div>
-                            
+
                             {history.length === 0 ? (
                                 <div className="text-center py-8 text-slate-400 text-sm font-medium">
                                     No conversations yet.
@@ -728,11 +728,10 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                                     setHistoryExpanded(false);
                                                 }
                                             }}
-                                            className={`w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm rounded-[6px] transition-all border ${
-                                                activeHistoryId === item.id 
-                                                ? 'bg-white border-blue-200 shadow-sm ring-1 ring-blue-100' 
+                                            className={`w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm rounded-[6px] transition-all border ${activeHistoryId === item.id
+                                                ? 'bg-white border-blue-200 shadow-sm ring-1 ring-blue-100'
                                                 : 'bg-transparent border-transparent hover:bg-white hover:border-slate-200 hover:shadow-sm'
-                                            }`}
+                                                }`}
                                         >
                                             <div className={`p-1.5 rounded-full shrink-0 ${activeHistoryId === item.id ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>
                                                 <MessageCircle size={14} />

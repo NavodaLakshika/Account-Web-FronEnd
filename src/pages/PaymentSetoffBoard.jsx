@@ -237,7 +237,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="PaymentSetoffBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Payment Set Off"

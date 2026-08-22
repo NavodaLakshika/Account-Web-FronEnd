@@ -289,7 +289,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="AdvancePayBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Advance Issued"

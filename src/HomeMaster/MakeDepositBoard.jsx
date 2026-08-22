@@ -150,7 +150,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
     }, [funds, selectedDocNos]);
 
     return (
-        <TransactionFormWrapper icon={FileText}
+        <TransactionFormWrapper boardName="MakeDepositBoard" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
             title="Collection to Deposit"

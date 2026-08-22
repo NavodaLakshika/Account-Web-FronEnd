@@ -272,7 +272,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <TransactionFormWrapper icon={FileText}
+        <TransactionFormWrapper boardName="BulkGRNBoard" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
             title="Bulk GRN"

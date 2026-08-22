@@ -340,7 +340,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="PayBillBoard" isOpen={isOpen}
                 onClose={onClose}
                 title="Pay Bill"
                 

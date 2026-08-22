@@ -230,7 +230,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper isOpen={isOpen} onClose={onClose}
+            <TransactionFormWrapper boardName="CustomerInvoiceBoard" isOpen={isOpen} onClose={onClose}
                 title="Customer Invoice (Other Invoice)"
                  icon={null}
                 footer={

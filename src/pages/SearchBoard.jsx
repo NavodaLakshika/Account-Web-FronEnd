@@ -95,7 +95,7 @@ const SearchBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <TransactionFormWrapper icon={FileText} 
+        <TransactionFormWrapper boardName="SearchBoard" icon={FileText} 
             isOpen={isOpen} 
             onClose={onClose} 
             title="Search Archive"

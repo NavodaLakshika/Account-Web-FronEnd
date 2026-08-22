@@ -268,7 +268,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="EnterBillBoard" isOpen={isOpen}
                 onClose={onClose}
                 title="Enter Bill"
                 

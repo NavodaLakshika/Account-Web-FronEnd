@@ -111,7 +111,7 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={Target}
+            <TransactionFormWrapper boardName="CostCenterProfileBoard" icon={Target}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Cost Center"

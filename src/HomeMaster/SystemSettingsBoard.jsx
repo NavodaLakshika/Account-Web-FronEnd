@@ -575,7 +575,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
     if (isInline) return content;
 
     return (
-        <TransactionFormWrapper icon={FileText} isOpen={isOpen} onClose={onClose} width="max-w-[1200px]" height="h-[80vh]">
+        <TransactionFormWrapper boardName="SystemSettingsBoard" icon={FileText} isOpen={isOpen} onClose={onClose} width="max-w-[1200px]" height="h-[80vh]">
             {content}
         </TransactionFormWrapper>
     );

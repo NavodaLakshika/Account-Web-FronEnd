@@ -163,7 +163,7 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="ReversalEntryBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Reversal Entry"

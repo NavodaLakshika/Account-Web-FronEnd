@@ -66,7 +66,7 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="DepartmentProfileBoard" icon={null}
                 isOpen={isOpen} onClose={onClose} title="Department"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">

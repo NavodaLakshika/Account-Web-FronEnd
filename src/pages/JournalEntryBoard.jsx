@@ -491,7 +491,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
     return (
         <>
             <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="JournalEntryBoard" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Journal Entry"

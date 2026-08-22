@@ -132,7 +132,7 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper icon={FileText} 
+            <TransactionFormWrapper boardName="DocumentSearchBoard" icon={FileText} 
                 isOpen={isOpen} 
                 onClose={onClose} 
                 title="Document Search"

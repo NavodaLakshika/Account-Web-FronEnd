@@ -204,7 +204,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <style>{`@keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }`}</style>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="BulkGRNBoard" icon={FileText}
                 isOpen={isOpen} onClose={onClose}
                 title="Bulk GRN"
                 footer={

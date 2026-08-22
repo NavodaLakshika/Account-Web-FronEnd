@@ -202,7 +202,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper isOpen={isOpen} onClose={onClose}
+            <TransactionFormWrapper boardName="CustomerAdvanceBoard" isOpen={isOpen} onClose={onClose}
                 title="Customer Advance Receipt"  icon={null}
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">

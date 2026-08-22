@@ -333,7 +333,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="SalesInvoiceBoard" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Sales Invoice"

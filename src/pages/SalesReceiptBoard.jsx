@@ -296,7 +296,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <style>{`@keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }`}</style>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="SalesReceiptBoard" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Create Sales Receipt"

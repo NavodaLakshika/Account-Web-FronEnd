@@ -182,7 +182,7 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="ChequeCancelBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Cheque Cancellation"

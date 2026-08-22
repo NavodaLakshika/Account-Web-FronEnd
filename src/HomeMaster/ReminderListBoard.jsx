@@ -107,7 +107,7 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
   };
 
   return (
-    <TransactionFormWrapper icon={FileText}
+    <TransactionFormWrapper boardName="ReminderListBoard" icon={FileText}
       isOpen={isOpen}
       onClose={onClose}
       title="Reminders"

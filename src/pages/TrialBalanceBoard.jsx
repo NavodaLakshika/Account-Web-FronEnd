@@ -154,7 +154,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
     return (
         <>
             <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="TrialBalanceBoard" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title={companyNameProp ? `Trial Balance - ${companyNameProp}` : "Strategic Portfolio Insight: Trial Balance"}

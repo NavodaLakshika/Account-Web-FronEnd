@@ -194,7 +194,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <TransactionFormWrapper icon={FileText}
+        <TransactionFormWrapper boardName="MarketingToolBoard" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
             title="Marketing Tool"

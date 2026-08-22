@@ -103,7 +103,7 @@ const UserProfileMaintenanceBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="UserProfileMaintenanceBoard" icon={null}
                 isOpen={isOpen} onClose={onClose} title="User"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">

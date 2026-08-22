@@ -97,7 +97,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             try {
                 const p = JSON.parse(companyData);
                 companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData;
-            } catch (e) {}
+            } catch (e) { }
         }
         setFormData({ ...initialState, CurrentUser: user?.empName || user?.username || 'SYSTEM', Company: companyCode });
         setIsEditMode(false);
@@ -198,6 +198,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             <TransactionFormWrapper icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
+                boardName="CustomerMasterBoard"
                 title="Customer"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
@@ -270,14 +271,14 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                             setFormData(prev => ({ ...prev, Type_Code: e.target.value, Type_Name: t ? (t.name || t.Name) : '' }));
                                         }}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select Type...</option>
                                         {typeList.map((t, i) => (
                                             <option key={i} value={t.code || t.Code}>{t.name || t.Name}</option>
                                         ))}
                                     </select>
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => setShowTypeModal(true)}
                                         className="h-10 w-10 flex-shrink-0 bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-[3px] flex items-center justify-center transition-colors relative"
@@ -313,14 +314,14 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                             setFormData(prev => ({ ...prev, Area: e.target.value, AreaName: a ? (a.name || a.Name) : '' }));
                                         }}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select Area...</option>
                                         {areaList.map((a, i) => (
                                             <option key={i} value={a.code || a.Code}>{a.name || a.Name}</option>
                                         ))}
                                     </select>
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => setShowAreaModal(true)}
                                         className="h-10 w-10 flex-shrink-0 bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-[3px] flex items-center justify-center transition-colors relative"

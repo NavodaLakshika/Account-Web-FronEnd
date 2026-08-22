@@ -173,7 +173,7 @@ const ChequeInHandBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="ChequeInHandBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Cheque In Hand (CIH)"

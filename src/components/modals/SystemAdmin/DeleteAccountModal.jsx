@@ -261,7 +261,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <TransactionFormWrapper isOpen={isOpen}
+        <TransactionFormWrapper boardName="DeleteAccountModal" isOpen={isOpen}
             onClose={onClose}
             title="Delete Account"
             

@@ -58,7 +58,7 @@ const ClearTempDataModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="ClearTempDataModal" isOpen={isOpen}
                 onClose={onClose}
                 title="CLEAR TEMPORARY DATA"
                 

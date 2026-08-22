@@ -117,7 +117,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="ChequeRegisterBoard" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Cheque Register"

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-    X, MoreVertical, Plus, Mic, 
+import {
+    X, MoreVertical, Plus, Mic,
     ThumbsUp, ThumbsDown, Download, PanelLeftClose, PanelLeft,
     Sparkles, MessageSquare, Clock, Edit, Copy, Check, ChevronUp, ChevronDown,
     Trash2, Paperclip, File, Image as ImageIcon, Square
@@ -14,30 +14,30 @@ import { getSAKnowledge, findSAModules } from '../../ai/saKnowledgeBase';
 import { saDataService } from '../../ai/saDataService';
 
 const SA_ACTIONS = {
-  'dashboard': { label: 'Dashboard Overview', action: 'dashboard' },
-  'companies': { label: 'Open Companies', action: 'companies' },
-  'employees': { label: 'Open Employees', action: 'employees' },
-  'roles': { label: 'Open Role Features', action: 'roles' },
-  'reports': { label: 'Open Reports', action: 'reports' },
-  'engagement': { label: 'Open Engagement', action: 'engagement' },
-  'subscriptions': { label: 'Open Subscriptions', action: 'subscriptions' },
-  'plans': { label: 'Open Subscription Plans', action: 'subscriptions' },
-  'pricing': { label: 'Open Pricing Plans', action: 'subscriptions' },
-  'database': { label: 'Open Database', action: 'database' },
-  'backup': { label: 'Open Database Backups', action: 'database' },
-  'security': { label: 'Open Security Audit', action: 'security' },
-  'audit': { label: 'Open Security Audit', action: 'security' },
-  'integrations': { label: 'Open Integrations', action: 'integrations' },
-  'feedback': { label: 'Open User Feedback', action: 'feedback' },
-  'reviews': { label: 'Open Reviews', action: 'engagement' },
-  'ads': { label: 'Open Advertisements', action: 'engagement' },
-  'logs': { label: 'Open System Logs', action: 'security' },
-  'config': { label: 'Open System Configuration', action: 'dashboard' },
-  'settings': { label: 'Open Settings', action: 'dashboard' },
-  'messaging': { label: 'Open Employee SMS', action: 'employees' },
-  'sms': { label: 'Open Employee SMS', action: 'employees' },
-  'resets': { label: 'Open Password Resets', action: 'dashboard' },
-  'stats': { label: 'Open System Statistics', action: 'dashboard' },
+    'dashboard': { label: 'Dashboard Overview', action: 'dashboard' },
+    'companies': { label: 'Open Companies', action: 'companies' },
+    'employees': { label: 'Open Employees', action: 'employees' },
+    'roles': { label: 'Open Role Features', action: 'roles' },
+    'reports': { label: 'Open Reports', action: 'reports' },
+    'engagement': { label: 'Open Engagement', action: 'engagement' },
+    'subscriptions': { label: 'Open Subscriptions', action: 'subscriptions' },
+    'plans': { label: 'Open Subscription Plans', action: 'subscriptions' },
+    'pricing': { label: 'Open Pricing Plans', action: 'subscriptions' },
+    'database': { label: 'Open Database', action: 'database' },
+    'backup': { label: 'Open Database Backups', action: 'database' },
+    'security': { label: 'Open Security Audit', action: 'security' },
+    'audit': { label: 'Open Security Audit', action: 'security' },
+    'integrations': { label: 'Open Integrations', action: 'integrations' },
+    'feedback': { label: 'Open User Feedback', action: 'feedback' },
+    'reviews': { label: 'Open Reviews', action: 'engagement' },
+    'ads': { label: 'Open Advertisements', action: 'engagement' },
+    'logs': { label: 'Open System Logs', action: 'security' },
+    'config': { label: 'Open System Configuration', action: 'dashboard' },
+    'settings': { label: 'Open Settings', action: 'dashboard' },
+    'messaging': { label: 'Open Employee SMS', action: 'employees' },
+    'sms': { label: 'Open Employee SMS', action: 'employees' },
+    'resets': { label: 'Open Password Resets', action: 'dashboard' },
+    'stats': { label: 'Open System Statistics', action: 'dashboard' },
 };
 
 const AdminAIChatbot = ({ isOpen, onClose, onAction }) => {
@@ -45,12 +45,12 @@ const AdminAIChatbot = ({ isOpen, onClose, onAction }) => {
     const [copiedIndex, setCopiedIndex] = useState(null);
     const [reactions, setReactions] = useState({});
     const [showAIInfoModal, setShowAIInfoModal] = useState(false);
-    
+
     // Chat states
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
-    
+
     // Persistent History from localStorage
     const [history, setHistory] = useState(() => {
         const saved = localStorage.getItem('sa_ai_chat_history');
@@ -61,7 +61,7 @@ const AdminAIChatbot = ({ isOpen, onClose, onAction }) => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [attachedFile, setAttachedFile] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
-    
+
     const messagesEndRef = useRef(null);
     const abortControllerRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -158,7 +158,7 @@ const AdminAIChatbot = ({ isOpen, onClose, onAction }) => {
 
     const handleDownload = (text, idx) => {
         const element = document.createElement("a");
-        const file = new Blob([text], {type: 'text/plain'});
+        const file = new Blob([text], { type: 'text/plain' });
         element.href = URL.createObjectURL(file);
         element.download = `Onimta_AI_Response_${idx + 1}.txt`;
         document.body.appendChild(element);
@@ -192,7 +192,7 @@ const AdminAIChatbot = ({ isOpen, onClose, onAction }) => {
             const knowledgeContext = relevantModules.length > 0
                 ? `\nRELEVANT MODULES:\n${relevantModules.map(m =>
                     `- ${m.name}: ${m.description}\n  Features: ${m.features.join(', ')}\n  Menu: ${m.menuPath || 'See navigation.'}`
-                  ).join('\n\n')}`
+                ).join('\n\n')}`
                 : '';
 
             let dataContext = '';
@@ -262,7 +262,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                     "Authorization": `Bearer ${API_KEY}`
                 },
                 body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile",
+                    model: "openai/gpt-oss-120b",
                     messages: apiMessages,
                     temperature: 0.7
                 }),
@@ -344,7 +344,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                 {/* Header */}
                 <div className="h-12 border-b border-slate-200 dark:border-gray-800/50 flex items-center justify-between px-6 shrink-0 bg-transparent z-20">
                     <div className="flex items-center gap-3">
-                        <button 
+                        <button
                             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                             className="p-1.5 hover:bg-gray-800 text-gray-400 hover:text-white rounded-[3px] transition-colors mr-2 hidden md:block"
                             title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
@@ -364,13 +364,13 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
 
                     <div className="flex items-center gap-1 relative">
                         <div className="relative">
-                            <button 
+                            <button
                                 onClick={() => setShowMenu(!showMenu)}
                                 className="p-1.5 hover:bg-gray-800 text-gray-400 hover:text-white rounded-[3px] transition-colors"
                             >
                                 <MoreVertical size={20} />
                             </button>
-                            
+
                             {showMenu && (
                                 <>
                                     <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)}></div>
@@ -385,7 +385,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                 </>
                             )}
                         </div>
-                        <button 
+                        <button
                             onClick={onClose}
                             className="p-1.5 hover:bg-red-500/20 text-gray-400 hover:text-red-500 rounded-lg transition-colors ml-1"
                         >
@@ -396,24 +396,24 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
 
                 {/* Main Content Area */}
                 <div className="flex-1 flex overflow-hidden bg-transparent">
-                    
+
                     {/* Sidebar */}
                     {!sidebarCollapsed && (
                         <div className="w-[200px] border-r border-slate-200 dark:border-gray-800/50 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
                             <div className="p-4">
-                                <button 
+                                <button
                                     className="w-full flex items-center gap-3 px-4 py-2.5 text-[14px] text-slate-700 dark:text-gray-300 font-medium hover:bg-slate-100 dark:hover:bg-gray-800 rounded-[3px] transition-colors"
                                     onClick={handleNewSession}
                                 >
                                     <Edit size={18} className="text-slate-500" /> New chat
                                 </button>
                             </div>
-                            
+
                             <div className="px-4 py-2 flex-1 overflow-y-auto">
                                 <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between mb-3 px-2">
                                     <div className=""><Clock size={14} /> Recent</div>
                                 </div>
-                                
+
                                 {history.length === 0 ? (
                                     <div className="px-2 py-2 text-[13px] text-slate-500 bg-slate-50/50 dark:bg-gray-800/50 rounded-[3px] border border-slate-100 dark:border-gray-700">
                                         No conversations yet
@@ -442,7 +442,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
 
                     {/* Chat Area */}
                     <div className="flex-1 flex flex-col relative">
-                        
+
                         {/* Scrollable Messages / Empty State */}
                         <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col no-scrollbar">
                             {messages.length === 0 ? (
@@ -515,31 +515,31 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                                                 </button>
                                                             </div>
                                                         )}
-                                                        
+
                                                         {/* AI Message Actions */}
                                                         <div className="flex items-center gap-2 mt-2">
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleCopy(msg.text, idx)}
                                                                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-gray-400 hover:text-slate-800 dark:text-white hover:bg-gray-800 rounded-lg transition-colors"
                                                                 title="Copy to clipboard"
                                                             >
                                                                 {copiedIndex === idx ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />} {copiedIndex === idx ? 'Copied' : 'Copy'}
                                                             </button>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleReaction(idx, 'like')}
                                                                 className={`p-1.5 rounded-lg transition-colors ${reactions[idx] === 'like' ? 'text-[#3b82f6] bg-blue-900/30' : 'text-gray-400 hover:text-slate-800 dark:text-white hover:bg-gray-800'}`}
                                                                 title="Helpful"
                                                             >
                                                                 <ThumbsUp size={16} className={reactions[idx] === 'like' ? 'fill-[#3b82f6]' : ''} />
                                                             </button>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleReaction(idx, 'dislike')}
                                                                 className={`p-1.5 rounded-lg transition-colors ${reactions[idx] === 'dislike' ? 'text-red-400 bg-red-900/30' : 'text-gray-400 hover:text-slate-800 dark:text-white hover:bg-gray-800'}`}
                                                                 title="Not helpful"
                                                             >
                                                                 <ThumbsDown size={16} className={reactions[idx] === 'dislike' ? 'fill-red-400' : ''} />
                                                             </button>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleDownload(msg.text, idx)}
                                                                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-gray-400 hover:text-slate-800 dark:text-white hover:bg-gray-800 rounded-lg transition-colors ml-auto"
                                                                 title="Download response"
@@ -552,7 +552,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                             )}
                                         </div>
                                     ))}
-                                    
+
                                     {isTyping && (
                                         <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2">
                                             <div className="flex gap-4 max-w-[90%]">
@@ -586,7 +586,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
 
                             <div className="max-w-[900px] w-full mx-auto relative group">
                                 <div className="absolute -inset-[1px] bg-gradient-to-r from-[#3b82f6]/50 via-indigo-500/50 to-[#3b82f6]/50 rounded-xl opacity-0 group-focus-within:opacity-100 transition-all duration-500"></div>
-                                
+
                                 <form onSubmit={handleSend} className="relative bg-white dark:bg-[#0f172a] rounded-xl flex flex-col min-h-[50px] p-1 shadow-inner border border-slate-200 dark:border-gray-800 group-focus-within:border-transparent">
                                     <input
                                         type="file"
@@ -596,14 +596,14 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                         accept="image/*,.pdf,.doc,.docx,.txt"
                                     />
                                     <div className="flex flex-row items-center w-full">
-                                        <button 
-                                            type="button" 
+                                        <button
+                                            type="button"
                                             onClick={() => fileInputRef.current.click()}
                                             className="p-2 text-gray-400 hover:text-slate-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors shrink-0 ml-1"
                                         >
                                             <Plus size={20} />
                                         </button>
-                                        <textarea 
+                                        <textarea
                                             autoFocus
                                             value={input}
                                             onChange={(e) => setInput(e.target.value)}
@@ -618,7 +618,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                             rows={1}
                                         />
                                         <div className="flex items-center gap-1 shrink-0 mr-1">
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => setIsRecording(!isRecording)}
                                                 className={`p-2 rounded-lg transition-colors ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'text-gray-400 hover:text-slate-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800'}`}
@@ -627,7 +627,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                                 <Mic size={20} />
                                             </button>
                                             {isTyping ? (
-                                                <button 
+                                                <button
                                                     type="button"
                                                     onClick={handleStopGeneration}
                                                     className="px-4 py-1.5 h-[34px] border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-[#0f172a] hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
@@ -635,7 +635,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                                     <Square size={12} fill="currentColor" /> Stop
                                                 </button>
                                             ) : (input.trim() || attachedFile) ? (
-                                                <button 
+                                                <button
                                                     type="submit"
                                                     className="px-4 py-1.5 bg-[#3b82f6] text-white text-[13px] font-bold rounded-lg hover:bg-blue-600 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.3)] animate-in fade-in zoom-in-95"
                                                 >
@@ -646,7 +646,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                     </div>
                                 </form>
                             </div>
-                            
+
                             <div className="max-w-[900px] mx-auto text-center mt-2">
                                 <p className="text-[11px] text-gray-500 font-medium">
                                     Onimta Intelligence can make mistakes. Onimta protects privacy and adheres to responsible AI principles. <button type="button" onClick={() => setShowAIInfoModal(true)} className="text-[#3b82f6] hover:underline cursor-pointer">How we use AI.</button>

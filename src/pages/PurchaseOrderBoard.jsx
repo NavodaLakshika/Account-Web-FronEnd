@@ -330,7 +330,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <style>{`@keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }`}</style>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="PurchaseOrderBoard" icon={FileText}
                 isOpen={isOpen} onClose={onClose}
                 title="Purchase Order"
                 footer={

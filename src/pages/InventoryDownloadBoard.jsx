@@ -133,7 +133,7 @@ const InventoryDownloadBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="InventoryDownloadBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Inventory Data Download"

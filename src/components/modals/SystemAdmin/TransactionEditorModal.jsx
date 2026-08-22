@@ -201,7 +201,7 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="TransactionEditorModal" isOpen={isOpen}
                 onClose={onClose}
                 title="TRANSACTION EDITOR"
                 

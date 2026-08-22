@@ -11,7 +11,7 @@ const AccountBalanceBoard = ({ isOpen, onClose }) => {
     ];
 
     return (
-        <TransactionFormWrapper icon={FileText}
+        <TransactionFormWrapper boardName="AccountBalanceBoard" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
             title="Account Balance"

@@ -198,7 +198,7 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="JournalEntryEditorBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Journal Entry Editor"

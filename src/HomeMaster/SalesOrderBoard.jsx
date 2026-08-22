@@ -321,7 +321,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="SalesOrderBoard" isOpen={isOpen}
                 onClose={onClose}
                 title="Sales Order"
                 

@@ -109,7 +109,7 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={Building2}
+            <TransactionFormWrapper boardName="CompanyProfileBoard" icon={Building2}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Company"

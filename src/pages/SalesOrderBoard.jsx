@@ -242,7 +242,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <style>{`@keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }`}</style>
-            <TransactionFormWrapper isOpen={isOpen} onClose={onClose}
+            <TransactionFormWrapper boardName="SalesOrderBoard" isOpen={isOpen} onClose={onClose}
                 title="Sales Order"
                 
                 icon={ShoppingCart}

@@ -445,7 +445,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="WriteChequeBoard" isOpen={isOpen}
                 onClose={onClose}
                 title="Write Cheque Portfolio"
                 

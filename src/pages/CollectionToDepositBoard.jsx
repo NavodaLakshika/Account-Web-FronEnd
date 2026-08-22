@@ -137,7 +137,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
   return (
     <>
       <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
-      <TransactionFormWrapper icon={FileText}
+      <TransactionFormWrapper boardName="CollectionToDepositBoard" icon={FileText}
         isOpen={isOpen}
         onClose={onClose}
         title="Collection to Deposit Selection"

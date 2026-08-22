@@ -129,7 +129,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="ReceivedPaymentBoard" isOpen={isOpen}
                 onClose={onClose}
                 title="Received Payment"
                 

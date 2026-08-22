@@ -302,7 +302,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <TransactionFormWrapper isOpen={isOpen}
+            <TransactionFormWrapper boardName="PettyCashBoard" isOpen={isOpen}
                 onClose={onClose}
                 title="Petty Cash"
                 

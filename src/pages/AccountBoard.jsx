@@ -264,7 +264,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     return (
         <>
             <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
-            <TransactionFormWrapper icon={FileText}
+            <TransactionFormWrapper boardName="AccountBoard" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Account Master"

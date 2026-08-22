@@ -188,7 +188,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="FundsTransferBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Funds Transfer"

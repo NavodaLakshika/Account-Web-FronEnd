@@ -264,7 +264,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={FileText} isOpen={isOpen} onClose={onClose} title="Item" maxWidth="max-w-[700px]"
+            <TransactionFormWrapper boardName="ItemMasterBoard" icon={FileText} isOpen={isOpen} onClose={onClose} title="Item" maxWidth="max-w-[700px]"
                 footer={
                     <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                         <div className="flex gap-3">

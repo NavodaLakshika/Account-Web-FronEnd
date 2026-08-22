@@ -189,7 +189,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <TransactionFormWrapper icon={null}
+            <TransactionFormWrapper boardName="CustomerChequeReturnBoard" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Customer Cheque Return"
