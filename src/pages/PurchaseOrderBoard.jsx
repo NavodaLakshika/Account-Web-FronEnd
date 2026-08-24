@@ -6,6 +6,7 @@ import ConfirmModal from '../components/modals/ConfirmModal';
 import FeatureLockedModal from '../components/modals/FeatureLockedModal';
 import { Search, Calendar, Plus, Trash2, Save, RotateCcw, Loader2, FileText, CheckCircle } from 'lucide-react';
 import { purchOrderService } from '../services/purchOrder.service';
+import { productService } from '../services/product.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -51,6 +52,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         code: '', name: '', unit: 'Nos', purchasePrice: '', sellingPrice: '', packSize: 1
     });
     const [isCreatingProduct, setIsCreatingProduct] = useState(false);
+    const [isUpdatingProduct, setIsUpdatingProduct] = useState(false);
+    const [isDeletingProduct, setIsDeletingProduct] = useState(false);
     const [isAddProductLocked, setIsAddProductLocked] = useState(false);
     const [showLockModal, setShowLockModal] = useState(false);
 
@@ -290,7 +293,11 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         }
         setIsCreatingProduct(true);
         try {
-            await purchOrderService.createProduct({ ...productMasterData, createUser: formData.createUser });
+            await purchOrderService.createProduct({
+                ...productMasterData,
+                createUser: formData.createUser,
+                companyCode: formData.company
+            });
             showSuccessToast('Product created successfully.');
             setShowProductMaster(false);
             setProductMasterData({ code: '', name: '', unit: 'Nos', purchasePrice: '', sellingPrice: '', packSize: 1 });
@@ -300,6 +307,74 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             showErrorToast(error.toString());
         } finally {
             setIsCreatingProduct(false);
+        }
+    };
+
+    const handleProductCodeBlur = async () => {
+        if (!productMasterData.code || productMasterData.code.trim() === '') return;
+        try {
+            const product = await productService.get(productMasterData.code, formData.company);
+            if (product && product.code) {
+                setProductMasterData({
+                    code: product.code,
+                    name: product.prod_Name || '',
+                    unit: product.unit || 'Nos',
+                    purchasePrice: product.purchase_price || '',
+                    sellingPrice: product.selling_Price || '',
+                    packSize: product.pack_Size || 1
+                });
+                showSuccessToast('Product loaded.');
+            }
+        } catch (error) {
+            // Silently ignore if product doesn't exist, as it could be a new product
+        }
+    };
+
+    const handleUpdateProduct = async () => {
+        if (!productMasterData.code || !productMasterData.name) {
+            return showErrorToast('Code and Name are required.');
+        }
+        setIsUpdatingProduct(true);
+        try {
+            const payload = {
+                Code: productMasterData.code,
+                Prod_Name: productMasterData.name,
+                Unit: productMasterData.unit || 'Nos',
+                Pack_Size: productMasterData.packSize || 1,
+                Purchase_price: parseFloat(productMasterData.purchasePrice) || 0,
+                Selling_Price: parseFloat(productMasterData.sellingPrice) || 0,
+                Company_Code: formData.company,
+                Dept_Code: '1',
+                Category_Code: '1'
+            };
+            await productService.save(payload);
+            showSuccessToast('Product updated successfully.');
+
+            const results = await purchOrderService.getLookups(formData.company);
+            setLookups(prev => ({ ...prev, products: results.products }));
+        } catch (error) {
+            showErrorToast('Error updating product.');
+        } finally {
+            setIsUpdatingProduct(false);
+        }
+    };
+
+    const handleDeleteProduct = async () => {
+        if (!productMasterData.code) {
+            return showErrorToast('Code is required to delete.');
+        }
+        setIsDeletingProduct(true);
+        try {
+            await productService.delete(productMasterData.code, formData.company);
+            showSuccessToast('Product deleted successfully.');
+            setShowProductMaster(false);
+            setProductMasterData({ code: '', name: '', unit: 'Nos', purchasePrice: '', sellingPrice: '', packSize: 1 });
+            const results = await purchOrderService.getLookups(formData.company);
+            setLookups(prev => ({ ...prev, products: results.products }));
+        } catch (error) {
+            showErrorToast('Error deleting product.');
+        } finally {
+            setIsDeletingProduct(false);
         }
     };
 
@@ -678,11 +753,21 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
             <SimpleModal isOpen={showProductMaster} onClose={() => setShowProductMaster(false)} title="Product Master Creation" maxWidth="max-w-[700px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
-                        <button onClick={() => setShowProductMaster(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[3px] border border-gray-300 hover:bg-blue-50/50 transition-all active:scale-95 cursor-pointer group border-b border-gray-50">CANCEL</button>
-                        <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] shadow-md hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none">
-                            {isCreatingProduct ? 'CREATING...' : 'CREATE PRODUCT'}
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between gap-3 border-t border-gray-200 rounded-b-xl">
+                        <div className="flex gap-2">
+                            <button onClick={handleDeleteProduct} disabled={isDeletingProduct} className="px-5 h-9 bg-white text-red-500 text-[13px] font-bold rounded-[3px] border border-red-200 hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center">
+                                {isDeletingProduct ? 'DELETING...' : 'DELETE'}
+                            </button>
+                        </div>
+                        <div className="flex gap-3 justify-end flex-1">
+                            <button onClick={() => setShowProductMaster(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[3px] border border-gray-300 hover:bg-blue-50/50 transition-all active:scale-95 cursor-pointer">CANCEL</button>
+                            <button onClick={handleUpdateProduct} disabled={isUpdatingProduct} className="px-6 h-9 bg-[#10b981] text-white text-[13px] font-bold rounded-[3px] shadow-sm hover:bg-[#059669] transition-all active:scale-95 border-none">
+                                {isUpdatingProduct ? 'UPDATING...' : 'UPDATE'}
+                            </button>
+                            <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] shadow-md hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none">
+                                {isCreatingProduct ? 'CREATING...' : 'CREATE PRODUCT'}
+                            </button>
+                        </div>
                     </div>
                 }
             >
@@ -690,7 +775,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Code</label>
-                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({ ...productMasterData, code: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" />
+                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({ ...productMasterData, code: e.target.value })} onBlur={handleProductCodeBlur} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Unit of Measure</label>
