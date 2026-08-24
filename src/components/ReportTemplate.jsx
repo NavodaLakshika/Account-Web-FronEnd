@@ -895,7 +895,7 @@ const ReportTemplate = ({
             setAiQuestion('');
         } catch (error) {
             console.error("AI API Error:", error);
-            setAiResponse("I'm sorry, I am currently unable to connect to the AI service. Please try again later.");
+            setAiResponse("I'm sorry, I am currently unable to connect to the AI service. Please try again later");
         } finally {
             setIsAiLoading(false);
         }
