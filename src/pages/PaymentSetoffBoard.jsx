@@ -73,6 +73,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     const [pendingPayments, setPendingPayments] = useState([]);
     const [returns, setReturns] = useState([]);
@@ -137,9 +138,13 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApplySetoff = async () => {
-        if (!formData.supplierId || selectedSetoffs.length === 0) {
-            showErrorToast("Please select a supplier and allocate set-offs.");
-            return;
+        const newErrors = {};
+        if (!formData.supplierId) newErrors.supplierId = 'Supplier is required';
+        if (selectedSetoffs.length === 0) newErrors.grid = 'Allocate set-offs';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return showErrorToast("Please select a supplier and allocate set-offs.");
         }
 
         try {
@@ -189,6 +194,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
         setPendingPayments([]);
         setReturns([]);
         setSelectedSetoffs([]);
+        setErrors({});
         loadInitialData();
     };
 
@@ -233,6 +239,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
         setSelectedPendingRow(null);
         setSelectedReturnRow(null);
         setoffAmountInputSet('');
+        if (errors.grid) setErrors(prev => ({ ...prev, grid: null }));
     };
 
     return (
@@ -260,7 +267,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-5">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.supplierId || ''}
@@ -270,9 +277,10 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                             if (item) {
                                                 const handler = handleSupplierSelect;
                                                 handler(item);
+                                                if (errors.supplierId) setErrors(prev => ({ ...prev, supplierId: null }));
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.supplierId ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -283,6 +291,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.supplierId && <div className="text-[11px] text-red-500 mt-1">{errors.supplierId}</div>}
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc ID</label>
@@ -318,7 +327,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                             <th className="px-4">Date</th>
                                             <th className="px-4 text-right">Amount</th>
                                             <th className="px-4 text-right">Balance</th>
-                                        <th className="text-right px-5 py-3">Action</th></tr>
+                                            <th className="text-right px-5 py-3">Action</th></tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {pendingPayments.map((p, i) => (
@@ -354,7 +363,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                             <th className="px-4">Date</th>
                                             <th className="px-4 text-right">Amount</th>
                                             <th className="px-4 text-right">Balance</th>
-                                        <th className="text-right px-5 py-3">Action</th></tr>
+                                            <th className="text-right px-5 py-3">Action</th></tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {returns.map((r, i) => (
@@ -412,9 +421,10 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Selected Allocation Table */}
-                    <div className="bg-white border border-slate-200 rounded-[3px] flex flex-col overflow-hidden">
-                        <div className="px-4 py-2.5 border-b border-gray-200 bg-slate-50">
+                    <div className={`bg-white border ${errors.grid ? 'border-red-500' : 'border-slate-200'} rounded-[3px] flex flex-col overflow-hidden`}>
+                        <div className="px-4 py-2.5 border-b border-gray-200 bg-slate-50 flex items-center gap-2">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Selected Allocation</span>
+                            {errors.grid && <span className="text-[10px] font-bold text-red-500 uppercase">{errors.grid}</span>}
                         </div>
                         <div className="min-h-[150px] max-h-[200px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
@@ -428,7 +438,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                         <th className="px-3">Date</th>
                                         <th className="px-3 text-right">Line Total</th>
                                         <th className="px-3 text-right">Rem. Balance</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {selectedSetoffs.map((s, idx) => (

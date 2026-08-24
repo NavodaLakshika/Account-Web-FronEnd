@@ -87,6 +87,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
     const [activeModal, setActiveModal] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showChqDatePicker, setShowChqDatePicker] = useState(false);
@@ -150,7 +151,11 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
         } catch (error) { console.error('Failed to generate doc number.'); }
     };
 
-    const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    };
 
     const handlePayTypeChange = (type) => {
         setFormData(prev => ({
@@ -160,6 +165,8 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
             bank: type === 'CHEQUE' ? prev.bank : '',
             branch: type === 'CHEQUE' ? prev.branch : ''
         }));
+        if (errors.payType) setErrors(prev => ({ ...prev, payType: null }));
+        if (type !== 'CHEQUE' && errors.chequeNo) setErrors(prev => ({ ...prev, chequeNo: null }));
     };
 
     const handleClear = () => {
@@ -168,14 +175,22 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
             bank: '', branch: '', amount: '0.00',
             debitAccCode: '', debitAccName: '', creditAccCode: '', creditAccName: '', memo: ''
         }));
+        setErrors({});
         generateDocNo();
     };
 
     const handleSave = async () => {
-        if (!formData.creditAccCode) return showErrorToast('Please select a customer (credit account).');
-        if (!formData.debitAccCode) return showErrorToast('Please select a debit account.');
-        if (!formData.amount || parseFloat(formData.amount) <= 0) return showErrorToast('Valid Payment Amount is required.');
-        if (formData.payType === 'CHEQUE' && !formData.chequeNo) return showErrorToast('Cheque Number is required.');
+        const newErrors = {};
+        if (!formData.creditAccCode) newErrors.creditAccCode = 'Customer required';
+        if (!formData.debitAccCode) newErrors.debitAccCode = 'Debit Account required';
+        if (!formData.amount || parseFloat(formData.amount) <= 0) newErrors.amount = 'Valid amount required';
+        if (formData.payType === 'CHEQUE' && !formData.chequeNo) newErrors.chequeNo = 'Cheque number required';
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            return showErrorToast('Please fill out all required fields.');
+        }
 
         setLoading(true);
         try {
@@ -196,14 +211,20 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast(error.toString()); } finally { setLoading(false); }
     };
 
-    const handleSelectCustomer = (item) => { setFormData(prev => ({ ...prev, creditAccCode: item.code, creditAccName: item.name })); };
-    const handleSelectDebitAccount = (item) => { setFormData(prev => ({ ...prev, debitAccCode: item.code, debitAccName: item.name })); };
+    const handleSelectCustomer = (item) => {
+        setFormData(prev => ({ ...prev, creditAccCode: item.code, creditAccName: item.name }));
+        if (errors.creditAccCode) setErrors(prev => ({ ...prev, creditAccCode: null }));
+    };
+    const handleSelectDebitAccount = (item) => {
+        setFormData(prev => ({ ...prev, debitAccCode: item.code, debitAccName: item.name }));
+        if (errors.debitAccCode) setErrors(prev => ({ ...prev, debitAccCode: null }));
+    };
     const handleSelectBank = (item) => { setFormData(prev => ({ ...prev, bank: item.name })); };
 
     return (
         <>
             <TransactionFormWrapper boardName="CustomerAdvanceBoard" isOpen={isOpen} onClose={onClose}
-                title="Customer Advance Receipt"  icon={null}
+                title="Customer Advance Receipt" icon={null}
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <button onClick={handleClear} disabled={loading}
@@ -244,16 +265,17 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Amount */}
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount *</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount <span className="text-red-500">*</span></label>
                                 <input type="number" ref={inputRefs.amount} name="amount" step="0.01"
                                     value={formData.amount} onChange={handleInputChange}
                                     onKeyDown={e => handleKeyDown(e, 'amount')}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                    className={`w-full h-10 border ${errors.amount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]`} />
+                                {errors.amount && <div className="text-[11px] text-red-500 mt-1">{errors.amount}</div>}
                             </div>
 
                             {/* Customer (Credit Account) */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer *</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.creditAccCode}
@@ -268,7 +290,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                                 // Custom handlers usually expect an item.
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700  cursor-pointer"
+                                        className={`w-full h-10 border ${errors.creditAccCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700  cursor-pointer`}
                                     >
                                         <option value="">Select...</option>
                                         {(lookups.customers || []).map((item, idx) => (
@@ -278,6 +300,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.creditAccCode && <div className="text-[11px] text-red-500 mt-1">{errors.creditAccCode}</div>}
                             </div>
 
                             {/* Pay Type */}
@@ -311,7 +334,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Debit Account */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Debit Acc *</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Debit Acc <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.debitAccCode}
@@ -326,7 +349,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                                 // Custom handlers usually expect an item.
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700  cursor-pointer"
+                                        className={`w-full h-10 border ${errors.debitAccCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700  cursor-pointer`}
                                     >
                                         <option value="">Select...</option>
                                         {(lookups.drAccounts || []).map((item, idx) => (
@@ -336,17 +359,19 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.debitAccCode && <div className="text-[11px] text-red-500 mt-1">{errors.debitAccCode}</div>}
                             </div>
 
                             {/* Cheque No */}
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Chq No</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Chq No {formData.payType === 'CHEQUE' && <span className="text-red-500">*</span>}</label>
                                 <input type="text" ref={inputRefs.chequeNo} name="chequeNo"
                                     value={formData.chequeNo} onChange={handleInputChange}
                                     disabled={formData.payType !== 'CHEQUE'}
                                     onKeyDown={e => handleKeyDown(e, 'chequeNo')}
                                     placeholder="Cheque number"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 disabled:bg-gray-100 disabled:text-gray-400" />
+                                    className={`w-full h-10 border ${errors.chequeNo ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 disabled:bg-gray-100 disabled:text-gray-400`} />
+                                {errors.chequeNo && <div className="text-[11px] text-red-500 mt-1">{errors.chequeNo}</div>}
                             </div>
 
                             {/* Bank / Branch */}

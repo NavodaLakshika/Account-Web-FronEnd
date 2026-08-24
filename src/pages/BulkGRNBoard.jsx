@@ -11,6 +11,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 const BulkGRNBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], pos: [], paymentMethods: [] });
+    const [errors, setErrors] = useState({});
     const [isApplying, setIsApplying] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -115,6 +116,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                 if (parsedGroups.length > 0) {
                     setGroupedGrns(prev => [...prev, ...parsedGroups]);
                     showSuccessToast(`Successfully grouped ${parsedGroups.length} GRNs from Excel.`);
+                    if (errors.grid) setErrors(prev => ({ ...prev, grid: null }));
                 } else {
                     showErrorToast("Could not parse any valid GRN groups.");
                 }
@@ -130,6 +132,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
 
     const handleClear = () => {
         setGroupedGrns([]);
+        setErrors({});
     };
 
     const removeGroup = (id) => {
@@ -137,7 +140,10 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApply = () => {
-        if (groupedGrns.length === 0) return showErrorToast('No GRNs to apply.');
+        if (groupedGrns.length === 0) {
+            setErrors({ grid: 'Load an excel file with data first' });
+            return showErrorToast('No GRNs to apply.');
+        }
         setShowConfirmModal(true);
     };
 
@@ -154,7 +160,8 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                 comment: group.comment, company: formDataTemplate.company, createUser: formDataTemplate.createUser,
                 taxPer: '0', nbtPer: '0', discPer: '0', adjType: '', adjAmt: '0.00',
                 total: sumTotal, totQty: sumQty, totFree: sumFree, taxAmt: 0, nbtAmnt: 0, discount: 0, netAmount: sumTotal,
-                products: group.products.map((p, i) => ({ ...p, lnNo: i + 1, qty: parseFloat(p.qty) || 0,
+                products: group.products.map((p, i) => ({
+                    ...p, lnNo: i + 1, qty: parseFloat(p.qty) || 0,
                     free: parseFloat(p.free) || 0, cost: parseFloat(p.cost) || 0, selling: parseFloat(p.selling) || 0,
                     amount: parseFloat(p.amount) || 0
                 }))
@@ -184,7 +191,8 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                 postDate: formDataTemplate.grnDate, expectedDate: formDataTemplate.expectedDate,
                 payType: group.payType || 'Cash', comment: group.comment || '',
                 total: sumTotal, totQty: sumQty, totFree: sumFree, taxAmt: 0, nbtAmnt: 0, discount: 0, netAmount: sumTotal,
-                products: group.products.map((p, i) => ({ ...p, lnNo: i + 1, qty: parseFloat(p.qty) || 0,
+                products: group.products.map((p, i) => ({
+                    ...p, lnNo: i + 1, qty: parseFloat(p.qty) || 0,
                     free: parseFloat(p.free) || 0, cost: parseFloat(p.cost) || 0, selling: parseFloat(p.selling) || 0,
                     amount: parseFloat(p.amount) || 0
                 }))
@@ -239,7 +247,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="border border-slate-200 rounded-[3px] bg-white overflow-hidden">
+                    <div className={`border ${errors.grid ? 'border-red-500' : 'border-slate-200'} rounded-[3px] bg-white overflow-hidden`}>
                         <div className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
                             <div className="flex items-center">
                                 <div className="flex-[1.5] px-4 border-r border-gray-200">Supplier</div>

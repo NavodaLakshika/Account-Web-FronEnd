@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Search, 
-    Calendar, 
-    RotateCcw, 
-    Save, 
-    Trash2, 
-    Loader2, 
+import {
+    Search,
+    Calendar,
+    RotateCcw,
+    Save,
+    Trash2,
+    Loader2,
     CheckCircle,
     PenTool,
     DollarSign,
@@ -24,7 +24,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 const WriteChequeBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [selectedTab, setSelectedTab] = useState('Expenses');
-    
+
     // UI States
     const [showBankModal, setShowBankModal] = useState(false);
     const [showCCModal, setShowCCModal] = useState(false);
@@ -42,6 +42,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
     const [accIndex, setAccIndex] = useState(0);
     const [itemIndex, setItemIndex] = useState(0);
     const [showVoidConfirm, setShowVoidConfirm] = useState(false);
+    const [errors, setErrors] = useState({});
 
     // Search States
     const [bankSearch, setBankSearch] = useState('');
@@ -79,7 +80,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
     const [expenses, setExpenses] = useState([]);
     const [items, setItems] = useState([]);
-    
+
     const [lookups, setLookups] = useState({
         banks: [],
         costCenters: [],
@@ -104,14 +105,14 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
         try {
             const { companyCode } = getSessionData();
             const data = await writeChequeService.getInitData(companyCode);
-            
+
             try {
                 const docs = await writeChequeService.searchSaved(companyCode);
                 setSavedDocs(docs || []);
             } catch (err) {
                 console.error("Failed to load saved docs", err);
             }
-            
+
             setLookups(prev => ({
                 ...prev,
                 banks: data.bankAccounts || [],
@@ -146,18 +147,30 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApply = async () => {
+        const newErrors = {};
+
         if (!formData.docId) return showErrorToast('Document ID is required. Please reload if it failed to generate.');
-        if (!formData.bankAcc) return showErrorToast('Select settlement bank.');
-        if (!formData.payeeId) return showErrorToast('Select a Pay to Order (Customer/Vendor).');
-        if (expenses.length === 0 && items.length === 0) return showErrorToast('Add at least one line item (Expense or Item).');
-        
+
+        if (!formData.bankAcc) newErrors.bankAcc = 'Select settlement bank';
+        if (!formData.payeeId) newErrors.payeeId = 'Select a Pay to Order';
+
+        if (expenses.length === 0 && items.length === 0) {
+            newErrors.grid = 'Add at least one line item (Expense or Item)';
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            return showErrorToast('Please correct the highlighted fields.');
+        }
+
         const totalAmount = calculateTotal();
         if (totalAmount <= 0) return showErrorToast('Total amount must be greater than zero.');
 
         setLoading(true);
         setLoading(true);
         try {
-            await writeChequeService.clearDraft(formData.docId, formData.company).catch(() => {});
+            await writeChequeService.clearDraft(formData.docId, formData.company).catch(() => { });
 
             for (const exp of expenses) {
                 if (!exp.accCode) continue;
@@ -236,17 +249,29 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSaveDraft = async () => {
+        const newErrors = {};
+
         if (!formData.docId) return showErrorToast('Document ID is required. Please reload if it failed to generate.');
-        if (!formData.bankAcc) return showErrorToast('Select settlement bank.');
-        if (!formData.payeeId) return showErrorToast('Select a Pay to Order (Customer/Vendor).');
-        if (expenses.length === 0 && items.length === 0) return showErrorToast('Add at least one line item (Expense or Item).');
-        
+
+        if (!formData.bankAcc) newErrors.bankAcc = 'Select settlement bank';
+        if (!formData.payeeId) newErrors.payeeId = 'Select a Pay to Order';
+
+        if (expenses.length === 0 && items.length === 0) {
+            newErrors.grid = 'Add at least one line item (Expense or Item)';
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            return showErrorToast('Please correct the highlighted fields.');
+        }
+
         const totalAmount = calculateTotal();
         if (totalAmount <= 0) return showErrorToast('Total amount must be greater than zero.');
 
         setLoading(true);
         try {
-            await writeChequeService.clearDraft(formData.docId, formData.company).catch(() => {});
+            await writeChequeService.clearDraft(formData.docId, formData.company).catch(() => { });
 
             for (const exp of expenses) {
                 if (!exp.accCode) continue;
@@ -326,6 +351,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             isApplied: false,
             isVoided: false
         }));
+        setErrors({});
         initData();
     };
 
@@ -351,7 +377,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
         try {
             const { companyCode } = getSessionData();
             const { header, expenses: loadedExpenses, items: loadedItems, isApplied } = await writeChequeService.loadSaved(docNo, companyCode);
-            
+
             setFormData(prev => ({
                 ...prev,
                 docId: header.docNo,
@@ -448,7 +474,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             <TransactionFormWrapper boardName="WriteChequeBoard" isOpen={isOpen}
                 onClose={onClose}
                 title="Write Cheque Portfolio"
-                
+
                 icon={PenTool}
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
@@ -515,10 +541,10 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                             <div className="">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Dispatch Date</label>
                                 <div className="relative w-full">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.date} 
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.date}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                         onClick={() => openCalendar('date')}
                                     />
@@ -533,7 +559,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                             {/* Left Column */}
                             <div className="col-span-6 space-y-3.5">
                                 <div className="">
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Settlement Bank</label>
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Settlement Bank <span className="text-red-500">*</span></label>
                                     <div className="relative">
                                         <select
                                             value={formData.bankAcc || ''}
@@ -541,11 +567,12 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                 const val = ev.target.value;
                                                 const b = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
                                                 if (b) {
-                                                    setFormData({...formData, bankAcc: b.code});
+                                                    setFormData({ ...formData, bankAcc: b.code });
                                                     fetchBankBalance(b.code);
+                                                    if (errors.bankAcc) setErrors(prev => ({ ...prev, bankAcc: null }));
                                                 }
                                             }}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                            className={`w-full h-10 border ${errors.bankAcc ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                         >
                                             <option value="">Select...</option>
@@ -556,6 +583,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                             ))}
                                         </select>
                                     </div>
+                                    {errors.bankAcc && <div className="text-[11px] text-red-500 mt-1">{errors.bankAcc}</div>}
                                     {formData.bankAcc && (
                                         <div className="mt-1.5 px-3 h-8 bg-blue-50 flex items-center justify-between rounded-[3px] border border-blue-100">
                                             <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Bank Balance</span>
@@ -568,7 +596,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                     <div className="relative">
                                         <select
                                             value={formData.costCenter || ''}
-                                            onChange={(e) => setFormData({...formData, costCenter: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, costCenter: e.target.value })}
                                             className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none"
                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                         >
@@ -586,7 +614,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                     <div className="relative">
                                         <select
                                             value={formData.endorsement || ''}
-                                            onChange={(e) => setFormData({...formData, endorsement: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, endorsement: e.target.value })}
                                             className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none"
                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                         >
@@ -602,53 +630,55 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                             {/* Right Column */}
                             <div className="col-span-6 space-y-3.5">
                                 <div className="">
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay to Order</label>
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay to Order <span className="text-red-500">*</span></label>
                                     <div className="flex gap-2">
                                         <div className="relative flex-1">
                                             <select
-                                        value={formData.payeeId}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const dataSource = payeeType === 'Vendor' ? lookups.vendors : lookups.customers;
-                                            const c = (dataSource || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                            if (c) {
-                                                setFormData({...formData, payeeId: c.code || c.id || c.itemId, payeeName: c.name});
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {((payeeType === 'Vendor' ? lookups.vendors : lookups.customers) || []).map((c, idx) => (
-                                            <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
-                                                {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                value={formData.payeeId}
+                                                onChange={(ev) => {
+                                                    const val = ev.target.value;
+                                                    const dataSource = payeeType === 'Vendor' ? lookups.vendors : lookups.customers;
+                                                    const c = (dataSource || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                    if (c) {
+                                                        setFormData({ ...formData, payeeId: c.code || c.id || c.itemId, payeeName: c.name });
+                                                        if (errors.payeeId) setErrors(prev => ({ ...prev, payeeId: null }));
+                                                    }
+                                                }}
+                                                className={`w-full h-10 border ${errors.payeeId ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none`}
+                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                            >
+                                                <option value="">Select...</option>
+                                                {((payeeType === 'Vendor' ? lookups.vendors : lookups.customers) || []).map((c, idx) => (
+                                                    <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
+                                                        {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                         <div className="relative flex-1">
-                                            <input 
-                                                type="text" 
-                                                value={formData.payeeName} 
-                                                onChange={(e) => setFormData({...formData, payeeName: e.target.value})}
+                                            <input
+                                                type="text"
+                                                value={formData.payeeName}
+                                                onChange={(e) => setFormData({ ...formData, payeeName: e.target.value })}
                                                 className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                                 placeholder="Payee Name"
                                             />
                                         </div>
                                         <button onClick={() => {
                                             setPayeeType(prev => prev === 'Customer' ? 'Vendor' : 'Customer');
-                                            setFormData({...formData, payeeId: '', payeeName: ''});
+                                            setFormData({ ...formData, payeeId: '', payeeName: '' });
                                         }} className="h-10 px-4 bg-white border border-[#0285fd] text-[#0285fd] font-semibold rounded-[3px] text-[13px] hover:bg-blue-50 transition-all flex items-center justify-center whitespace-nowrap gap-1">
                                             <RotateCcw size={14} /> LOAD {payeeType === 'Customer' ? 'VENDORS' : 'CUSTOMERS'}
                                         </button>
                                     </div>
+                                    {errors.payeeId && <div className="text-[11px] text-red-500 mt-1">{errors.payeeId}</div>}
                                 </div>
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Postal Address</label>
-                                    <textarea 
-                                        className="w-full h-[82px] border border-gray-300 rounded-[3px] px-3 py-2 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 resize-none" 
-                                        value={formData.address} 
-                                        onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                    <textarea
+                                        className="w-full h-[82px] border border-gray-300 rounded-[3px] px-3 py-2 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 resize-none"
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                         placeholder="Enter postal address..."
                                     />
                                 </div>
@@ -668,11 +698,11 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                             <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
                                 <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Bank Submission Details</h4>
                                 <label className="flex items-center gap-2 cursor-pointer">
-                                    <input 
-                                        type="checkbox" 
-                                        className="w-4 h-4 rounded border-slate-300 text-[#0285fd] focus:ring-[#0285fd] transition-all" 
-                                        checked={formData.isElectronic} 
-                                        onChange={(e) => setFormData({...formData, isElectronic: e.target.checked, chqNo: e.target.checked ? 'EPAY' : ''})} 
+                                    <input
+                                        type="checkbox"
+                                        className="w-4 h-4 rounded border-slate-300 text-[#0285fd] focus:ring-[#0285fd] transition-all"
+                                        checked={formData.isElectronic}
+                                        onChange={(e) => setFormData({ ...formData, isElectronic: e.target.checked, chqNo: e.target.checked ? 'EPAY' : '' })}
                                     />
                                     <span className="text-[11px] font-medium text-gray-600">Electronic Pay</span>
                                 </label>
@@ -681,29 +711,29 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque No</label>
                                     <div className="flex gap-2 items-center">
-                                        <input 
-                                            type="checkbox" 
-                                            className="w-4 h-4 rounded border-slate-300 text-[#0285fd] focus:ring-[#0285fd] shrink-0" 
-                                            checked={formData.isChqNoManual} 
-                                            onChange={(e) => setFormData({...formData, isChqNoManual: e.target.checked})} 
+                                        <input
+                                            type="checkbox"
+                                            className="w-4 h-4 rounded border-slate-300 text-[#0285fd] focus:ring-[#0285fd] shrink-0"
+                                            checked={formData.isChqNoManual}
+                                            onChange={(e) => setFormData({ ...formData, isChqNoManual: e.target.checked })}
                                             title="Manual entry"
                                         />
-                                        <input 
-                                            type="text" 
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
-                                            value={formData.chqNo} 
-                                            onChange={(e) => setFormData({...formData, chqNo: e.target.value})} 
+                                        <input
+                                            type="text"
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                            value={formData.chqNo}
+                                            onChange={(e) => setFormData({ ...formData, chqNo: e.target.value })}
                                         />
                                     </div>
                                 </div>
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque Date</label>
                                     <div className="relative">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={formData.chqDate} 
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" 
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={formData.chqDate}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                             onClick={() => openCalendar('chqDate')}
                                         />
                                         <button onClick={() => openCalendar('chqDate')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
@@ -725,13 +755,13 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                     <div className="mt-4">
                         <div className="flex items-center gap-3 mb-2 px-2 border-b border-gray-200 pb-2">
                             <div className="flex gap-4">
-                                <button 
+                                <button
                                     onClick={() => setSelectedTab('Expenses')}
                                     className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Expenses' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                                 >
                                     Expenses
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setSelectedTab('Items')}
                                     className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Items' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                                 >
@@ -740,7 +770,13 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[250px]">
+                        {errors.grid && (
+                            <div className="mb-2 px-4 py-2 bg-red-50 text-red-500 text-[11px] font-bold rounded-[3px] border border-red-200 uppercase tracking-widest text-center">
+                                {errors.grid}
+                            </div>
+                        )}
+
+                        <div className={`border rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[250px] ${errors.grid ? 'border-red-500' : 'border-gray-200'}`}>
                             {selectedTab === 'Expenses' ? (
                                 <>
                                     <table className="w-full text-sm text-left border-collapse">
@@ -751,7 +787,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                 <th className="px-4 w-[20%]">Allocation CC</th>
                                                 <th className="px-4 w-[15%] text-right">Net Value</th>
                                                 <th className="px-4 w-[25%]">Memo</th>
-                                            <th className="text-right px-5 py-3">Action</th></tr>
+                                                <th className="text-right px-5 py-3">Action</th></tr>
                                         </thead>
                                         <tbody>
                                             {expenses.map((line, idx) => (
@@ -761,21 +797,21 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                         <div className="flex gap-1 items-center">
                                                             <select
                                                                 value={line.accCode || ''}
-                                                                    onChange={(ev) => {
-                                                                        const val = ev.target.value;
-                                                                        if (!val) {
-                                                                            const newExp = [...expenses];
-                                                                            newExp[idx].accCode = '';
-                                                                            setExpenses(newExp);
-                                                                            return;
-                                                                        }
-                                                                        const a = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                                                        if (a) {
-                                                                            const newExp = [...expenses];
-                                                                            newExp[idx].accCode = val;
-                                                                            setExpenses(newExp);
-                                                                        }
-                                                                    }}
+                                                                onChange={(ev) => {
+                                                                    const val = ev.target.value;
+                                                                    if (!val) {
+                                                                        const newExp = [...expenses];
+                                                                        newExp[idx].accCode = '';
+                                                                        setExpenses(newExp);
+                                                                        return;
+                                                                    }
+                                                                    const a = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                                    if (a) {
+                                                                        const newExp = [...expenses];
+                                                                        newExp[idx].accCode = val;
+                                                                        setExpenses(newExp);
+                                                                    }
+                                                                }}
                                                                 className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
                                                                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                                             >
@@ -810,33 +846,33 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                         </div>
                                                     </td>
                                                     <td className="px-2 py-2.5">
-                                                        <input 
-                                                            type="text" 
-                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" 
-                                                            value={line.amount} 
+                                                        <input
+                                                            type="text"
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono"
+                                                            value={line.amount}
                                                             onChange={(e) => {
                                                                 const newExp = [...expenses];
                                                                 newExp[idx].amount = e.target.value;
                                                                 setExpenses(newExp);
-                                                            }} 
+                                                            }}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-2.5">
-                                                        <input 
-                                                            type="text" 
-                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
-                                                            value={line.memo} 
+                                                        <input
+                                                            type="text"
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                            value={line.memo}
                                                             onChange={(e) => {
                                                                 const newExp = [...expenses];
                                                                 newExp[idx].memo = e.target.value;
                                                                 setExpenses(newExp);
-                                                            }} 
+                                                            }}
                                                             placeholder="Memo"
                                                         />
                                                     </td>
                                                     <td className="px-5 py-2.5 text-right">
-                                                        <button 
-                                                            onClick={() => setExpenses(expenses.filter((_, i) => i !== idx))} 
+                                                        <button
+                                                            onClick={() => setExpenses(expenses.filter((_, i) => i !== idx))}
                                                             className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-[3px] transition-all"
                                                         >
                                                             <Trash2 size={14} />
@@ -852,8 +888,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         </tbody>
                                     </table>
                                     <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2">
-                                        <button 
-                                            onClick={() => setExpenses([...expenses, { accCode: '', costCenter: '', amount: '0.00', memo: '' }])} 
+                                        <button
+                                            onClick={() => setExpenses([...expenses, { accCode: '', costCenter: '', amount: '0.00', memo: '' }])}
                                             className="w-full py-2.5 text-[#0285fd] font-bold text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center justify-center gap-2 border border-dashed border-[#0285fd]/30 rounded-[3px] bg-transparent"
                                         >
                                             <Save size={12} /> ADD EXPENSE LINE
@@ -871,7 +907,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                 <th className="px-4 w-[15%] text-right">Unit Cost</th>
                                                 <th className="px-4 w-[15%] text-right">Sub Total</th>
                                                 <th className="px-4 w-[18%]">Memo</th>
-                                            <th className="text-right px-5 py-3">Action</th></tr>
+                                                <th className="text-right px-5 py-3">Action</th></tr>
                                         </thead>
                                         <tbody>
                                             {items.map((line, idx) => (
@@ -881,21 +917,21 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                         <div className="flex gap-1 items-center">
                                                             <select
                                                                 value={line.itemCode || ''}
-                                                                    onChange={(ev) => {
-                                                                        const val = ev.target.value;
-                                                                        if (!val) {
-                                                                            const newItems = [...items];
-                                                                            newItems[idx].itemCode = '';
-                                                                            setItems(newItems);
-                                                                            return;
-                                                                        }
-                                                                        const p = (lookups.products || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                                                        if (p) {
-                                                                            const newItems = [...items];
-                                                                            newItems[idx].itemCode = val;
-                                                                            setItems(newItems);
-                                                                        }
-                                                                    }}
+                                                                onChange={(ev) => {
+                                                                    const val = ev.target.value;
+                                                                    if (!val) {
+                                                                        const newItems = [...items];
+                                                                        newItems[idx].itemCode = '';
+                                                                        setItems(newItems);
+                                                                        return;
+                                                                    }
+                                                                    const p = (lookups.products || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                                    if (p) {
+                                                                        const newItems = [...items];
+                                                                        newItems[idx].itemCode = val;
+                                                                        setItems(newItems);
+                                                                    }
+                                                                }}
                                                                 className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
                                                                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                                             >
@@ -909,48 +945,48 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                         </div>
                                                     </td>
                                                     <td className="px-2 py-2.5">
-                                                        <input 
-                                                            type="number" 
-                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-center text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" 
-                                                            value={line.qty} 
+                                                        <input
+                                                            type="number"
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-center text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono"
+                                                            value={line.qty}
                                                             onChange={(e) => {
                                                                 const newItems = [...items];
                                                                 newItems[idx].qty = e.target.value;
                                                                 setItems(newItems);
-                                                            }} 
+                                                            }}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-2.5">
-                                                        <input 
-                                                            type="text" 
-                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" 
-                                                            value={line.cost} 
+                                                        <input
+                                                            type="text"
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono"
+                                                            value={line.cost}
                                                             onChange={(e) => {
                                                                 const newItems = [...items];
                                                                 newItems[idx].cost = e.target.value;
                                                                 setItems(newItems);
-                                                            }} 
+                                                            }}
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2.5 text-right font-mono font-black text-gray-700 bg-gray-50/30">
                                                         {((parseFloat(line.cost) || 0) * (parseInt(line.qty) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                     </td>
                                                     <td className="px-2 py-2.5">
-                                                        <input 
-                                                            type="text" 
-                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
-                                                            value={line.description} 
+                                                        <input
+                                                            type="text"
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                            value={line.description}
                                                             onChange={(e) => {
                                                                 const newItems = [...items];
                                                                 newItems[idx].description = e.target.value;
                                                                 setItems(newItems);
-                                                            }} 
+                                                            }}
                                                             placeholder="Memo"
                                                         />
                                                     </td>
                                                     <td className="px-5 py-2.5 text-right">
-                                                        <button 
-                                                            onClick={() => setItems(items.filter((_, i) => i !== idx))} 
+                                                        <button
+                                                            onClick={() => setItems(items.filter((_, i) => i !== idx))}
                                                             className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-[3px] transition-all"
                                                         >
                                                             <Trash2 size={14} />
@@ -966,8 +1002,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         </tbody>
                                     </table>
                                     <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2">
-                                        <button 
-                                            onClick={() => setItems([...items, { itemCode: '', description: '', qty: '1', cost: '0.00' }])} 
+                                        <button
+                                            onClick={() => setItems([...items, { itemCode: '', description: '', qty: '1', cost: '0.00' }])}
                                             className="w-full py-2.5 text-[#0285fd] font-bold text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center justify-center gap-2 border border-dashed border-[#0285fd]/30 rounded-[3px] bg-transparent"
                                         >
                                             <Save size={12} /> ADD ITEM LINE
@@ -1002,11 +1038,11 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input 
-                            type="text" 
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
-                            value={bankSearch} 
-                            onChange={(e) => setBankSearch(e.target.value)} 
+                        <input
+                            type="text"
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
+                            value={bankSearch}
+                            onChange={(e) => setBankSearch(e.target.value)}
                             placeholder="Search by name..."
                         />
                     </div>
@@ -1026,7 +1062,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{b.name}</td>
                                         <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button onClick={() => {
-                                                setFormData({...formData, bankAcc: b.code});
+                                                setFormData({ ...formData, bankAcc: b.code });
                                                 fetchBankBalance(b.code);
                                                 setShowBankModal(false);
                                             }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
@@ -1048,11 +1084,11 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input 
-                            type="text" 
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
-                            value={accSearch} 
-                            onChange={(e) => setAccSearch(e.target.value)} 
+                        <input
+                            type="text"
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
+                            value={accSearch}
+                            onChange={(e) => setAccSearch(e.target.value)}
                             placeholder="Filter accounts..."
                         />
                     </div>
@@ -1091,11 +1127,11 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input 
-                            type="text" 
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
-                            value={itemSearch} 
-                            onChange={(e) => setItemSearch(e.target.value)} 
+                        <input
+                            type="text"
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
+                            value={itemSearch}
+                            onChange={(e) => setItemSearch(e.target.value)}
                             placeholder="Search products..."
                         />
                     </div>
@@ -1135,11 +1171,11 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input 
-                            type="text" 
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                        <input
+                            type="text"
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
                             value={formData.payeeName}
-                            onChange={(e) => setFormData({...formData, payeeName: e.target.value})} 
+                            onChange={(e) => setFormData({ ...formData, payeeName: e.target.value })}
                             placeholder="Search payees..."
                         />
                     </div>
@@ -1159,7 +1195,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.name}</td>
                                         <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button onClick={() => {
-                                                setFormData({...formData, payeeId: c.code, payeeName: c.name});
+                                                setFormData({ ...formData, payeeId: c.code, payeeName: c.name });
                                                 setShowPayeeModal(false);
                                             }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
@@ -1176,11 +1212,11 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input 
-                            type="text" 
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                        <input
+                            type="text"
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
                             value={docSearchQuery}
-                            onChange={(e) => setDocSearchQuery(e.target.value)} 
+                            onChange={(e) => setDocSearchQuery(e.target.value)}
                             placeholder="Search vendors..."
                         />
                     </div>
@@ -1194,8 +1230,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {lookups.vendors.filter(v => 
-                                    (v.name?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) || 
+                                {lookups.vendors.filter(v =>
+                                    (v.name?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) ||
                                     (v.id?.toLowerCase() || '').includes(docSearchQuery.toLowerCase())
                                 ).map((v, idx) => (
                                     <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
@@ -1203,7 +1239,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{v.name}</td>
                                         <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button onClick={() => {
-                                                setFormData({...formData, payeeId: v.id, payeeName: v.name, address: v.address});
+                                                setFormData({ ...formData, payeeId: v.id, payeeName: v.name, address: v.address });
                                                 setShowVendorModal(false);
                                             }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
@@ -1219,13 +1255,13 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title={`Search Documents`} maxWidth="max-w-[900px]">
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex bg-slate-100 p-1 border-b border-gray-200 gap-1 rounded-t-[5px]">
-                        <button 
+                        <button
                             onClick={() => setSearchTab('draft')}
                             className={`flex-1 py-2 text-[12px] font-bold rounded-[3px] transition-all ${searchTab === 'draft' ? 'bg-white text-[#0285fd] shadow-sm' : 'text-gray-500 hover:bg-slate-200'}`}
                         >
                             DRAFTS ({savedDocs.length})
                         </button>
-                        <button 
+                        <button
                             onClick={() => setSearchTab('applied')}
                             className={`flex-1 py-2 text-[12px] font-bold rounded-[3px] transition-all ${searchTab === 'applied' ? 'bg-white text-[#0285fd] shadow-sm' : 'text-gray-500 hover:bg-slate-200'}`}
                         >
@@ -1234,11 +1270,11 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                     </div>
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <input 
-                            type="text" 
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
-                            value={docSearchQuery} 
-                            onChange={(e) => setDocSearchQuery(e.target.value)} 
+                        <input
+                            type="text"
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
+                            value={docSearchQuery}
+                            onChange={(e) => setDocSearchQuery(e.target.value)}
                             placeholder="Enter Doc No or Payee..."
                         />
                     </div>
@@ -1256,8 +1292,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {(searchTab === 'draft' ? savedDocs : appliedDocs).filter(d => 
-                                    (d.docNo?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) || 
+                                {(searchTab === 'draft' ? savedDocs : appliedDocs).filter(d =>
+                                    (d.docNo?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) ||
                                     (d.payee?.toLowerCase() || '').includes(docSearchQuery.toLowerCase())
                                 ).map((d, idx) => (
                                     <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
@@ -1265,13 +1301,13 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.date}</td>
                                         <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{d.payee}</td>
                                         <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{d.bankCode}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3 text-right">{d.amount?.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3 text-right">{d.amount?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                                         <td className="text-center px-5 py-3">
-                                            {searchTab === 'draft' ? 
-                                                <span className="text-[10px] font-bold text-orange-500 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded">DRAFT</span> 
-                                                : d.cancel === 'T' ? 
-                                                <span className="text-[10px] font-bold text-red-500 bg-red-50 border border-red-200 px-2 py-0.5 rounded">VOIDED</span> 
-                                                : <span className="text-[10px] font-bold text-green-500 bg-green-50 border border-green-200 px-2 py-0.5 rounded">APPLIED</span>
+                                            {searchTab === 'draft' ?
+                                                <span className="text-[10px] font-bold text-orange-500 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded">DRAFT</span>
+                                                : d.cancel === 'T' ?
+                                                    <span className="text-[10px] font-bold text-red-500 bg-red-50 border border-red-200 px-2 py-0.5 rounded">VOIDED</span>
+                                                    : <span className="text-[10px] font-bold text-green-500 bg-green-50 border border-green-200 px-2 py-0.5 rounded">APPLIED</span>
                                             }
                                         </td>
                                         <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3 text-center">
@@ -1294,17 +1330,17 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             <SimpleModal isOpen={showVoidReasonModal} onClose={() => setShowVoidReasonModal(false)} title="Void Document">
                 <div className="p-5 font-['Tahoma']">
                     <p className="text-[13px] text-gray-600 mb-4 leading-relaxed">
-                        You are about to void the applied document <strong className="font-mono text-red-500">{formData.docId}</strong>.<br/>
+                        You are about to void the applied document <strong className="font-mono text-red-500">{formData.docId}</strong>.<br />
                         This will reverse all generated accounting and inventory entries. This action cannot be undone.
                     </p>
                     <label className="block text-[12px] font-bold text-gray-700 uppercase mb-2 tracking-wide">Reason for Voiding</label>
-                    <textarea 
+                    <textarea
                         className="w-full border border-gray-300 rounded-[3px] p-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none resize-none h-24 mb-6 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]"
                         placeholder="Please enter a valid reason..."
                         value={voidReason}
                         onChange={(e) => setVoidReason(e.target.value)}
                     ></textarea>
-                    
+
                     <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                         <button onClick={() => setShowVoidReasonModal(false)} className="px-5 py-2 text-[12px] font-bold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-[3px] uppercase tracking-wide transition-colors">Cancel</button>
                         <button onClick={handleVoidSubmit} disabled={loading} className="px-5 py-2 text-[12px] font-bold text-white bg-red-500 hover:bg-red-600 rounded-[3px] shadow-sm uppercase tracking-wide flex items-center justify-center gap-2 transition-colors disabled:opacity-50 min-w-[120px]">
@@ -1314,14 +1350,14 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            <CalendarModal 
+            <CalendarModal
                 isOpen={showCalendar}
                 onClose={() => setShowCalendar(false)}
                 onDateSelect={handleDateSelect}
                 initialDate={formData.date}
             />
 
-            <ConfirmModal 
+            <ConfirmModal
                 isOpen={showVoidConfirm}
                 onClose={() => setShowVoidConfirm(false)}
                 onConfirm={async () => {

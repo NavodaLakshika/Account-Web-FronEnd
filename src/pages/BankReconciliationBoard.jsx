@@ -59,6 +59,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ banks: [] });
     const [companyCode, setCompanyCode] = useState('');
     const [currentUser, setCurrentUser] = useState('');
+    const [errors, setErrors] = useState({});
 
     const getInitialHeader = () => ({
         docNo: 'BRC-AUTO',
@@ -104,7 +105,10 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
     };
 
     const loadData = async () => {
-        if (!header.bankId) return showErrorToast('Please select a bank account');
+        if (!header.bankId) {
+            setErrors(prev => ({ ...prev, bankId: 'Bank account required' }));
+            return showErrorToast('Please select a bank account');
+        }
         setLoading(true);
         try {
             const obData = await bankingService.getReconOpeningBalance({
@@ -171,6 +175,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
     const handleReset = () => {
         setHeader(getInitialHeader());
         setTransactions({ debits: [], credits: [] });
+        setErrors({});
         generateDocNo(companyCode);
     };
 
@@ -225,7 +230,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                             <th className="px-3">Date</th>
                             <th className="px-3">Doc/CHQ</th>
                             <th className="px-3 text-right">Amount</th>
-                        <th className="text-right px-5 py-3">Action</th></tr>
+                            <th className="text-right px-5 py-3">Action</th></tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {items.map((item, i) => (
@@ -295,11 +300,14 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                                             const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
-                                                const handler = item => setHeader({ ...header, bankId: item.code, bankName: item.name });
+                                                const handler = item => {
+                                                    setHeader({ ...header, bankId: item.code, bankName: item.name });
+                                                    if (errors.bankId) setErrors(prev => ({ ...prev, bankId: null }));
+                                                }
                                                 handler(item);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.bankId ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -310,6 +318,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.bankId && <div className="text-[11px] text-red-500 mt-1">{errors.bankId}</div>}
                                 <div className="mt-1.5 flex items-center gap-2">
                                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Recon Ref:</span>
                                     <span className="text-[10px] font-mono font-bold text-blue-600">{header.docNo}</span>

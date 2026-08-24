@@ -61,6 +61,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ banks: [], costCenters: [] });
     const [receiptData, setReceiptData] = useState(null);
+    const [errors, setErrors] = useState({});
 
     const getInitialFormData = () => ({
         docNo: '',
@@ -122,8 +123,10 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
             const { balance } = await bankingService.getAccountBalance(account.code, formData.company);
             if (type === 'from') {
                 setFormData(prev => ({ ...prev, fromAccount: account.code, fromAccountName: account.name, fromBalance: balance }));
+                if (errors.fromAccount) setErrors(prev => ({ ...prev, fromAccount: null }));
             } else {
                 setFormData(prev => ({ ...prev, toAccount: account.code, toAccountName: account.name, toBalance: balance }));
+                if (errors.toAccount) setErrors(prev => ({ ...prev, toAccount: null }));
             }
         } catch (error) {
             showErrorToast("Failed to fetch account balance");
@@ -131,13 +134,18 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.fromAccount || !formData.toAccount || formData.amount <= 0) {
-            showErrorToast("Please select both accounts and enter a valid amount.");
-            return;
+        const newErrors = {};
+        if (!formData.fromAccount) newErrors.fromAccount = 'Source account required';
+        if (!formData.toAccount) newErrors.toAccount = 'Destination account required';
+        if (!formData.amount || formData.amount <= 0) newErrors.amount = 'Valid amount required';
+        if (formData.fromAccount && formData.toAccount && formData.fromAccount === formData.toAccount) {
+            newErrors.toAccount = 'Source and destination cannot be the same';
         }
-        if (formData.fromAccount === formData.toAccount) {
-            showErrorToast("Source and destination accounts cannot be the same.");
-            return;
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            return showErrorToast("Please correct the highlighted fields.");
         }
 
         try {
@@ -183,6 +191,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
             toCostCenter: '', toCostCenterName: '',
             amount: 0, reffNo: '', memo: ''
         });
+        setErrors({});
         loadInitialData();
     };
 
@@ -241,7 +250,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Transfer From</h3>
 
                             <div>
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Source Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Source Account <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.fromAccount || ''}
@@ -253,7 +262,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                                                 handler(item);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.fromAccount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -264,6 +273,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.fromAccount && <div className="text-[11px] text-red-500 mt-1">{errors.fromAccount}</div>}
                                 <div className="mt-2 flex items-center justify-between px-1">
                                     <span className="text-[11px] font-bold text-gray-400 uppercase">Balance</span>
                                     <span className="text-[12px] font-black text-red-600">Rs. {formData.fromBalance.toLocaleString()}</span>
@@ -301,7 +311,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Transfer To</h3>
 
                             <div>
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Destination Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Destination Account <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.toAccount || ''}
@@ -313,7 +323,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                                                 handler(item);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.toAccount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -324,6 +334,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.toAccount && <div className="text-[11px] text-red-500 mt-1">{errors.toAccount}</div>}
                                 <div className="mt-2 flex items-center justify-between px-1">
                                     <span className="text-[11px] font-bold text-gray-400 uppercase">Balance</span>
                                     <span className="text-[12px] font-black text-[#0285fd]">Rs. {formData.toBalance.toLocaleString()}</span>
@@ -371,9 +382,13 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Transfer Amount *</label>
-                                <input type="number" step="0.01" value={formData.amount} onChange={e => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Transfer Amount <span className="text-red-500">*</span></label>
+                                <input type="number" step="0.01" value={formData.amount} onChange={e => {
+                                    setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 });
+                                    if (errors.amount) setErrors(prev => ({ ...prev, amount: null }));
+                                }}
+                                    className={`w-full h-10 border ${errors.amount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]`} />
+                                {errors.amount && <div className="text-[11px] text-red-500 mt-1">{errors.amount}</div>}
                             </div>
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Memo / Remarks</label>

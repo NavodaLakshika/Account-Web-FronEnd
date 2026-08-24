@@ -1,0 +1,504 @@
+import React, { useState, useEffect } from 'react';
+import SimpleModal from '../components/SimpleModal';
+import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
+import ConfirmModal from '../components/modals/ConfirmModal';
+import { customerService } from '../services/customer.service';
+
+import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
+
+const CustomerBoard = ({ isOpen, onClose }) => {
+    const getInitialFormData = () => ({
+        Code: '',
+        Cust_Name: '',
+        Address1: '',
+        Address2: '',
+        Phone: '',
+        Fax: '',
+        Email: '',
+        Web: '',
+        Cont_Person: '',
+        NIC: '',
+        Credit_Period: '0',
+        Credit_Limit: 0,
+        Bank: '',
+        Brunch: '',
+        AC_Number: '',
+        VAT_Number: '',
+        Type: 'Regular',
+        Area_Code: '',
+        Route_Code: '',
+        Locked: false,
+        CurrentUser: ''
+    });
+
+    const [formData, setFormData] = useState(getInitialFormData());
+    const [areas, setAreas] = useState([]);
+    const [routes, setRoutes] = useState([]);
+    const [banks, setBanks] = useState([]);
+    const [types, setTypes] = useState(['Platinum', 'Regular']);
+    const [loading, setLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [showSearchModal, setShowSearchModal] = useState(false);
+    const [customersList, setCustomersList] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setFormData(getInitialFormData());
+            fetchLookups();
+            const { userName } = getSessionData();
+            setFormData(prev => ({ ...prev, CurrentUser: userName }));
+        }
+    }, [isOpen]);
+
+    const fetchLookups = async () => {
+        try {
+            const [areasData, routesData, banksData, typesData] = await Promise.all([
+                customerService.getAreas(),
+                customerService.getRoutes(),
+                customerService.getBanks(),
+                customerService.getTypes()
+            ]);
+            setAreas(areasData || []);
+            setRoutes(routesData || []);
+            setBanks(banksData || []);
+            if (typesData && typesData.length > 0) setTypes(typesData);
+        } catch (error) {
+            console.error('Lookup fetch error:', error);
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleClear = () => {
+        setFormData({
+            ...getInitialFormData(),
+            CurrentUser: formData.CurrentUser
+        });
+        setIsEditMode(false);
+        showSuccessToast('Form cleared');
+    };
+
+    const handleSave = async () => {
+        if (!formData.Cust_Name) {
+            showErrorToast('Customer Name is required');
+            return;
+        }
+        if (!formData.Type) {
+            showErrorToast('Customer Type is required');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const payload = {
+                ...formData,
+                Credit_Period: String(formData.Credit_Period || '0'),
+                Credit_Limit: Number(formData.Credit_Limit || 0)
+            };
+
+            if (isEditMode) {
+                await customerService.update(formData.Code, payload);
+                showSuccessToast('Customer updated successfully');
+            } else {
+                const response = await customerService.create(payload);
+                setFormData(prev => ({ ...prev, Code: response.code }));
+                showSuccessToast(`Customer created: ${response.code}`);
+                if (response.nameExists) {
+                    showErrorToast('Warning: A customer with this name already exists.');
+                }
+                setIsEditMode(true);
+            }
+        } catch (error) {
+            showErrorToast(typeof error === 'string' ? error : (error.message || 'Operation failed'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = () => {
+        if (!isEditMode || !formData.Code) return;
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await customerService.delete(formData.Code);
+            showSuccessToast('Customer deleted');
+            setShowDeleteConfirm(false);
+            handleClear();
+        } catch (error) {
+            showErrorToast(error);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const openSearch = async () => {
+        setLoading(true);
+        try {
+            const data = await customerService.getAll();
+            setCustomersList(data);
+            setShowSearchModal(true);
+        } catch (error) {
+            showErrorToast('Failed to load customers');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const selectCustomer = async (code) => {
+        setLoading(true);
+        try {
+            const data = await customerService.getByCode(code);
+            // Map backend potentially PascalCase/camelCase response to our PascalCase state
+            setFormData({
+                Code: data.code || data.Code,
+                Cust_Name: data.cust_Name || data.Cust_Name,
+                Address1: data.address1 || data.Address1,
+                Address2: data.address2 || data.Address2,
+                Phone: data.phone || data.Phone,
+                Fax: data.fax || data.Fax,
+                Email: data.email || data.Email,
+                Web: data.web || data.Web,
+                Cont_Person: data.cont_Person || data.Cont_Person,
+                NIC: data.nic || data.NIC,
+                Credit_Period: String(data.credit_Period || data.Credit_Period || '0'),
+                Credit_Limit: Number(data.credit_Limit || data.Credit_Limit || 0),
+                Bank: data.bank || data.Bank,
+                Brunch: data.brunch || data.Brunch,
+                AC_Number: data.ac_Number || data.AC_Number,
+                VAT_Number: data.vat_Number || data.VAT_Number,
+                Type: data.type || data.Type,
+                Area_Code: data.area_Code || data.Area_Code,
+                Route_Code: data.route_Code || data.Route_Code,
+                Locked: (data.locked || data.Locked) === 1,
+                CurrentUser: formData.CurrentUser
+            });
+            setIsEditMode(true);
+            setShowSearchModal(false);
+            showSuccessToast('Customer loaded');
+        } catch (error) {
+            showErrorToast(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const footer = (
+        <>
+            <button
+                onClick={handleClear}
+                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none"
+            >
+                <RotateCcw size={14} className="text-[#0078d4]" /> Clear
+            </button>
+            <button
+                onClick={handleDelete}
+                disabled={!isEditMode || loading}
+                className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center gap-2 border border-red-100 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                <Trash2 size={14} /> Delete
+            </button>
+            <button
+                onClick={handleSave}
+                disabled={loading}
+                className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-[3px] shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                {isEditMode ? 'Update' : 'Save'}
+            </button>
+            <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
+                <X size={28} /> Exit
+            </button>
+        </>
+    );
+
+    return (
+        <>
+            <SimpleModal
+                isOpen={isOpen}
+                onClose={onClose}
+                title="Customer Information"
+                footer={footer}
+            >
+                <div className="space-y-4">
+                    {/* ID and Name */}
+                    <div className="grid grid-cols-12 gap-4 border-b border-gray-200 pb-4">
+                        <div className="col-span-3">
+                            <label className="block text-xs font-bold text-gray-700 mb-1">Customer ID</label>
+                            <div className="flex gap-1">
+                                <input
+                                    type="text"
+                                    name="Code"
+                                    value={formData.Code}
+                                    onChange={handleInputChange}
+                                    className="w-full h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold appearance-none"
+                                    placeholder="AUTO"
+                                    readOnly={isEditMode}
+                                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                            </div>
+                        </div>
+                        <div className="col-span-9">
+                            <label className="block text-xs font-bold text-gray-700 mb-1">Customer Name</label>
+                            <input
+                                type="text"
+                                name="Cust_Name"
+                                value={formData.Cust_Name}
+                                onChange={handleInputChange}
+                                className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none"
+                                placeholder="Enter customer name..."
+                            />
+                        </div>
+                    </div>
+
+                    {/* Main Info */}
+                    <div className="grid grid-cols-2 gap-8">
+                        {/* Left Side: Contact */}
+                        <div className="space-y-3">
+                            <h3 className="text-xs font-bold text-blue-800 uppercase border-b border-blue-100 pb-1">Contact Details</h3>
+                            <div className="grid grid-cols-1 gap-2">
+                                <FormRow label="Address 1">
+                                    <input type="text" name="Address1" value={formData.Address1} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                </FormRow>
+                                <FormRow label="Address 2">
+                                    <input type="text" name="Address2" value={formData.Address2} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                </FormRow>
+                                <FormRow label="Phone">
+                                    <input type="text" name="Phone" value={formData.Phone} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                </FormRow>
+                                <FormRow label="Fax">
+                                    <input type="text" name="Fax" value={formData.Fax} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                </FormRow>
+                                <FormRow label="Contact Person">
+                                    <input type="text" name="Cont_Person" value={formData.Cont_Person} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                </FormRow>
+                                <FormRow label="Email">
+                                    <input type="email" name="Email" value={formData.Email} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                </FormRow>
+                                <FormRow label="Website">
+                                    <input type="text" name="Web" value={formData.Web} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                </FormRow>
+                                <FormRow label="NIC">
+                                    <input type="text" name="NIC" value={formData.NIC} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                </FormRow>
+                            </div>
+                        </div>
+
+                        {/* Right Side: Financial & Settings */}
+                        <div className="space-y-6">
+                            <div className="space-y-3">
+                                <h3 className="text-xs font-bold text-blue-800 uppercase border-b border-blue-100 pb-1">Credit & Financial</h3>
+                                <div className="grid grid-cols-1 gap-2">
+                                    <FormRow label="Credit Limit">
+                                        <input type="number" name="Credit_Limit" value={formData.Credit_Limit} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm text-right" />
+                                    </FormRow>
+                                    <FormRow label="Credit Period">
+                                        <div className="flex-1">
+                                            <input type="number" name="Credit_Period" value={formData.Credit_Period} onChange={handleInputChange} className="w-20 h-7 border border-gray-300 px-2 text-sm" />
+                                            <span className="text-xs text-gray-500">Days</span>
+                                        </div>
+                                    </FormRow>
+                                    <FormRow label="VAT/Tax ID">
+                                        <input type="text" name="VAT_Number" value={formData.VAT_Number} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                    </FormRow>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <h3 className="text-xs font-bold text-blue-800 uppercase border-b border-blue-100 pb-1">Banking</h3>
+                                <div className="grid grid-cols-1 gap-2">
+                                    <FormRow label="Bank Name">
+                                        <select
+                                            name="Bank"
+                                            value={formData.Bank}
+                                            onChange={handleInputChange}
+                                            className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
+                                        >
+                                            <option value="">Select Bank...</option>
+                                            {banks.map(b => <option key={b.id} value={b.bank_Name}>{b.bank_Name}</option>)}
+                                        </select>
+                                    </FormRow>
+                                    <FormRow label="Branch">
+                                        <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                    </FormRow>
+                                    <FormRow label="Account No">
+                                        <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm" />
+                                    </FormRow>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Geography & Categorization */}
+                    <div className="bg-gray-50 p-4 border border-gray-200 space-y-3">
+                        <h3 className="text-xs font-bold text-gray-700 uppercase">Categorization & Geography</h3>
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="space-y-2">
+                                <FormRow label="Type">
+                                    <select
+                                        name="Type"
+                                        value={formData.Type}
+                                        onChange={handleInputChange}
+                                        className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
+                                    >
+                                        <option value="">Select Type...</option>
+                                        {types.map(t => <option key={t} value={t}>{t}</option>)}
+                                    </select>
+                                </FormRow>
+                                <div className="flex items-center gap-2 ml-[120px]">
+                                    <input
+                                        type="checkbox"
+                                        id="locked"
+                                        name="Locked"
+                                        checked={formData.Locked}
+                                        onChange={handleInputChange}
+                                        className="w-4 h-4"
+                                    />
+                                    <label htmlFor="locked" className="text-xs text-gray-700 font-bold">Mark as Locked (Inactive)</label>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <FormRow label="Area">
+                                    <div className="flex gap-1 flex-1">
+                                        <input
+                                            type="text"
+                                            name="Area_Code"
+                                            value={formData.Area_Code}
+                                            onChange={handleInputChange}
+                                            className="w-16 h-7 border border-gray-300 px-2 text-sm"
+                                        />
+                                        <select
+                                            value={formData.Area_Code}
+                                            onChange={(e) => setFormData(p => ({ ...p, Area_Code: e.target.value }))}
+                                            className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
+                                        >
+                                            <option value="">Select Area...</option>
+                                            {areas.map(a => <option key={a.code} value={a.code}>{a.area_Name}</option>)}
+                                        </select>
+                                    </div>
+                                </FormRow>
+                                <FormRow label="Route">
+                                    <div className="flex gap-1 flex-1">
+                                        <input
+                                            type="text"
+                                            name="Route_Code"
+                                            value={formData.Route_Code}
+                                            onChange={handleInputChange}
+                                            className="w-16 h-7 border border-gray-300 px-2 text-sm"
+                                        />
+                                        <select
+                                            value={formData.Route_Code}
+                                            onChange={(e) => setFormData(p => ({ ...p, Route_Code: e.target.value }))}
+                                            className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
+                                        >
+                                            <option value="">Select Route...</option>
+                                            {routes.map(r => <option key={r.code} value={r.code}>{r.route_Name}</option>)}
+                                        </select>
+                                    </div>
+                                </FormRow>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Simple Search Modal */}
+            {showSearchModal && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[80vh]">
+                        <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2 font-['Plus_Jakarta_Sans']">
+                            <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                <input
+                                    type="text"
+                                    placeholder="Search by name or code..."
+                                    className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                            <button 
+                                onClick={() => setShowSearchModal(false)} 
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group shrink-0"
+                                title="Close"
+                            >
+                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
+                            </button>
+                        </div>
+                        <div className="overflow-y-auto p-2">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Name</th>
+                                        <th className="px-5 py-3 text-right w-24">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {customersList
+                                        .filter(c => (c.cust_Name || c.Cust_Name)?.toLowerCase().includes(searchQuery.toLowerCase()) || (c.code || c.Code)?.toLowerCase().includes(searchQuery.toLowerCase()))
+                                        .map(c => (
+                                            <tr key={c.code || c.Code} className="group hover:bg-blue-50/50 transition-all cursor-pointer border-b border-gray-50">
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code || c.Code}</td>
+                                                <td className="px-5 py-3">{c.cust_Name || c.Cust_Name}</td>
+                                                <td className="px-5 py-3">
+                                                    <button
+                                                        onClick={() => selectCustomer(c.code || c.Code)}
+                                                        className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
+                                                    >
+                                                        Select
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    {customersList.length === 0 && (
+                                        <tr>
+                                            <td colSpan="3" className="p-4 text-center text-gray-500">No customers found.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Delete Customer"
+                message={`Are you sure you want to delete this customer (${formData.Cust_Name})? This action cannot be undone.`}
+                loading={isDeleting}
+                confirmText="Delete"
+                variant="danger"
+            />
+        </>
+    );
+};
+
+const FormRow = ({ label, children }) => (
+    <div className="flex items-center">
+        <label className="text-xs font-semibold text-gray-600 w-[120px] shrink-0">{label}</label>
+        {children}
+    </div>
+);
+
+export default CustomerBoard;
+;

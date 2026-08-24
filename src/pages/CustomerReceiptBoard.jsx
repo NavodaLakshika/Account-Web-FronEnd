@@ -80,6 +80,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
     const [invoices, setInvoices] = useState([]);
     const [advanceBalance, setAdvanceBalance] = useState(0);
     const [overPayment, setOverPayment] = useState(0);
@@ -132,7 +133,11 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast("Failed to generate Document Number"); }
     };
 
-    const handleInput = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
+    const handleInput = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    };
 
     const handleCustomerSelect = async (customer) => {
         setFormData(prev => ({ ...prev, customerId: customer.code || customer.Code }));
@@ -147,6 +152,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                 discount: inv.discount || 0, setOff: inv.setOffVal || 0, payment: inv.payment || 0
             })));
         } catch (error) { showErrorToast("Failed to load outstanding invoices"); }
+        if (errors.customerId) setErrors(prev => ({ ...prev, customerId: null }));
     };
 
     const handleInvoiceCheck = async (idx) => {
@@ -192,6 +198,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
         setAdvanceBalance(0);
         setOverPayment(0);
         generateDocNo(formData.company);
+        setErrors({});
     };
 
     const handleSelectAll = async () => {
@@ -207,8 +214,15 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApply = async () => {
-        if (!formData.customerId) return showErrorToast("Please select a customer");
-        if (parseFloat(formData.amount) <= 0) return showErrorToast("Please enter receipt amount");
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = "Customer required";
+        if (parseFloat(formData.amount) <= 0) newErrors.amount = "Valid amount required";
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast("Please fill all required fields correctly.");
+            return;
+        }
         setIsSaving(true);
         try {
             const payload = {
@@ -250,7 +264,14 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
     const handleReceiptClose = () => { setReceiptTx(null); if (onClose) onClose(); };
 
     const handleSave = async () => {
-        if (!formData.customerId) return showErrorToast("Please select a customer");
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = "Customer required";
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast("Please select a customer");
+            return;
+        }
         setIsSaving(true);
         try {
             const payload = {
@@ -268,7 +289,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <TransactionFormWrapper boardName="CustomerReceiptBoard" isOpen={isOpen} onClose={onClose}
-                title="Customer Receipt"  icon={null}
+                title="Customer Receipt" icon={null}
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
@@ -316,19 +337,21 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount <span className="text-red-500">*</span></label>
                                 <input type="text" name="amount" value={formData.amount} onChange={handleInput}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    className={`w-full h-10 border ${errors.amount ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.amount && <div className="text-red-500 text-[11px] mt-1">{errors.amount}</div>}
                             </div>
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Received From</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Received From <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <input type="text" readOnly
                                         value={lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Cust_Name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.cust_Name || ''}
                                         onClick={() => setShowCustomerSearch(true)}
                                         placeholder="Select Customer..."
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-[#0285fd] font-mono cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        className={`w-full h-10 border ${errors.customerId ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-[#0285fd] font-mono cursor-pointer appearance-none`} style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
+                                {errors.customerId && <div className="text-red-500 text-[11px] mt-1">{errors.customerId}</div>}
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay Method</label>
@@ -337,7 +360,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                         value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || ''}
                                         onClick={() => setShowPayMethodSearch(true)}
                                         placeholder="Select method..."
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-8">
@@ -347,7 +370,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                         value={lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.Bank_Name || ''}
                                         onClick={() => setShowBankSearch(true)}
                                         placeholder="Select Bank"
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                                 <input type="text" name="branchCode" value={formData.branchCode} onChange={handleInput}
                                     placeholder="Branch"
@@ -360,7 +383,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                         value={(() => { const cc = lookups.costCenters?.find(c => (c.code || c.Code || c.CostCenterCode || c.costCenterCode) === formData.costCenter); return cc ? (cc.name || cc.Name || cc.CostCenterName || cc.costCenterName || '') : ''; })()}
                                         onClick={() => setShowCostCenterSearch(true)}
                                         placeholder="Select cost center..."
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-4">

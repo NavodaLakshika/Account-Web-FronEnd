@@ -69,6 +69,8 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
     const [rowToDelete, setRowToDelete] = useState(null);
     const [lookups, setLookups] = useState([]);
     const [journalList, setJournalList] = useState([]);
+    const [errors, setErrors] = useState({});
+    const [entryErrors, setEntryErrors] = useState({});
 
     const [currentRow, setCurrentRow] = useState({
         accountCode: '', accountName: '', debit: '', credit: '', memo: ''
@@ -91,7 +93,10 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
     };
 
     const handleLoad = async () => {
-        if (!entryNo) return showErrorToast('Enter a valid Journal Number');
+        if (!entryNo) {
+            setErrors({ entryNo: 'Enter Journal Number' });
+            return showErrorToast('Enter a valid Journal Number');
+        }
         setLoading(true);
         try {
             const session = getSessionData();
@@ -143,8 +148,17 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
     };
 
     const handleAddRow = async () => {
-        if (!currentRow.accountCode) return showErrorToast('Please select an account');
-        if (!currentRow.debit && !currentRow.credit) return showErrorToast('Please enter debit or credit amount');
+        const tempEntryErrors = {};
+        if (!currentRow.accountCode) tempEntryErrors.accountCode = 'Account code required';
+        if (!currentRow.debit && !currentRow.credit) {
+            tempEntryErrors.debit = 'Debit or Credit is required';
+            tempEntryErrors.credit = 'Debit or Credit is required';
+        }
+
+        if (Object.keys(tempEntryErrors).length > 0) {
+            setEntryErrors(tempEntryErrors);
+            return showErrorToast('Please complete required fields for entry');
+        }
 
         setLoading(true);
         try {
@@ -173,8 +187,14 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
     };
 
     const handleDone = async () => {
-        if (rows.length === 0) return showErrorToast('No journal entries to save');
-        if (totalDebit !== totalCredit) return showErrorToast('Journal entry is not balanced (Debit != Credit)');
+        const newErrors = {};
+        if (rows.length === 0) newErrors.grid = 'Add entries to save';
+        if (totalDebit !== totalCredit) newErrors.grid = 'Journal entry is not balanced (Debit != Credit)';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return showErrorToast(newErrors.grid);
+        }
 
         setLoading(true);
         try {
@@ -193,6 +213,8 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
         setRows([]);
         setEntryNo('');
         setCurrentRow({ accountCode: '', accountName: '', debit: '', credit: '', memo: '' });
+        setErrors({});
+        setEntryErrors({});
         showSuccessToast('Editor cleared successfully');
     };
 
@@ -231,9 +253,12 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
                                 <div className="flex gap-2">
                                     <div className="relative flex-1">
                                         <input type="text" value={entryNo}
-                                            onChange={(e) => setEntryNo(e.target.value)}
+                                            onChange={(e) => {
+                                                setEntryNo(e.target.value);
+                                                if (errors.entryNo) setErrors(prev => ({ ...prev, entryNo: null }));
+                                            }}
                                             placeholder="JRN-00001"
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                            className={`w-full h-10 border ${errors.entryNo ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
                                     </div>
                                     <button onClick={handleJournalSearch}
                                         className="w-10 h-10 border border-gray-300 text-gray-500 hover:bg-gray-50 rounded-[3px] transition-all flex items-center justify-center bg-white">
@@ -264,7 +289,7 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Entry Grid */}
-                    <div className="bg-white border border-slate-200 rounded-[3px] overflow-hidden flex flex-col">
+                    <div className={`bg-white border ${errors.grid ? 'border-red-500 border-2' : 'border-slate-200'} rounded-[3px] overflow-hidden flex flex-col`}>
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest leading-10 border-b border-slate-200">
                                 <tr>
@@ -274,7 +299,7 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
                                     <th className="px-4 w-32 text-right border-r border-slate-200">Credit</th>
                                     <th className="px-4 w-48 border-r border-slate-200">Memo</th>
                                     <th className="px-4 w-12 text-center"></th>
-                                <th className="text-right px-5 py-3">Action</th></tr>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {rows.length === 0 ? (
@@ -330,12 +355,12 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="grid grid-cols-12 gap-x-4 gap-y-3.5 items-end">
                             <div className="col-span-2">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Acct Code</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Acct Code <span className="text-red-500">*</span></label>
                                 <div className="flex gap-1">
                                     <input type="text" readOnly value={currentRow.accountCode}
                                         onClick={() => setShowAccountLookup(true)}
                                         placeholder="Search..."
-                                        className="flex-1 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        className={`flex-1 h-10 border ${entryErrors.accountCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none`} style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -343,26 +368,32 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
                                 <input type="text" readOnly value={currentRow.accountName}
                                     onClick={() => setShowAccountLookup(true)}
                                     placeholder="Select an account"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate" />
+                                    className={`w-full h-10 border ${entryErrors.accountCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate`} />
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Debit</label>
                                 <input type="text" value={currentRow.debit}
-                                    onChange={(e) => setCurrentRow({...currentRow, debit: e.target.value, credit: ''})}
+                                    onChange={(e) => {
+                                        setCurrentRow({ ...currentRow, debit: e.target.value, credit: '' });
+                                        if (entryErrors.debit && (parseFloat(e.target.value) > 0)) { setEntryErrors(prev => ({ ...prev, debit: null, credit: null })); }
+                                    }}
                                     placeholder="0.00"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold" />
+                                    className={`w-full h-10 border ${entryErrors.debit ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold`} />
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Credit</label>
                                 <input type="text" value={currentRow.credit}
-                                    onChange={(e) => setCurrentRow({...currentRow, credit: e.target.value, debit: ''})}
+                                    onChange={(e) => {
+                                        setCurrentRow({ ...currentRow, credit: e.target.value, debit: '' });
+                                        if (entryErrors.credit && (parseFloat(e.target.value) > 0)) { setEntryErrors(prev => ({ ...prev, debit: null, credit: null })); }
+                                    }}
                                     placeholder="0.00"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold" />
+                                    className={`w-full h-10 border ${entryErrors.credit ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold`} />
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Memo / Narrative</label>
                                 <input type="text" value={currentRow.memo}
-                                    onChange={(e) => setCurrentRow({...currentRow, memo: e.target.value})}
+                                    onChange={(e) => setCurrentRow({ ...currentRow, memo: e.target.value })}
                                     placeholder="Entry details..."
                                     className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
@@ -392,6 +423,7 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
                 items={lookups}
                 onSelect={(acc) => {
                     setCurrentRow({ ...currentRow, accountCode: acc.code, accountName: acc.name });
+                    if (entryErrors.accountCode) setEntryErrors(prev => ({ ...prev, accountCode: null }));
                     setShowAccountLookup(false);
                 }}
                 searchPlaceholder="Search accounts..."

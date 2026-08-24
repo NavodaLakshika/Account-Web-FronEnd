@@ -27,6 +27,7 @@ const EstimateBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
     const [items, setItems] = useState([]);
     const [entry, setEntry] = useState({
         prodCode: '', prodName: '', unit: '', price: '', qty: '', amount: '', packSize: 1
@@ -118,12 +119,20 @@ const EstimateBoard = ({ isOpen, onClose }) => {
         setFormData(prev => ({
             ...prev, customerId: '', paymentTerms: '', remarks: '', comment: '', taxPer: '15', nbtAmnt: 0
         }));
+        setErrors({});
         fetchInitialData(formData.company);
     };
 
     const handleApply = async () => {
-        if (!formData.customerId) return showErrorToast('Please select a customer.');
-        if (items.length === 0) return showErrorToast('No products added.');
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = 'Customer is required';
+        if (items.length === 0) newErrors.grid = 'Add at least one product';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return showErrorToast('Please complete required fields.');
+        }
+
         setIsApplying(true);
         try {
             const payload = {
@@ -153,8 +162,15 @@ const EstimateBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSaveDraft = async () => {
-        if (!formData.customerId) return showErrorToast('Please select a customer.');
-        if (items.length === 0) return showErrorToast('No products added.');
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = 'Customer is required';
+        if (items.length === 0) newErrors.grid = 'Add at least one product';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return showErrorToast('Please complete required fields.');
+        }
+
         setIsApplying(true);
         try {
             const payload = {
@@ -293,7 +309,7 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.customerId || ''}
@@ -302,9 +318,10 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                                             const c = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
                                             if (c) {
                                                 setFormData({ ...formData, customerId: c.code });
+                                                if (errors.customerId) setErrors(prev => ({ ...prev, customerId: null }));
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.customerId ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -315,6 +332,7 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.customerId && <div className="text-[11px] text-red-500 mt-1">{errors.customerId}</div>}
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Terms</label>
@@ -347,10 +365,13 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="border border-slate-200 rounded-[3px] bg-white overflow-hidden">
+                    <div className={`border ${errors.grid ? 'border-red-500' : 'border-slate-200'} rounded-[3px] bg-white overflow-hidden`}>
                         <div className="flex items-center justify-between px-4 py-2 bg-slate-50/50 border-b border-slate-200">
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Item Selection Portfolio</span>
-                            <button onClick={() => setShowProductSearch(true)} className="h-7 px-3 bg-[#0285fd] text-white text-[10px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all flex items-center gap-1.5 border-none shadow-sm active:scale-95">
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Item Selection Portfolio</span>
+                                {errors.grid && <span className="text-[10px] font-bold text-red-500 uppercase">{errors.grid}</span>}
+                            </div>
+                            <button onClick={() => { setShowProductSearch(true); if (errors.grid) setErrors(prev => ({ ...prev, grid: null })); }} className="h-7 px-3 bg-[#0285fd] text-white text-[10px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all flex items-center gap-1.5 border-none shadow-sm active:scale-95">
                                 <Plus size={13} /> ADD ITEM
                             </button>
                         </div>
@@ -365,7 +386,7 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                                         <th className="px-2 text-center w-20">Usage</th>
                                         <th className="px-4 text-right w-36">Extended Net</th>
                                         <th className="w-12"></th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {items.length === 0 ? (

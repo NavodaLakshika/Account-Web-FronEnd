@@ -36,8 +36,8 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         accountType: 'Medical Members',
         docStatus: 'New'
     });
-
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     const [invoices, setInvoices] = useState([]);
     const [orders, setOrders] = useState([]);
@@ -102,11 +102,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const handleInput = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleCustomerSelect = async (customer) => {
         const custId = customer.code || customer.Code || customer.id;
         setFormData(prev => ({ ...prev, customerId: custId }));
+        if (errors.customerId) setErrors(prev => ({ ...prev, customerId: null }));
 
         try {
             const data = await receivePaymentService.getOutstanding(custId, formData.company, formData.docNo, formData.accountType, formData.createUser);
@@ -182,6 +184,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         setInvoices([]);
         setAdvanceBalance(0);
         generateDocNo(formData.company);
+        setErrors({});
     };
 
     const handleSelectAll = async () => {
@@ -211,10 +214,19 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApply = async () => {
-        if (!formData.customerId) return showErrorToast("Please select a customer");
-        if (parseFloat(formData.amount) <= 0) return showErrorToast("Please enter receipt amount");
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = 'Customer required';
+        if (!formData.amount || parseFloat(formData.amount) <= 0) newErrors.amount = 'Valid amount required';
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast("Please provide all required fields.");
+            return;
+        }
+
         if (formData.accountType !== "Other" && parseFloat(formData.amount) < totalAllocated) {
-            return showErrorToast("Paid amount less than payble amount do not match.");
+            return showErrorToast("Paid amount less than payable amount do not match.");
         }
 
         setShowConfirmModal(true);
@@ -247,8 +259,16 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSaveDraft = async () => {
-        if (!formData.customerId) return showErrorToast("Please select a customer");
-        if (parseFloat(formData.amount) <= 0) return showErrorToast("Please enter receipt amount");
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = 'Customer required';
+        if (!formData.amount || parseFloat(formData.amount) <= 0) newErrors.amount = 'Valid amount required';
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast("Please provide all required fields.");
+            return;
+        }
 
         setIsSaving(true);
         try {
@@ -435,8 +455,9 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-3">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount</label>
-                                <input type="text" name="amount" value={formData.amount} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount <span className="text-red-500">*</span></label>
+                                <input type="text" name="amount" value={formData.amount} onChange={handleInput} className={`w-full h-10 border ${errors.amount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.amount && <div className="text-[11px] text-red-500 mt-1">{errors.amount}</div>}
                             </div>
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer Type</label>
@@ -462,7 +483,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <div className="flex gap-2">
                                         <input type="text" readOnly value={formData.customerId} className="w-24 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0" />
@@ -496,6 +517,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         </div>
                                     </div>
                                 </div>
+                                {errors.customerId && <div className="text-[11px] text-red-500 mt-1">{errors.customerId}</div>}
                             </div>
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay Method</label>

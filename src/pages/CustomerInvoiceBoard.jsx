@@ -97,6 +97,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     const [activeModal, setActiveModal] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -138,6 +139,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
             }
             return updated;
         });
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleAmountBlur = () => {
@@ -151,11 +153,15 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
 
     const handleSelectCustomer = item => {
         setFormData(prev => ({ ...prev, customerId: item.code, customerName: item.name }));
+        if (errors.customerId) setErrors(prev => ({ ...prev, customerId: null }));
+        if (errors.customerName) setErrors(prev => ({ ...prev, customerName: null }));
         setTimeout(() => { descriptionRef.current?.focus(); }, 100);
     };
 
     const handleSelectAccount = item => {
         setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name }));
+        if (errors.accountCode) setErrors(prev => ({ ...prev, accountCode: null }));
+        if (errors.accountName) setErrors(prev => ({ ...prev, accountName: null }));
         setTimeout(() => { saveBtnRef.current?.focus(); }, 100);
     };
 
@@ -167,17 +173,24 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
             amount: '0.00', discount: '0.00', netAmount: '0.00',
             accountCode: '', accountName: ''
         }));
+        setErrors({});
         generateDocNo(formData.company);
         setTimeout(() => { customerInputRef.current?.focus(); }, 100);
     };
 
     const handleSave = async () => {
-        if (!formData.customerId) return showErrorToast('Customer Code is required.');
-        if (!formData.customerName) return showErrorToast('Customer Name is required.');
-        if (!formData.description) return showErrorToast('Description is required.');
-        if (!formData.amount || parseFloat(formData.amount) <= 0) return showErrorToast('A valid Gross Amount is required.');
-        if (!formData.accountCode) return showErrorToast('Account Code is required.');
-        if (!formData.accountName) return showErrorToast('Account Name is required.');
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = 'Customer is required.';
+        if (!formData.description) newErrors.description = 'Description is required.';
+        if (!formData.amount || parseFloat(formData.amount) <= 0) newErrors.amount = 'A valid Gross Amount is required.';
+        if (!formData.accountCode) newErrors.accountCode = 'Account Code is required.';
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast('Please fill in all required fields.');
+            return;
+        }
 
         setLoading(true);
         try {
@@ -232,7 +245,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
         <>
             <TransactionFormWrapper boardName="CustomerInvoiceBoard" isOpen={isOpen} onClose={onClose}
                 title="Customer Invoice (Other Invoice)"
-                 icon={null}
+                icon={null}
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <button onClick={handleClear} disabled={loading}
@@ -263,7 +276,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                                 handler(item);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-[#0285fd] font-mono cursor-pointer appearance-none"
+                                        className={`w-full h-10 border ${errors.customerId ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-[#0285fd] font-mono cursor-pointer appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -274,6 +287,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.customerId && <div className="text-red-500 text-[11px] mt-1">{errors.customerId}</div>}
                             </div>
 
                             {/* Doc ID */}
@@ -297,7 +311,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                                 handler(item);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"
+                                        className={`w-full h-10 border ${errors.accountCode ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -308,6 +322,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.accountCode && <div className="text-red-500 text-[11px] mt-1">{errors.accountCode}</div>}
                             </div>
 
                             {/* Date */}
@@ -335,7 +350,8 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                     value={formData.description} onChange={handleInputChange}
                                     onKeyDown={e => handleKeyDown(e, 'amount')}
                                     placeholder="Enter description..."
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    className={`w-full h-10 border ${errors.description ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.description && <div className="text-red-500 text-[11px] mt-1">{errors.description}</div>}
                             </div>
                         </div>
                     </div>
@@ -348,7 +364,8 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                 <input ref={amountRef} name="amount" type="number" step="0.01"
                                     value={formData.amount} onChange={handleInputChange}
                                     onBlur={handleAmountBlur} onKeyDown={e => handleKeyDown(e, 'discount')}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] font-mono" />
+                                    className={`w-full h-10 border ${errors.amount ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] font-mono`} />
+                                {errors.amount && <div className="text-red-500 text-[11px] mt-1">{errors.amount}</div>}
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Discount</label>

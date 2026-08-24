@@ -29,7 +29,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
-    
+
     // Create Modals
     const [showSupplierMaster, setShowSupplierMaster] = useState(false);
     const [showAccountMaster, setShowAccountMaster] = useState(false);
@@ -83,6 +83,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
+    const [entryErrors, setEntryErrors] = useState({});
 
     const [products, setProducts] = useState([]);
     const [entry, setEntry] = useState({
@@ -143,13 +145,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => {
             const next = { ...prev, [name]: type === 'checkbox' ? checked : value };
-            
+
             // Consignment Basis Logic: Clear invoice details if checked
             if (name === 'consignmentBasis' && checked) {
                 next.suppInv = '';
                 next.invAmount = '0.00';
             }
-            
+
             // Accept Other Supp Logic: If unchecked while a PO is selected, revert supplier to PO's supplier
             if (name === 'acceptOtherSupp' && !checked && next.poNo) {
                 const selectedPO = orders.find(o => o.docNo === next.poNo || o.doc_No === next.poNo);
@@ -157,9 +159,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     next.suppCode = selectedPO.vendor_Id?.trim() || next.suppCode;
                 }
             }
-            
+
             return next;
         });
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleDateSelect = (date) => {
@@ -192,15 +195,24 @@ const GRNBoard = ({ isOpen, onClose }) => {
             newEntry.amount = (q * c).toFixed(2);
         }
         setEntry(newEntry);
+        if (entryErrors[name]) setEntryErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const addProduct = () => {
-        if (!entry.prodCode) return showErrorToast('Select a Product.');
-        if (!entry.qty || parseFloat(entry.qty) <= 0) return showErrorToast('Enter valid Quantity.');
+        const newEntryErrors = {};
+        if (!entry.prodCode) newEntryErrors.prodCode = 'Select a Product';
+        if (!entry.qty || parseFloat(entry.qty) <= 0) newEntryErrors.qty = 'Enter valid Quantity';
+        setEntryErrors(newEntryErrors);
+
+        if (Object.keys(newEntryErrors).length > 0) {
+            showErrorToast('Please fix product entry errors.');
+            return false;
+        }
 
         setProducts([...products, { ...entry }]);
         setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', free: '', cost: '', selling: '', amount: '0.00' });
         showSuccessToast("Product added to GRN listing.");
+        return true;
     };
 
     const totals = useMemo(() => {
@@ -218,7 +230,15 @@ const GRNBoard = ({ isOpen, onClose }) => {
     }, [products, formData]);
 
     const handleSaveDraft = async () => {
-        if (!formData.suppCode) return showErrorToast('Select Supplier.');
+        const newErrors = {};
+        if (!formData.suppCode) newErrors.suppCode = 'Supplier required';
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast('Please provide required fields.');
+            return;
+        }
+
         if (products.length === 0) return showErrorToast('No products entered.');
         const payload = preparePayload();
         try {
@@ -228,12 +248,20 @@ const GRNBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApply = async () => {
-        if (!formData.suppCode) return showErrorToast('Select Supplier.');
+        const newErrors = {};
+        if (!formData.suppCode) newErrors.suppCode = 'Supplier required';
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast('Please provide required fields.');
+            return;
+        }
+
         if (products.length === 0) return showErrorToast('No products entered.');
-        
+
         const invAmt = parseFloat(formData.invAmount) || 0;
         const netAmt = parseFloat(totals.netAmount) || 0;
-        
+
         if (Math.abs(invAmt - netAmt) > 0.01) {
             return showErrorToast(`Invoice Amount (${invAmt.toFixed(2)}) does not match Net Liability (${netAmt.toFixed(2)}).`);
         }
@@ -247,7 +275,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
         try {
             const result = await grnService.apply(payload);
             showSuccessToast('GRN Applied successfully.');
-            
+
             // Auto open GRN Report inside a Modal
             const appliedDocNo = result?.docNo || result?.DocNo || formData.docNo;
             setAppliedDocNoState(appliedDocNo);
@@ -410,6 +438,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
             acceptOtherSupp: false, comment: '', taxPer: '0', nbtPer: '0', discPer: '0', adjType: '', adjAmt: '0.00'
         }));
         generateDocNo(formData.company);
+        setErrors({});
+        setEntryErrors({});
     };
 
     const handleSearchClick = async () => {
@@ -626,14 +656,17 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
                             {/* Row 2: Supplier | PO Number */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier <span className="text-red-500">*</span></label>
                                 <div className="flex gap-2">
                                     <div className="relative flex-1">
-                                        <select 
-                                            value={formData.suppCode} 
-                                            onChange={e => setFormData(prev => ({ ...prev, suppCode: e.target.value }))} 
+                                        <select
+                                            value={formData.suppCode}
+                                            onChange={e => {
+                                                setFormData(prev => ({ ...prev, suppCode: e.target.value }));
+                                                if (errors.suppCode) setErrors(prev => ({ ...prev, suppCode: null }));
+                                            }}
                                             disabled={!!formData.poNo && !formData.acceptOtherSupp}
-                                            className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none truncate transition-colors ${!!formData.poNo && !formData.acceptOtherSupp ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white cursor-pointer text-gray-700'}`} 
+                                            className={`w-full h-10 border ${errors.suppCode ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none truncate transition-colors ${!!formData.poNo && !formData.acceptOtherSupp ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white cursor-pointer text-gray-700'}`}
                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                         >
                                             <option value="">-- Select Supplier --</option>
@@ -646,6 +679,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                         <Plus size={18} />
                                     </button>
                                 </div>
+                                {errors.suppCode && <div className="text-red-500 text-[11px] mt-1">{errors.suppCode}</div>}
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">PO Number</label>
@@ -662,36 +696,36 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             {/* Row 3: Supp. Inv | Inv. Amount | Pay Method */}
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier Invoice</label>
-                                <input 
-                                    type="text" 
-                                    name="suppInv" 
-                                    value={formData.suppInv} 
-                                    onChange={handleInput} 
+                                <input
+                                    type="text"
+                                    name="suppInv"
+                                    value={formData.suppInv}
+                                    onChange={handleInput}
                                     disabled={formData.consignmentBasis}
                                     placeholder={formData.consignmentBasis ? "N/A (Consignment)" : ""}
-                                    className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400 placeholder-gray-400' : 'bg-white text-gray-700'}`} 
+                                    className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400 placeholder-gray-400' : 'bg-white text-gray-700'}`}
                                 />
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Invoice Amount</label>
-                                <input 
-                                    type="text" 
-                                    name="invAmount" 
-                                    value={formData.invAmount} 
-                                    onChange={handleInput} 
+                                <input
+                                    type="text"
+                                    name="invAmount"
+                                    value={formData.invAmount}
+                                    onChange={handleInput}
                                     disabled={formData.consignmentBasis}
-                                    className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-right transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white text-gray-700'}`} 
+                                    className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-right transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white text-gray-700'}`}
                                 />
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Method</label>
                                 <div className="relative">
-                                    <select 
+                                    <select
                                         name="payType"
-                                        value={formData.payType} 
-                                        onChange={handleInput} 
+                                        value={formData.payType}
+                                        onChange={handleInput}
                                         disabled={formData.consignmentBasis}
-                                        className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none truncate transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white cursor-pointer text-gray-700'}`} 
+                                        className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none truncate transition-colors ${formData.consignmentBasis ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white cursor-pointer text-gray-700'}`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">-- Select Payment Method --</option>
@@ -812,7 +846,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Expense Account</label>
                                     <div className="flex gap-2">
                                         <div className="relative flex-1">
-                                            <select 
+                                            <select
                                                 name="expenseAcc"
                                                 value={formData.expenseAcc}
                                                 onChange={e => {
@@ -953,7 +987,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     value={productSearchQuery}
                                     onChange={async (e) => {
                                         const val = e.target.value; setProductSearchQuery(val);
-                                        if (val.length >= 2) { try { const r = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
+                                        if (val.length >= 2) { try { const r = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) { } }
                                         else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
                                     }}
                                     autoFocus
@@ -976,7 +1010,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                         <th className=" px-5 py-3">Code</th>
                                         <th className=" px-5 py-3">Item Description</th>
                                         <th className="text-right px-5 py-3">Base Price</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
@@ -1066,17 +1100,18 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Received Qty</label>
+                                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Received Qty <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="qty"
                                     ref={qtyRef}
                                     value={entry.qty}
                                     onChange={handleEntryInput}
-                                    onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }}
-                                    className="w-full h-12 border border-blue-500 px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none bg-blue-50/20"
+                                    onKeyDown={e => { if (e.key === 'Enter') { const success = addProduct(); if (success) { setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } } }}
+                                    className={`w-full h-12 border ${entryErrors.qty ? 'border-red-500' : 'border-blue-500'} px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none ${entryErrors.qty ? 'bg-red-50' : 'bg-blue-50/20'}`}
                                     autoFocus
                                 />
+                                {entryErrors.qty && <div className="text-[11px] text-red-500 font-bold">{entryErrors.qty}</div>}
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Free Issue</label>
@@ -1102,7 +1137,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             </div>
                         </div>
                         <button
-                            onClick={() => { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); }}
+                            onClick={() => { const success = addProduct(); if (success) { setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }}
                             className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none shadow-sm"
                         >
                             <Plus size={16} /> ADD TO LIST
@@ -1156,29 +1191,29 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Code</label>
-                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" placeholder="" />
+                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({ ...productMasterData, code: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" placeholder="" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Unit of Measure</label>
-                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
+                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({ ...productMasterData, unit: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
                         </div>
                     </div>
                     <div className="space-y-1">
                         <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Description</label>
-                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white uppercase shadow-sm font-bold" placeholder="" />
+                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({ ...productMasterData, name: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white uppercase shadow-sm font-bold" placeholder="" />
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Purchase Price</label>
-                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({ ...productMasterData, purchasePrice: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Selling Price</label>
-                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({ ...productMasterData, sellingPrice: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Pack Size</label>
-                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="1" />
+                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({ ...productMasterData, packSize: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="1" />
                         </div>
                     </div>
                     <div className="bg-blue-50/50 p-3.5 rounded-[3px] border border-blue-100/50 flex items-start gap-3">
@@ -1218,7 +1253,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
             />
 
             {/* Create Modals */}
-            <SupplierMasterBoard 
+            <SupplierMasterBoard
                 isOpen={showSupplierMaster}
                 onClose={handleSupplierMasterClose}
             />

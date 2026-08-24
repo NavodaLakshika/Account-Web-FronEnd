@@ -37,9 +37,11 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
+    const [entryErrors, setEntryErrors] = useState({});
 
     const [products, setProducts] = useState([]);
-    const [invoices, setInvoices] = useState([]); 
+    const [invoices, setInvoices] = useState([]);
     const [newDocNo, setNewDocNo] = useState('');
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -56,7 +58,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
 
     const [showAssistantSearch, setShowAssistantSearch] = useState(false);
     const [assistantSearchQuery, setAssistantSearchQuery] = useState('');
-    
+
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('date');
 
@@ -94,9 +96,9 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             const invList = await salesInvoiceService.search(company).catch(() => []);
             setInvoices(invList || []);
 
-            setLookups(prev => ({ 
-                ...prev, 
-                customers: soData.customers || [], 
+            setLookups(prev => ({
+                ...prev,
+                customers: soData.customers || [],
                 products: productsData.map(p => ({
                     code: p.code,
                     name: p.name,
@@ -152,6 +154,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             }
             return newState;
         });
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleEntryInput = (e) => {
@@ -166,14 +169,20 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
         }
 
         setEntry(newEntry);
+        if (entryErrors[name]) setEntryErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const addProduct = () => {
-        if (!entry.prodCode) return showErrorToast('Select a Product.');
-        if (!entry.qty || parseFloat(entry.qty) <= 0) return showErrorToast('Enter valid Quantity.');
+        const newEntryErrors = {};
+        if (!entry.prodCode) newEntryErrors.prodCode = 'Select a Product';
+        if (!entry.qty || parseFloat(entry.qty) <= 0) newEntryErrors.qty = 'Enter valid Quantity';
+
+        setEntryErrors(newEntryErrors);
+        if (Object.keys(newEntryErrors).length > 0) return;
 
         setProducts([...products, { ...entry }]);
         setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', price: '', discount: '0', amount: '0.00' });
+        setShowAddProductModal(false);
     };
 
     const removeProduct = (idx) => {
@@ -182,16 +191,16 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
 
     const totals = useMemo(() => {
         const gross = products.reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
-        
+
         const discPerValue = parseFloat(formData.discountPer) || 0;
         const discAmt = (gross * discPerValue / 100);
-        
+
         const nbtPerValue = parseFloat(formData.nbtPer) || 0;
         const nbtAmt = ((gross - discAmt) * nbtPerValue / 100);
-        
+
         const taxPerValue = parseFloat(formData.taxPer) || 0;
         const taxAmt = ((gross - discAmt + nbtAmt) * taxPerValue / 100);
-        
+
         const netAmount = gross - discAmt + nbtAmt + taxAmt;
 
         return { gross, discAmt, nbtAmt, taxAmt, netAmount };
@@ -206,6 +215,8 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             taxPer: '0', nbtPer: '0', discountPer: '0'
         }));
         generateDocNo(formData.company);
+        setErrors({});
+        setEntryErrors({});
     };
 
     const handleSearch = async () => {
@@ -257,7 +268,13 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.customerId) return showErrorToast('Select a Customer.');
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = 'Customer required';
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast('Please select a Customer.');
+            return;
+        }
         if (products.length === 0) return showErrorToast('No products entered.');
 
         const payload = preparePayload();
@@ -270,7 +287,13 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApply = async () => {
-        if (!formData.customerId) return showErrorToast('Select a Customer.');
+        const newErrors = {};
+        if (!formData.customerId) newErrors.customerId = 'Customer required';
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast('Please select a Customer.');
+            return;
+        }
         if (products.length === 0) return showErrorToast('No products entered.');
         setShowConfirmModal(true);
     };
@@ -410,32 +433,34 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <input type="number" name="creditPeriod" value={formData.creditPeriod} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <div className="flex gap-2">
                                         <input type="text" readOnly value={formData.customerId} className="w-24 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0" />
                                         <div className="relative flex-1">
                                             <select
-                                        value={formData.customerId || ''}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const c = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                            if (c) {
-                                                setFormData(prev => ({ ...prev, customerId: c.code }));
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.customers || []).map((c, idx) => (
-                                            <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
-                                                {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                value={formData.customerId || ''}
+                                                onChange={(ev) => {
+                                                    const val = ev.target.value;
+                                                    const c = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                    if (c) {
+                                                        setFormData(prev => ({ ...prev, customerId: c.code }));
+                                                    }
+                                                    if (errors.customerId) setErrors(prev => ({ ...prev, customerId: null }));
+                                                }}
+                                                className={`w-full h-10 border ${errors.customerId ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
+                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                            >
+                                                <option value="">Select...</option>
+                                                {(lookups.customers || []).map((c, idx) => (
+                                                    <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
+                                                        {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
+                                    {errors.customerId && <div className="text-red-500 text-[11px] mt-1">{errors.customerId}</div>}
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -752,7 +777,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                             <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
                                     </tr>
-                                ))}                                
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -817,15 +842,16 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             <SimpleModal isOpen={showAddProductModal} onClose={() => setShowAddProductModal(false)} title="Product Entry Terminal" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">
                     <div className="space-y-1.5">
-                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Product / Service</label>
+                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Product / Service <span className="text-red-500">*</span></label>
                         <div className="relative">
-                            <select value={entry.prodCode} onChange={e => { const p = lookups.products.find(x => x.code === e.target.value); if (p) { setEntry({ ...entry, prodCode: p.code, prodName: p.name, unit: p.unit || '', price: (p.selling || '0').toString(), amount: (1 * (parseFloat(p.selling) || 0)).toFixed(2) }); setTimeout(() => qtyRef.current?.focus(), 50); } }} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate shadow-sm" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                            <select value={entry.prodCode} onChange={e => { const p = lookups.products.find(x => x.code === e.target.value); if (p) { setEntry({ ...entry, prodCode: p.code, prodName: p.name, unit: p.unit || '', price: (p.selling || '0').toString(), amount: (1 * (parseFloat(p.selling) || 0)).toFixed(2) }); setTimeout(() => qtyRef.current?.focus(), 50); } if (entryErrors.prodCode) setEntryErrors(prev => ({ ...prev, prodCode: null })); }} className={`w-full h-10 border ${entryErrors.prodCode ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate shadow-sm`} style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
                                 <option value="">-- Select Product --</option>
                                 {(lookups.products || []).map((p, idx) => (
                                     <option key={idx} value={p.code}>{p.code} - {p.name}</option>
                                 ))}
                             </select>
                         </div>
+                        {entryErrors.prodCode && <div className="text-red-500 text-[11px] mt-0.5">{entryErrors.prodCode}</div>}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
@@ -833,8 +859,9 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <input type="text" name="price" value={entry.price} onChange={handleEntryInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[14px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Quantity</label>
-                            <input type="text" ref={qtyRef} name="qty" value={entry.qty} onChange={handleEntryInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[14px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
+                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Quantity <span className="text-red-500">*</span></label>
+                            <input type="text" ref={qtyRef} name="qty" value={entry.qty} onChange={handleEntryInput} className={`w-full h-10 border ${entryErrors.qty ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-4 text-[14px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm`} />
+                            {entryErrors.qty && <div className="text-red-500 text-[11px] mt-0.5">{entryErrors.qty}</div>}
                         </div>
                     </div>
                     <div className="pt-4">
@@ -850,7 +877,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} currentDate={formData[datePickerField]} onDateChange={(d) => { setFormData(prev => ({ ...prev, [datePickerField]: d })); setShowDatePicker(false); }} title="Select Date" />
             <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Confirm Final Application" message="Are you sure you want to apply this invoice to the ledger? This action will update inventory and accounting balances." isLoading={isApplying} />
             <ConfirmModal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} onConfirm={confirmDelete} title="Confirm Deletion" message={`Are you sure you want to delete invoice ${formData.docNo}? This action cannot be undone.`} isLoading={isDeleting} />
-            
+
             {appliedDocNo && (
                 <SalesInvoiceDetailModal
                     docNo={appliedDocNo}

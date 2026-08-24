@@ -79,6 +79,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     const [activeModal, setActiveModal] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -118,9 +119,14 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.bankAccount || !formData.apAccount || formData.amount <= 0) {
-            showErrorToast("Please fill in all required fields and ensure the amount is greater than zero.");
-            return;
+        const newErrors = {};
+        if (!formData.bankAccount) newErrors.bankAccount = 'Bank Account is required';
+        if (!formData.apAccount) newErrors.apAccount = 'A/P Account is required';
+        if (formData.amount <= 0) newErrors.amount = 'Amount must be greater than zero';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return showErrorToast("Please fill in all required fields and ensure the amount is greater than zero.");
         }
 
         try {
@@ -194,6 +200,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
             amount: 0,
             type: 'Expenses'
         });
+        setErrors({});
         loadInitialData();
     };
 
@@ -257,7 +264,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
 
                             {/* Bank Account */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank Account <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.bankAccount || ''}
@@ -267,9 +274,10 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                             if (item) {
                                                 const handler = (item) => setFormData({ ...formData, bankAccount: item.code, bankAccountName: item.name });
                                                 handler(item);
+                                                if (errors.bankAccount) setErrors(prev => ({ ...prev, bankAccount: null }));
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.bankAccount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -280,6 +288,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.bankAccount && <div className="text-[11px] text-red-500 mt-1">{errors.bankAccount}</div>}
                             </div>
 
                             {/* Type Selection */}
@@ -302,7 +311,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
 
                             {/* A/P Account */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/P Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/P Account <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.apAccount || ''}
@@ -312,9 +321,10 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                             if (item) {
                                                 const handler = (item) => setFormData({ ...formData, apAccount: item.code, apAccountName: item.name });
                                                 handler(item);
+                                                if (errors.apAccount) setErrors(prev => ({ ...prev, apAccount: null }));
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.apAccount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -325,6 +335,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.apAccount && <div className="text-[11px] text-red-500 mt-1">{errors.apAccount}</div>}
                             </div>
 
                             {/* Cost Center */}
@@ -363,9 +374,13 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
 
                             {/* Amount */}
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount *</label>
-                                <input type="number" step="0.01" value={formData.amount} onChange={e => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount <span className="text-red-500">*</span></label>
+                                <input type="number" step="0.01" value={formData.amount} onChange={e => {
+                                    setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 });
+                                    if (errors.amount && parseFloat(e.target.value) > 0) setErrors(prev => ({ ...prev, amount: null }));
+                                }}
+                                    className={`w-full h-10 border ${errors.amount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]`} />
+                                {errors.amount && <div className="text-[11px] text-red-500 mt-1">{errors.amount}</div>}
                             </div>
                         </div>
                     </div>

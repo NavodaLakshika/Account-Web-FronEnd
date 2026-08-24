@@ -40,6 +40,8 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [orders, setOrders] = useState([]);
     const [newDocNo, setNewDocNo] = useState('');
+    const [errors, setErrors] = useState({});
+    const [rowErrors, setRowErrors] = useState({});
 
     const [showCustModal, setShowCustModal] = useState(false);
     const [custSearch, setCustSearch] = useState('');
@@ -80,9 +82,11 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
             setOrders(orderList || []);
 
             const grnLookups = await grnService.getLookups(activeCompany);
-            setLookups(prev => ({ ...prev, products: (grnLookups.products || []).map(p => ({
-                code: p.code, name: p.name, unit: p.unit || '', cost: p.price || 0, selling: p.sellingPrice || 0
-            })) }));
+            setLookups(prev => ({
+                ...prev, products: (grnLookups.products || []).map(p => ({
+                    code: p.code, name: p.name, unit: p.unit || '', cost: p.price || 0, selling: p.sellingPrice || 0
+                }))
+            }));
         } catch (error) {
             showErrorToast("Failed to initialize Sales Order");
         }
@@ -139,11 +143,15 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
             }
             return row;
         }));
+        if (rowErrors[id] && rowErrors[id][field]) {
+            setRowErrors(prev => ({ ...prev, [id]: { ...prev[id], [field]: null } }));
+        }
     };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
         if (name === 'custCode') {
             const cust = lookups.customers.find(c => c.code === value);
             setFormData(prev => ({ ...prev, custName: cust ? cust.name : '' }));
@@ -151,8 +159,24 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async (apply = false) => {
-        if (!formData.custCode) return showErrorToast("Please select a customer");
-        if (rows.some(r => !r.prodCode || r.qty <= 0)) return showErrorToast("Please fill all item details correctly");
+        const newErrors = {};
+        const newRowErrors = {};
+
+        if (!formData.custCode) newErrors.custCode = 'Customer required';
+
+        rows.forEach(r => {
+            const rowErrs = {};
+            if (!r.prodCode) rowErrs.prodCode = true;
+            if (r.qty <= 0) rowErrs.qty = true;
+            if (Object.keys(rowErrs).length > 0) newRowErrors[r.id] = rowErrs;
+        });
+
+        setErrors(newErrors);
+        setRowErrors(newRowErrors);
+
+        if (Object.keys(newErrors).length > 0 || Object.keys(newRowErrors).length > 0) {
+            return showErrorToast("Please fill all required fields properly.");
+        }
 
         const payload = {
             header: {
@@ -188,6 +212,8 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     const handleClear = () => {
         setFormData(getInitialForm());
         setRows([{ id: Date.now(), prodCode: '', prodName: '', unit: '', cost: 0, selling: 0, qty: 0, discPer: 0, discount: 0, amount: 0 }]);
+        setErrors({});
+        setRowErrors({});
         initComponent();
     };
 
@@ -244,7 +270,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
             <style>{`@keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }`}</style>
             <TransactionFormWrapper boardName="SalesOrderBoard" isOpen={isOpen} onClose={onClose}
                 title="Sales Order"
-                
+
                 icon={ShoppingCart}
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
@@ -339,33 +365,35 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <div className="flex gap-2">
-                                        <input type="text" readOnly value={formData.custCode} className="w-24 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0" />
+                                        <input type="text" readOnly value={formData.custCode} className={`w-24 h-10 border ${errors.custCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0`} />
                                         <div className="relative flex-1">
                                             <select
-                                        value={formData.custCode || ''}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const c = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                            if (c) {
-                                                setFormData({ ...formData, custCode: c.code, custName: c.name });
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.customers || []).map((c, idx) => (
-                                            <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
-                                                {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                value={formData.custCode || ''}
+                                                onChange={(ev) => {
+                                                    const val = ev.target.value;
+                                                    const c = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                    if (c) {
+                                                        setFormData({ ...formData, custCode: c.code, custName: c.name });
+                                                        if (errors.custCode) setErrors(prev => ({ ...prev, custCode: null }));
+                                                    }
+                                                }}
+                                                className={`w-full h-10 border ${errors.custCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
+                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                            >
+                                                <option value="">Select...</option>
+                                                {(lookups.customers || []).map((c, idx) => (
+                                                    <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
+                                                        {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
+                                {errors.custCode && <div className="text-[11px] text-red-500 mt-1">{errors.custCode}</div>}
                             </div>
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ref. No</label>
@@ -430,18 +458,18 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                         <th className="px-2 text-right w-20">DIS %</th>
                                         <th className="px-4 text-right w-32">AMOUNT</th>
                                         <th className="w-12"></th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {rows.map((row, idx) => (
                                         <tr key={row.id} className="text-[12px] font-bold text-gray-700 border-b border-gray-50 hover:bg-slate-50/30 transition-colors">
                                             <td className="px-2 py-1">
-                                                <select value={row.prodCode} onChange={e => handleRowChange(row.id, 'prodCode', e.target.value)} className="w-full h-8 border border-gray-200 rounded-[3px] px-2 text-[12px] font-mono text-blue-700 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
-                                        <option value="">-- Select --</option>
-                                        {(lookups.products || []).map((p, idx) => (
-                                            <option key={idx} value={p.code}>{p.code} - {p.name}</option>
-                                        ))}
-                                    </select>
+                                                <select value={row.prodCode} onChange={e => handleRowChange(row.id, 'prodCode', e.target.value)} className={`w-full h-8 border ${rowErrors[row.id]?.prodCode ? 'border-red-500 bg-red-50' : 'border-gray-200'} rounded-[3px] px-2 text-[12px] font-mono text-blue-700 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none cursor-pointer truncate`} style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                                    <option value="">-- Select --</option>
+                                                    {(lookups.products || []).map((p, idx) => (
+                                                        <option key={idx} value={p.code}>{p.code} - {p.name}</option>
+                                                    ))}
+                                                </select>
                                             </td>
                                             <td className="px-3 py-2.5 truncate">{row.prodName}</td>
                                             <td className="px-3 py-2.5 text-center text-gray-400">{row.unit}</td>
@@ -449,7 +477,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                                 <input type="number" value={row.selling} onChange={(e) => handleRowChange(row.id, 'selling', e.target.value)} className="w-full h-8 border border-gray-200 rounded-[3px] text-right text-[12px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2" />
                                             </td>
                                             <td className="px-1 py-1">
-                                                <input type="number" value={row.qty} onChange={(e) => handleRowChange(row.id, 'qty', e.target.value)} className="w-full h-8 border border-gray-200 rounded-[3px] text-right text-[12px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2" />
+                                                <input type="number" value={row.qty} onChange={(e) => handleRowChange(row.id, 'qty', e.target.value)} className={`w-full h-8 border ${rowErrors[row.id]?.qty ? 'border-red-500 bg-red-50' : 'border-gray-200'} rounded-[3px] text-right text-[12px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2`} />
                                             </td>
                                             <td className="px-1 py-1">
                                                 <input type="number" value={row.discPer} onChange={(e) => handleRowChange(row.id, 'discPer', e.target.value)} className="w-full h-8 border border-gray-200 rounded-[3px] text-right text-[12px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2" />
@@ -516,7 +544,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <div className="flex items-center justify-between gap-4">
                                     <span className="text-[13px] font-medium text-gray-700">Adjustment</span>
                                     <div className="flex items-center gap-2">
-                                        <button onClick={() => setFormData({...formData, adjType: formData.adjType === 'Add' ? 'Less' : 'Add'})} className="w-16 h-8 text-[10px] font-black text-white bg-gray-400 hover:bg-gray-500 rounded-full uppercase shadow-sm transition-all active:scale-95">
+                                        <button onClick={() => setFormData({ ...formData, adjType: formData.adjType === 'Add' ? 'Less' : 'Add' })} className="w-16 h-8 text-[10px] font-black text-white bg-gray-400 hover:bg-gray-500 rounded-full uppercase shadow-sm transition-all active:scale-95">
                                             {formData.adjType}
                                         </button>
                                         <input type="number" name="adjValue" value={formData.adjValue} onChange={handleInputChange} className="w-28 h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[13px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
@@ -648,19 +676,19 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                     ) : orders
                                         .filter(o => !orderSearch || o.docNo.toLowerCase().includes(orderSearch.toLowerCase()) || o.date?.includes(orderSearch))
                                         .map((order, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => loadOrder(order.docNo)}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.docNo}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.date?.split('T')[0]}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                                <span className={`px-2 py-0.5 rounded-[3px] text-[9px] font-black uppercase ${order.status === 'Applied' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
-                                                    {order.status}
-                                                </span>
-                                            </td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                            <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => loadOrder(order.docNo)}>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.docNo}</td>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.date?.split('T')[0]}</td>
+                                                <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                                    <span className={`px-2 py-0.5 rounded-[3px] text-[9px] font-black uppercase ${order.status === 'Applied' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
+                                                        {order.status}
+                                                    </span>
+                                                </td>
+                                                <td className="text-right px-5 py-3">
+                                                    <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button>
+                                                </td>
+                                            </tr>
+                                        ))}
                                 </tbody>
                             </table>
                         </div>

@@ -1,0 +1,292 @@
+import React, { useState, useEffect } from 'react';
+import SimpleModal from '../components/SimpleModal';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
+import { 
+  Search, Calendar, ChevronDown, Plus, Filter, FileText, 
+  CreditCard, PenTool, Wallet, RefreshCw, Loader2, 
+  ArrowUpRight, TrendingUp, DollarSign, Users, PieChart, AlertCircle, Printer, X
+} from 'lucide-react';
+import { biDashboardService } from '../services/biDashboard.service';
+import { getSessionData } from '../utils/session';
+import { showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
+
+const ProfitLossDashboardBoard = ({ 
+  isOpen, 
+  onClose, 
+  onEnterBill, 
+  onPayBill, 
+  onWriteCheque, 
+  onPettyCash 
+}) => {
+  const [selectedTab, setSelectedTab] = useState('overview');
+  const [selectedTx, setSelectedTx] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({
+    totalIncome: 0,
+    totalExpenses: 0,
+    recentTransactions: [],
+    categoryBreakdown: []
+  });
+
+  const [companyName, setCompanyName] = useState('Profit & Loss Workspace');
+
+  const { companyCode } = getSessionData();
+
+  useEffect(() => {
+    try {
+      const companyRaw = sessionStorage.getItem('selectedCompany');
+      if (companyRaw) {
+        const parsed = JSON.parse(companyRaw);
+        setCompanyName(parsed.CompanyName || parsed.companyName || parsed.Company_Name || 'Profit & Loss Workspace');
+      }
+    } catch (e) {}
+  }, []);
+
+  const fetchDashboardData = async () => {
+    if (!companyCode) return;
+    setLoading(true);
+    try {
+      const res = await biDashboardService.getSummary(companyCode);
+      
+      setData({
+        totalIncome: res.totalIncome || 0,
+        totalExpenses: res.totalExpenses || 0,
+        recentTransactions: res.recentTransactions || [],
+        categoryBreakdown: res.categoryBreakdown || []
+      });
+    } catch (error) {
+      showErrorToast('Failed to load profit and loss data.');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchDashboardData();
+    }
+  }, [isOpen]);
+
+  const netProfit = data.totalIncome - data.totalExpenses;
+  const profitColor = netProfit >= 0 ? 'text-emerald-500' : 'text-rose-500';
+  const profitBg = netProfit >= 0 ? 'from-emerald-500 to-emerald-600' : 'from-rose-500 to-rose-600';
+
+  return (
+    <TransactionFormWrapper boardName="ProfitLossDashboardBoard" icon={FileText}
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Profit & Loss"
+    >
+      <div className="flex flex-col gap-6 select-none font-['Plus_Jakarta_Sans'] text-slate-800">
+        
+        {/* Header Controls */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div className="">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 leading-none">Profit & Loss Dashboard</h2>
+              <span className="text-xs text-blue-600 font-bold uppercase tracking-wider">{companyName}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button 
+              onClick={fetchDashboardData}
+              disabled={loading}
+              className="border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-500 rounded-[3px] transition-all active:scale-95 disabled:opacity-50 shrink-0 px-5 py-3"
+              title="Refresh Data"
+            >
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            </button>
+          </div>
+        </div>
+
+        {/* Metric Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Net Profit */}
+          <div className={`relative overflow-hidden bg-gradient-to-br ${profitBg} text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col`}>
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+              <TrendingUp size={120} />
+            </div> */}
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-white/70 mb-1">Net Profit (Loss)</span>
+                <span className="text-[12px] font-bold text-white/90">Current Period</span>
+              </div>
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <TrendingUp size={20} strokeWidth={2.5} />
+              </div> */}
+            </div>
+
+            <div className="mt-auto">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Income */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
+              <DollarSign size={120} />
+            </div> */}
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-blue-100/70 mb-1">Total Income</span>
+                <span className="text-[12px] font-bold text-blue-50">Operating Revenue</span>
+              </div>
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <ArrowUpRight size={20} strokeWidth={2.5} />
+              </div> */}
+            </div>
+
+            <div className="mt-auto">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${data.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Expenses */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+              <Wallet size={120} />
+            </div> */}
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-orange-100/70 mb-1">Total Expenses</span>
+                <span className="text-[12px] font-bold text-orange-50">Operating Costs</span>
+              </div>
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <AlertCircle size={20} strokeWidth={2.5} />
+              </div> */}
+            </div>
+
+            <div className="mt-auto">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${data.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Selection */}
+        <div className="border-b border-slate-100 flex items-center gap-6 mt-2">
+          {[
+            { id: 'overview', label: 'Overview', icon: PieChart },
+            { id: 'transactions', label: 'Recent Transactions', icon: FileText }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = selectedTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedTab(tab.id)}
+                className={`flex items-center gap-2 pb-3 font-bold text-xs uppercase tracking-wider border-b-2 transition-all relative ${
+                  isActive 
+                    ? 'border-blue-600 text-blue-600' 
+                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <Icon size={14} />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Panels */}
+        <div className="flex-1">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-3">
+              <Loader2 size={36} className="text-blue-500 animate-spin" />
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading...</span>
+            </div>
+          ) : (
+            <>
+              {selectedTab === 'overview' && (
+                <div className="bg-slate-50/50 border-2 border-dashed border-slate-200 p-6 rounded-2xl flex flex-col items-center justify-center min-h-[300px] group hover:bg-slate-50 hover:border-blue-300 transition-all duration-500">
+                    <div className="w-20 h-20 bg-white rounded-full shadow-sm flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-md transition-all duration-500 relative">
+                        <div className="absolute inset-0 rounded-full border border-slate-100 group-hover:border-blue-100 animate-ping opacity-20"></div>
+                        <PieChart size={32} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
+                    <span className="text-[14px] text-slate-800 font-black tracking-tight mb-1">Visualizations in Progress</span>
+                    <span className="text-[12px] text-slate-500 font-medium max-w-xs text-center leading-relaxed">
+                        We're currently building advanced charts and analytics for your profit & loss data. Check back soon!
+                    </span>
+                </div>
+              )}
+              {selectedTab === 'transactions' && (
+                <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm flex flex-col">
+                  <div className="overflow-x-auto max-h-[480px]">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="bg-slate-50 sticky top-0 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 z-10 shadow-sm leading-10">
+                        <tr>
+                          <th className="px-6 w-[15%]">Date</th>
+                          <th className="px-6 w-[15%]">Type</th>
+                          <th className="px-6 w-[20%]">Doc No</th>
+                          <th className="px-6 w-[30%]">Details</th>
+                          <th className="px-6 w-[20%] text-right">Amount</th>
+                        {/* <th className="text-right px-5 py-3">Action</th> */}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
+                        {data.recentTransactions.map((tx, idx) => (
+                          <tr key={idx} className="hover:bg-blue-50/50 cursor-pointer transition-colors border-b border-slate-50 group" onClick={() => setSelectedTx(tx)}>
+                            <td className="py-3 px-6 font-mono text-slate-500">{tx.date.split('T')[0]}</td>
+                            <td className="py-3 px-6">
+                              <span className="uppercase text-[9px] tracking-wider px-2 py-0.5 rounded font-black bg-slate-100 text-slate-500">
+                                {tx.type}
+                              </span>
+                            </td>
+                            <td className="py-3 px-6 font-mono text-blue-600 group-hover:underline">{tx.docNo}</td>
+                            <td className="py-3 px-6 truncate max-w-[300px] font-mono">{tx.payee || tx.category || '---'}</td>
+                            <td className="py-3 px-6 text-right font-mono font-black text-slate-900">
+                              {tx.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </td>
+                          </tr>
+                        ))}
+                        {data.recentTransactions.length === 0 && (
+                          <tr>
+                            <td colSpan="5" className="py-16 text-center text-slate-300 font-bold italic text-xs uppercase tracking-wider">
+                              No transactions available.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Transaction Receipt Modal */}
+      <TransactionReceiptModal 
+        selectedTx={selectedTx} 
+        onClose={() => setSelectedTx(null)} 
+      />
+
+    </TransactionFormWrapper>
+  );
+};
+
+export default ProfitLossDashboardBoard;

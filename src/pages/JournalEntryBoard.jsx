@@ -112,6 +112,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
     });
 
     const [header, setHeader] = useState(getInitialHeader());
+    const [errors, setErrors] = useState({});
 
     const [currentLine, setCurrentLine] = useState({
         accId: '',
@@ -207,7 +208,13 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
     };
 
     const handleAddLine = async () => {
-        if (!currentLine.accId || (!currentLine.debit && !currentLine.credit)) {
+        const newErrors = {};
+        if (!currentLine.accId) newErrors.accId = 'Ledger Account is required';
+        if (!currentLine.debit && !currentLine.credit) newErrors.amount = 'Debit or Credit amount is required';
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
             showErrorToast("Please select an account and enter an amount");
             return;
         }
@@ -275,6 +282,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
             memo: '', vendId: '', vendName: '',
             drMode: true
         }));
+        setErrors({});
     };
 
     const fileInputRef = useRef(null);
@@ -618,7 +626,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                             }}
                                             placeholder="Doc No"
                                             className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                     </div>
                                 ) : (
                                     <div className="w-full h-10 border border-gray-300 rounded-[3px] px-3 flex items-center text-[14px] font-bold font-mono text-blue-600">
@@ -634,7 +642,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
 
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ledger Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ledger Account <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={currentLine.accId || ''}
@@ -645,8 +653,9 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                                 const handler = handleAccountSelect;
                                                 handler(item);
                                             }
+                                            if (errors.accId) setErrors(prev => ({ ...prev, accId: null }));
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.accId ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -657,6 +666,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.accId && <div className="text-red-500 text-[11px] mt-1">{errors.accId}</div>}
                             </div>
 
                             <div className="col-span-4">
@@ -706,11 +716,15 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                                 type="number" step="0.01"
                                                 value={currentLine.debit}
                                                 disabled={!currentLine.drMode}
-                                                onChange={e => setCurrentLine({ ...currentLine, debit: e.target.value })}
+                                                onChange={e => {
+                                                    setCurrentLine({ ...currentLine, debit: e.target.value });
+                                                    if (errors.amount) setErrors(prev => ({ ...prev, amount: null }));
+                                                }}
                                                 className={`w-full h-10 border rounded-[3px] pl-9 pr-3 text-[14px] font-bold outline-none text-right
+                                                    ${errors.amount ? 'border-red-500' : 'border-gray-300'}
                                                     ${currentLine.drMode
-                                                        ? 'border-gray-300 bg-white text-blue-600 focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]'
-                                                        : 'border-gray-300 bg-gray-50 text-gray-300 cursor-not-allowed'}`}
+                                                        ? 'bg-white text-blue-600 focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]'
+                                                        : 'bg-gray-50 text-gray-300 cursor-not-allowed'}`}
                                             />
                                         </div>
                                     </div>
@@ -722,13 +736,18 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                                 type="number" step="0.01"
                                                 value={currentLine.credit}
                                                 disabled={currentLine.drMode}
-                                                onChange={e => setCurrentLine({ ...currentLine, credit: e.target.value })}
+                                                onChange={e => {
+                                                    setCurrentLine({ ...currentLine, credit: e.target.value });
+                                                    if (errors.amount) setErrors(prev => ({ ...prev, amount: null }));
+                                                }}
                                                 className={`w-full h-10 border rounded-[3px] pl-9 pr-3 text-[14px] font-bold outline-none text-right
+                                                    ${errors.amount ? 'border-red-500' : 'border-gray-300'}
                                                     ${!currentLine.drMode
-                                                        ? 'border-red-400 bg-white text-red-600 focus:border-red-400 focus:ring-1 focus:ring-red-400/30'
-                                                        : 'border-gray-300 bg-gray-50 text-gray-300 cursor-not-allowed'}`}
+                                                        ? 'bg-white text-red-600 focus:border-red-400 focus:ring-1 focus:ring-red-400/30'
+                                                        : 'bg-gray-50 text-gray-300 cursor-not-allowed'}`}
                                             />
                                         </div>
+                                        {errors.amount && <div className="text-red-500 text-[11px] mt-1 whitespace-nowrap">{errors.amount}</div>}
                                     </div>
                                 </div>
 
@@ -874,7 +893,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                 loading={isDeleting}
             />
 
-            <ColumnSelectionModal 
+            <ColumnSelectionModal
                 isOpen={showColumnSelector}
                 onClose={() => setShowColumnSelector(false)}
                 onDownload={handleDownloadTemplate}

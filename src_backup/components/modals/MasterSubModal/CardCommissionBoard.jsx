@@ -1,0 +1,145 @@
+import React, { useState, useEffect } from 'react';
+import { Save, RotateCcw, Loader2, AlertTriangle, CreditCard, Banknote, Percent } from 'lucide-react';
+import { cardCommissionService } from '../../../services/cardCommission.service';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
+import { getCompanyCode } from '../../../utils/session';
+
+const CardCommissionBoard = ({ isOpen, onClose }) => {
+    const initialState = { BankAccCode: '', BankAccName: '', CardID: '', CardType: '', Rate: '0.0' };
+
+    const [formData, setFormData] = useState(initialState);
+    const [cardTypes, setCardTypes] = useState([]);
+    const [bankAccounts, setBankAccounts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [showBankModal, setShowBankModal] = useState(false);
+    const [showCardModal, setShowCardModal] = useState(false);
+    const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            handleClear(); fetchLookups(); }
+    }, [isOpen]);
+
+    const fetchLookups = async () => {
+        try {
+            const data = await cardCommissionService.getLookups();
+            setCardTypes(data.cardTypes || []);
+            setBankAccounts(data.bankAccounts || []);
+        } catch (error) { showErrorToast('Failed to load lookup data'); }
+    };
+
+    const handleCardChange = async (e) => {
+        const id = e.target.value;
+        const card = cardTypes.find(c => c.cardID === id);
+        if (card) {
+            setFormData(prev => ({ ...prev, CardID: id, CardType: card.name }));
+            if (id && formData.BankAccCode) {
+                try { const rate = await cardCommissionService.getRate(formData.BankAccCode, id, getCompanyCode()); setFormData(prev => ({ ...prev, CardID: id, CardType: card.name, Rate: rate.rate.toString() })); } catch { setFormData(prev => ({ ...prev, CardID: id, CardType: card.name, Rate: '0.0' })); }
+            }
+        } else {
+            setFormData(prev => ({ ...prev, CardID: '', CardType: '' }));
+        }
+    };
+
+    const handleBankChange = async (e) => {
+        const code = e.target.value;
+        const bank = bankAccounts.find(b => b.code === code);
+        if (bank) {
+            setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: bank.name }));
+            if (formData.CardID && code) {
+                try { const rate = await cardCommissionService.getRate(code, formData.CardID, getCompanyCode()); setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: bank.name, Rate: rate.rate.toString() })); } catch { setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: bank.name, Rate: '0.0' })); }
+            }
+        } else {
+            setFormData(prev => ({ ...prev, BankAccCode: '', BankAccName: '' }));
+        }
+    };
+
+    const handleSave = () => {
+        if (!formData.BankAccCode) { showErrorToast('Please select a Bank Account'); return; }
+        if (!formData.CardID) { showErrorToast('Card Type Not Found.'); return; }
+        if (parseFloat(formData.Rate) === 0) { showErrorToast('Commission Rate cannot be zero.'); return; }
+        setShowSaveConfirm(true);
+    };
+
+    const confirmSave = async () => {
+        setShowSaveConfirm(false);
+        setLoading(true);
+        try {
+            await cardCommissionService.save({ ...formData, Rate: parseFloat(formData.Rate), Company: getCompanyCode() });
+            showSuccessToast('Commission Rate Saved Successfully.');
+            setFormData(prev => ({ ...prev, CardID: '', CardType: '', Rate: '0.0' }));
+        } catch (error) { showErrorToast(error.message || error); } finally { setLoading(false); }
+    };
+
+    const handleClear = () => {
+        setFormData(initialState);
+    };
+
+    return (
+        <>
+            <MasterFormWrapper
+                isOpen={isOpen}
+                onClose={onClose}
+                title="Commission Rate"
+                subtitle="Configure bank card commission percentages"
+                icon={CreditCard}
+                maxWidth="max-w-[700px]"
+                isEditMode={false}
+                loading={loading}
+                onClear={handleClear}
+                onSave={handleSave}
+                saveLabel="SAVE"
+            >
+                <MasterFieldRow label="Bank Account" colSpan="col-span-12">
+                    <MasterSelect
+                        name="BankAccCode"
+                        value={formData.BankAccCode || ''}
+                        onChange={handleBankChange}
+                        options={bankAccounts.map(b => ({ value: b.code, label: `${b.code} - ${b.name}` }))}
+                        placeholder="Select bank account..."
+                    />
+                </MasterFieldRow>
+                <MasterFieldRow label="Card Type" colSpan="col-span-12">
+                    <MasterSelect
+                        name="CardID"
+                        value={formData.CardID || ''}
+                        onChange={handleCardChange}
+                        options={cardTypes.map(c => ({ value: c.cardID, label: `${c.cardID} - ${c.name}` }))}
+                        placeholder="Select card type..."
+                    />
+                </MasterFieldRow>
+                <MasterFieldRow label="Commission Rate" colSpan="col-span-12">
+                    <div className="flex items-center gap-3 flex-1">
+                        <input type="number" step="0.1" value={formData.Rate} onChange={(e) => setFormData(prev => ({ ...prev, Rate: e.target.value }))}
+                            className="w-[140px] h-8 border border-slate-200 px-3 text-sm font-mono font-bold rounded outline-none bg-slate-50 text-slate-700 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all text-right" placeholder="0.0" />
+                        <span className="text-[12px] font-black text-slate-400 uppercase tracking-wider">% Percentage</span>
+                    </div>
+                </MasterFieldRow>
+            </MasterFormWrapper>
+
+            {showSaveConfirm && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => !loading && setShowSaveConfirm(false)} />
+ <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-8 text-center">
+                            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-emerald-500" /></div>
+                            <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Save</h3>
+                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">
+                                Do you want to save this commission record for <span className="font-bold text-[#0285fd] uppercase">"{formData.CardType || formData.CardID}"</span>?
+                                <br />This will update the rate to <span className="font-bold text-slate-800">{formData.Rate}%</span>.
+                            </p>
+                            <div className="flex gap-3">
+                                <button onClick={() => setShowSaveConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
+                                <button onClick={confirmSave} disabled={loading} className="flex-1 h-11 bg-emerald-500 text-white text-[11px] font-black rounded-[3px] hover:bg-emerald-600 shadow-lg shadow-emerald-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Save Record'}</button>
+                            </div>
+                        </div>
+                        <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Transaction Integrity Guaranteed</span></div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
+export default CardCommissionBoard;

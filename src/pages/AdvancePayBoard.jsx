@@ -22,8 +22,8 @@ const formatDateToDMY = (dateStr) => {
 // Generic Search Modal following the high-fidelity style of JournalEntryBoard
 const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Search by code or name..." }) => {
     const [query, setQuery] = useState('');
-    const filtered = (items || []).filter(item => 
-        (item.name || '').toLowerCase().includes(query.toLowerCase()) || 
+    const filtered = (items || []).filter(item =>
+        (item.name || '').toLowerCase().includes(query.toLowerCase()) ||
         (item.code || '').toLowerCase().includes(query.toLowerCase())
     );
 
@@ -71,7 +71,7 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholde
 const AdvancePayBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ vendors: [], accounts: [], costCenters: [], payTypes: [] });
     const [loading, setLoading] = useState(false);
-    
+
     // Cheque Validation state
     const [chequeStatus, setChequeStatus] = useState('idle'); // 'idle', 'checking', 'valid', 'invalid'
     const [chequeMessage, setChequeMessage] = useState('');
@@ -100,6 +100,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     // Custom Search Modal States
     const [activeModal, setActiveModal] = useState(null); // 'vendor', 'account', 'fromCc', 'toCc'
@@ -117,7 +118,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                 company: companyCode,
                 createUser: userName
             }));
-            
+
             fetchLookups(companyCode, userName);
             generateDocNo(companyCode);
         }
@@ -150,6 +151,8 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+
         if (name === 'chqNo') {
             setChequeStatus('idle');
             setChequeMessage('');
@@ -166,6 +169,9 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
         }));
         setChequeStatus('idle');
         setChequeMessage('');
+
+        if (errors.payType) setErrors(prev => ({ ...prev, payType: null }));
+        if (type !== 'CHEQUE' && errors.chqNo) setErrors(prev => ({ ...prev, chqNo: null }));
     };
 
     // Cheque Number Realtime Validation on Blur
@@ -209,16 +215,24 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
         }));
         setChequeStatus('idle');
         setChequeMessage('');
+        setErrors({});
         generateDocNo();
     };
 
     const handleSave = async () => {
-        if (!formData.apAccount) return showErrorToast('A/P Account selection is required.');
-        if (!formData.vendId) return showErrorToast('Vendor selection is required.');
-        if (!formData.amount || parseFloat(formData.amount) <= 0) return showErrorToast('Valid Payment Amount is required.');
+        const newErrors = {};
+        if (!formData.apAccount) newErrors.apAccount = 'A/P Account required';
+        if (!formData.vendId) newErrors.vendId = 'Supplier required';
+        if (!formData.amount || parseFloat(formData.amount) <= 0) newErrors.amount = 'Valid amount required';
         if (formData.payType === 'CHEQUE') {
-            if (!formData.chqNo) return showErrorToast('Cheque Number is required.');
-            if (chequeStatus === 'invalid') return showErrorToast(chequeMessage || 'Please enter a valid Cheque Number.');
+            if (!formData.chqNo) newErrors.chqNo = 'Cheque number required';
+            if (chequeStatus === 'invalid') newErrors.chqNo = chequeMessage || 'Invalid cheque';
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            return showErrorToast('Please fill out all required fields.');
         }
 
         setLoading(true);
@@ -233,7 +247,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
         try {
             const resp = await advancePayService.save(payload);
             showSuccessToast(`Advance Payment processed successfully! Doc ID: ${resp.docNo}`);
-            
+
             // Format receipt data
             setReceiptTx({
                 type: 'ADVANCE PAY',
@@ -268,23 +282,25 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
     // Modal Item Selection Handlers
     const handleSelectVendor = (item) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            vendId: item.code, 
-            vender: item.name, 
-            address: item.address || '' 
+        setFormData(prev => ({
+            ...prev,
+            vendId: item.code,
+            vender: item.name,
+            address: item.address || ''
         }));
+        if (errors.vendId) setErrors(prev => ({ ...prev, vendId: null }));
     };
 
     const handleSelectAccount = (item) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            apAccount: item.code, 
-            apAccountName: item.name 
+        setFormData(prev => ({
+            ...prev,
+            apAccount: item.code,
+            apAccountName: item.name
         }));
         // Reset cheque validation on account change
         setChequeStatus('idle');
         setChequeMessage('');
+        if (errors.apAccount) setErrors(prev => ({ ...prev, apAccount: null }));
     };
 
     return (
@@ -311,62 +327,64 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                     {/* Unified Fields Grid */}
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            
+
                             {/* ROW 1 */}
                             {/* A/P Account */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/P Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/P Account <span className="text-red-500">*</span></label>
                                 <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.apAccount ? `${formData.apAccount} - ${formData.apAccountName}` : ''} 
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.apAccount ? `${formData.apAccount} - ${formData.apAccountName}` : ''}
+                                        className={`w-full h-10 border ${errors.apAccount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         onClick={() => setActiveModal('account')}
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
+                                {errors.apAccount && <div className="text-[11px] text-red-500 mt-1">{errors.apAccount}</div>}
                             </div>
 
                             {/* Document ID */}
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc ID</label>
-                                <input 
-                                    type="text" 
-                                    value={formData.docNo} 
-                                    readOnly 
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" 
+                                <input
+                                    type="text"
+                                    value={formData.docNo}
+                                    readOnly
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                 />
                             </div>
 
                             {/* ROW 2 */}
                             {/* Supplier / Vendor */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier <span className="text-red-500">*</span></label>
                                 <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.vendId ? `${formData.vendId} - ${formData.vender}` : ''} 
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.vendId ? `${formData.vendId} - ${formData.vender}` : ''}
+                                        className={`w-full h-10 border ${errors.vendId ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         onClick={() => setActiveModal('vendor')}
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
+                                {errors.vendId && <div className="text-[11px] text-red-500 mt-1">{errors.vendId}</div>}
                             </div>
 
                             {/* Post Date */}
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Post Date</label>
                                 <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.postDate ? formatDateToDMY(formData.postDate) : ''} 
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.postDate ? formatDateToDMY(formData.postDate) : ''}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                         onClick={() => setShowDatePicker(true)}
                                     />
-                                    <button 
+                                    <button
                                         type="button"
-                                        onClick={() => setShowDatePicker(true)} 
+                                        onClick={() => setShowDatePicker(true)}
                                         className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer"
                                     >
                                         <Calendar size={16} />
@@ -378,26 +396,27 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                             {/* Address */}
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Address</label>
-                                <input 
-                                    name="address" 
-                                    value={formData.address} 
-                                    onChange={handleInputChange} 
-                                    type="text" 
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
+                                <input
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={handleInputChange}
+                                    type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                 />
                             </div>
 
                             {/* Amount Input */}
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Net Amount *</label>
-                                <input 
-                                    name="amount" 
-                                    value={formData.amount} 
-                                    onChange={handleInputChange} 
-                                    type="number" 
-                                    step="0.01" 
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Net Amount <span className="text-red-500">*</span></label>
+                                <input
+                                    name="amount"
+                                    value={formData.amount}
+                                    onChange={handleInputChange}
+                                    type="number"
+                                    step="0.01"
+                                    className={`w-full h-10 border ${errors.amount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`}
                                 />
+                                {errors.amount && <div className="text-[11px] text-red-500 mt-1">{errors.amount}</div>}
                             </div>
 
                             {/* ROW 4 */}
@@ -405,13 +424,13 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">From CC</label>
                                 <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={lookups.costCenters.find(c => c.code === formData.fromCostCenter)?.name || formData.fromCostCenter || ''} 
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={lookups.costCenters.find(c => c.code === formData.fromCostCenter)?.name || formData.fromCostCenter || ''}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
                                         onClick={() => setActiveModal('fromCc')}
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -419,25 +438,25 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">To CC</label>
                                 <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || formData.costCenter || ''} 
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || formData.costCenter || ''}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
                                         onClick={() => setActiveModal('toCc')}
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
                             {/* Vouch No */}
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vouch No</label>
-                                <input 
-                                    name="vouNo" 
-                                    value={formData.vouNo} 
-                                    onChange={handleInputChange} 
-                                    type="text" 
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
+                                <input
+                                    name="vouNo"
+                                    value={formData.vouNo}
+                                    onChange={handleInputChange}
+                                    type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                 />
                             </div>
 
@@ -445,24 +464,24 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                             {/* Memo */}
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Memo</label>
-                                <input 
-                                    name="memo" 
-                                    value={formData.memo} 
-                                    onChange={handleInputChange} 
-                                    type="text" 
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
+                                <input
+                                    name="memo"
+                                    value={formData.memo}
+                                    onChange={handleInputChange}
+                                    type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                 />
                             </div>
 
                             {/* Ref No */}
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ref No</label>
-                                <input 
-                                    name="refNo" 
-                                    value={formData.refNo} 
-                                    onChange={handleInputChange} 
-                                    type="text" 
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
+                                <input
+                                    name="refNo"
+                                    value={formData.refNo}
+                                    onChange={handleInputChange}
+                                    type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                 />
                             </div>
 
@@ -476,40 +495,40 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay Method</label>
                                     <div className="relative">
                                         <select
-                                        value={formData.payType}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const item = (lookups.payTypes || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
-                                            if (item) {
-                                                const handler = (item) => handlePayTypeChange(item.code);
-                                                handler(item);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.payTypes || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
-                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                            value={formData.payType}
+                                            onChange={(ev) => {
+                                                const val = ev.target.value;
+                                                const item = (lookups.payTypes || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                                if (item) {
+                                                    const handler = (item) => handlePayTypeChange(item.code);
+                                                    handler(item);
+                                                }
+                                            }}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select...</option>
+                                            {(lookups.payTypes || []).map((item, idx) => (
+                                                <option key={idx} value={item.code || item.name || item}>
+                                                    {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
 
                                 {/* Cheque Number */}
                                 <div className="col-span-4">
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque No</label>
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque No {formData.payType === 'CHEQUE' && <span className="text-red-500">*</span>}</label>
                                     <div className="relative">
-                                        <input 
-                                            name="chqNo" 
-                                            value={formData.chqNo} 
-                                            onChange={handleInputChange} 
+                                        <input
+                                            name="chqNo"
+                                            value={formData.chqNo}
+                                            onChange={handleInputChange}
                                             onBlur={handleChequeBlur}
-                                            disabled={formData.payType !== 'CHEQUE'} 
-                                            type="text" 
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 disabled:bg-gray-100 disabled:text-gray-400 pr-10" 
+                                            disabled={formData.payType !== 'CHEQUE'}
+                                            type="text"
+                                            className={`w-full h-10 border ${(errors.chqNo || chequeStatus === 'invalid') ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 disabled:bg-gray-100 disabled:text-gray-400 pr-10`}
                                         />
                                         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
                                             {chequeStatus === 'checking' && <Loader2 size={14} className="animate-spin text-blue-500" />}
@@ -517,24 +536,25 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                                             {chequeStatus === 'invalid' && <AlertCircle size={14} className="text-rose-500" />}
                                         </div>
                                     </div>
+                                    {errors.chqNo && <div className="text-[11px] text-red-500 mt-1">{errors.chqNo}</div>}
                                 </div>
 
                                 {/* Cheque Date */}
                                 <div className="col-span-4">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheq Date</label>
                                     <div className="relative">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={formData.chqDate ? formatDateToDMY(formData.chqDate) : ''} 
-                                            disabled={formData.payType !== 'CHEQUE'} 
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={formData.chqDate ? formatDateToDMY(formData.chqDate) : ''}
+                                            disabled={formData.payType !== 'CHEQUE'}
                                             className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate disabled:bg-gray-100 disabled:text-gray-400"
                                             onClick={() => formData.payType === 'CHEQUE' && setShowChqDatePicker(true)}
                                         />
-                                        <button 
+                                        <button
                                             type="button"
-                                            onClick={() => setShowChqDatePicker(true)} 
-                                            disabled={formData.payType !== 'CHEQUE'} 
+                                            onClick={() => setShowChqDatePicker(true)}
+                                            disabled={formData.payType !== 'CHEQUE'}
                                             className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer disabled:text-gray-300"
                                         >
                                             <Calendar size={16} />
@@ -584,12 +604,12 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                 searchPlaceholder="Search to cost center..."
             />
 
-            <SearchModal 
-                isOpen={activeModal === 'payType'} 
-                onClose={() => setActiveModal(null)} 
-                title="Select Pay Type" 
-                items={lookups.payTypes} 
-                onSelect={(item) => handlePayTypeChange(item.code)} 
+            <SearchModal
+                isOpen={activeModal === 'payType'}
+                onClose={() => setActiveModal(null)}
+                title="Select Pay Type"
+                items={lookups.payTypes}
+                onSelect={(item) => handlePayTypeChange(item.code)}
             />
 
             <CalendarModal
@@ -607,12 +627,12 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
             />
 
             {receiptTx && (
-                <TransactionReceiptModal 
-                    selectedTx={receiptTx} 
+                <TransactionReceiptModal
+                    selectedTx={receiptTx}
                     onClose={() => {
                         setReceiptTx(null);
                         onClose(); // Close the main board when receipt is closed
-                    }} 
+                    }}
                 />
             )}
         </>

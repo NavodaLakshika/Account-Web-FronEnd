@@ -73,7 +73,7 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
-
+    const [errors, setErrors] = useState({});
     const [activeModal, setActiveModal] = useState(null);
 
     useEffect(() => {
@@ -99,6 +99,7 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleClear = () => {
@@ -113,16 +114,21 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
             authUsername: '',
             authPassword: ''
         });
+        setErrors({});
     };
 
     const handleApply = async () => {
-        if (!formData.transactionType || (!formData.voucherNo && !formData.documentNo)) {
-            showErrorToast("Please provide transaction type and a reference number.");
-            return;
+        const newErrors = {};
+        if (!formData.transactionType) newErrors.transactionType = 'Transaction type is required';
+        if (!formData.voucherNo && !formData.documentNo) {
+            newErrors.voucherNo = 'Provide Voucher or Document No';
+            newErrors.documentNo = 'Provide Voucher or Document No';
         }
-        if (!formData.authPassword) {
-            showErrorToast("Authorization password is required.");
-            return;
+        if (!formData.authPassword) newErrors.authPassword = 'Password is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return showErrorToast('Please complete the required fields.');
         }
 
         try {
@@ -205,7 +211,7 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                                 handler(item);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.transactionType ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -216,20 +222,23 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.transactionType && <div className="text-[11px] text-red-500 mt-1">{errors.transactionType}</div>}
                             </div>
 
                             {/* Voucher No */}
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Voucher No</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Voucher No <span className="text-red-500">*</span></label>
                                 <input name="voucherNo" value={formData.voucherNo} onChange={handleInputChange} type="text"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    className={`w-full h-10 border ${errors.voucherNo ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.voucherNo && <div className="text-[11px] text-red-500 mt-1">{errors.voucherNo}</div>}
                             </div>
 
                             {/* Document No */}
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Document No.</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Document No. <span className="text-red-500">*</span></label>
                                 <input name="documentNo" value={formData.documentNo} onChange={handleInputChange} type="text"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    className={`w-full h-10 border ${errors.documentNo ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.documentNo && <div className="text-[11px] text-red-500 mt-1">{errors.documentNo}</div>}
                             </div>
 
                             {/* Cheque No */}
@@ -282,9 +291,10 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Password</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Password <span className="text-red-500">*</span></label>
                                 <input name="authPassword" type="password" value={formData.authPassword} onChange={handleInputChange}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    className={`w-full h-10 border ${errors.authPassword ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.authPassword && <div className="text-[11px] text-red-500 mt-1">{errors.authPassword}</div>}
                             </div>
                         </div>
                     </div>

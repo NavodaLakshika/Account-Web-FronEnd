@@ -30,6 +30,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
+    const [entryErrors, setEntryErrors] = useState({});
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]);
     const [newDocNo, setNewDocNo] = useState('');
@@ -99,6 +101,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const handleInput = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleEntryInput = (e) => {
@@ -125,13 +128,23 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             newEntry.amount = (q * p).toFixed(2);
         }
         setEntry(newEntry);
+        if (entryErrors[name]) setEntryErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const addProduct = () => {
-        if (!entry.prodCode) return showErrorToast('Select a Product.');
-        if (!entry.qty || parseFloat(entry.qty) <= 0) return showErrorToast('Enter valid Quantity.');
+        const newEntryErrors = {};
+        if (!entry.prodCode) newEntryErrors.prodCode = 'Select a Product';
+        if (!entry.qty || parseFloat(entry.qty) <= 0) newEntryErrors.qty = 'Enter valid QTY';
+        setEntryErrors(newEntryErrors);
+
+        if (Object.keys(newEntryErrors).length > 0) {
+            showErrorToast('Please fix product entry errors.');
+            return false;
+        }
+
         setProducts([...products, { ...entry }]);
         setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', purchasePrice: '', amount: '' });
+        return true;
     };
 
     const removeProduct = (idx) => {
@@ -159,6 +172,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             ...prev, vendorId: '', payType: '', remarks: '', reference: '', comment: '', taxPer: '0', nbtAmnt: 0
         }));
         generateDocNo(formData.company);
+        setErrors({});
+        setEntryErrors({});
     };
 
     const handleSearch = async () => {
@@ -200,8 +215,15 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.vendorId) return showErrorToast('Select User/Supplier.');
-        if (!formData.payType) return showErrorToast('Payment type has not been selected.');
+        const newErrors = {};
+        if (!formData.vendorId) newErrors.vendorId = 'Supplier required';
+        if (!formData.payType) newErrors.payType = 'Payment method required';
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast('Please provide required fields.');
+            return;
+        }
         if (products.length === 0) return showErrorToast('No products entered.');
         const payload = preparePayload();
         try {
@@ -213,8 +235,15 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApply = async () => {
-        if (!formData.vendorId) return showErrorToast('Select User/Supplier.');
-        if (!formData.payType) return showErrorToast('Payment type has not been selected.');
+        const newErrors = {};
+        if (!formData.vendorId) newErrors.vendorId = 'Supplier required';
+        if (!formData.payType) newErrors.payType = 'Payment method required';
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            showErrorToast('Please provide required fields.');
+            return;
+        }
         if (products.length === 0) return showErrorToast('No products entered.');
         setShowConfirmModal(true);
     };
@@ -236,10 +265,12 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
     const handleSelectSupplier = (code) => {
         setFormData(prev => ({ ...prev, vendorId: code }));
+        if (errors.vendorId) setErrors(prev => ({ ...prev, vendorId: null }));
     };
 
     const handleSelectProduct = (product) => {
-        setEntry({ ...entry, prodCode: product.code, prodName: product.name, unit: product.unit || '',
+        setEntry({
+            ...entry, prodCode: product.code, prodName: product.name, unit: product.unit || '',
             packSize: product.packSize || 1, purchasePrice: product.price?.toString() || '0',
             amount: (1 * (product.price || 0)).toFixed(2)
         });
@@ -400,22 +431,24 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier</label>
-                                <select value={formData.vendorId} onChange={e => handleSelectSupplier(e.target.value)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={dropdownStyle}>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier <span className="text-red-500">*</span></label>
+                                <select value={formData.vendorId} onChange={e => handleSelectSupplier(e.target.value)} className={`w-full h-10 border ${errors.vendorId ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate`} style={dropdownStyle}>
                                     <option value="">Select Supplier...</option>
                                     {lookups.suppliers.map(s => (
                                         <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
                                     ))}
                                 </select>
+                                {errors.vendorId && <div className="text-red-500 text-[11px] mt-1">{errors.vendorId}</div>}
                             </div>
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Method</label>
-                                <select value={formData.payType} onChange={e => setFormData(prev => ({ ...prev, payType: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={dropdownStyle}>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Method <span className="text-red-500">*</span></label>
+                                <select value={formData.payType} onChange={e => handleInput(e)} name="payType" className={`w-full h-10 border ${errors.payType ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate`} style={dropdownStyle}>
                                     <option value="">Select Payment Method...</option>
                                     {(lookups.paymentMethods || []).map(m => (
                                         <option key={m.code} value={m.code}>{m.code} - {m.name}</option>
                                     ))}
                                 </select>
+                                {errors.payType && <div className="text-red-500 text-[11px] mt-1">{errors.payType}</div>}
                             </div>
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Brief Remarks</label>
@@ -533,7 +566,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     <th className=" px-5 py-3">Reference ID</th>
                                     <th className=" px-5 py-3">Ledger Posting Date</th>
                                     <th className="text-right px-5 py-3">Interaction</th>
-                                <th className="text-right px-5 py-3">Action</th></tr>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {orders.length === 0 ? (
@@ -545,9 +578,9 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         <td className="text-right px-5 py-3">
                                             <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button>
                                         </td>
-                                    
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
+
+                                        <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>
@@ -565,7 +598,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input type="text" placeholder="Search Inventory.." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={productSearchQuery} onChange={async (e) => {
                                     const val = ev.target.value; setProductSearchQuery(val);
-                                    if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
+                                    if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) { } }
                                     else if (val.length === 0) { const init = await purchOrderService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
                                 }} autoFocus />
                             </div>
@@ -583,7 +616,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
                                         <tr key={p.code} onClick={() => {
-                                            setEntry(prev => ({ ...prev, prodCode: p.code, prodName: p.name, unit: p.unit || '',
+                                            setEntry(prev => ({
+                                                ...prev, prodCode: p.code, prodName: p.name, unit: p.unit || '',
                                                 packSize: p.packSize || 1, purchasePrice: parseFloat(p.price || 0).toFixed(2), qty: '', amount: '0.00'
                                             }));
                                             setShowProductQtyModal(true);
@@ -617,8 +651,9 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                             <input type="text" name="purchasePrice" value={entry.purchasePrice} onChange={handleEntryInput} className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-[3px] outline-none focus:border-blue-500 bg-white" />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Order Qty</label>
-                            <input type="text" name="qty" ref={qtyRef} value={entry.qty} onChange={handleEntryInput} onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }} className="w-full h-12 border border-blue-500 px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none bg-blue-50/20" autoFocus />
+                            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Order Qty <span className="text-red-500">*</span></label>
+                            <input type="text" name="qty" ref={qtyRef} value={entry.qty} onChange={handleEntryInput} onKeyDown={e => { if (e.key === 'Enter') { const success = addProduct(); if (success) { setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } } }} className={`w-full h-12 border ${entryErrors.qty ? 'border-red-500' : 'border-blue-500'} px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none ${entryErrors.qty ? 'bg-red-50' : 'bg-blue-50/20'}`} autoFocus />
+                            {entryErrors.qty && <div className="text-[11px] text-red-500 font-bold mt-0.5">{entryErrors.qty}</div>}
                         </div>
                     </div>
                     <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
@@ -629,7 +664,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 <span className="text-[26px] font-mono font-black text-slate-800 tracking-tight">{parseFloat(entry.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                             </div>
                         </div>
-                        <button onClick={() => { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); }} className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none shadow-sm">
+                        <button onClick={() => { const success = addProduct(); if (success) { setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }} className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none shadow-sm">
                             <Plus size={16} /> ADD TO LIST
                         </button>
                     </div>
@@ -655,29 +690,29 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Code</label>
-                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" />
+                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({ ...productMasterData, code: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Unit of Measure</label>
-                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
+                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({ ...productMasterData, unit: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
                         </div>
                     </div>
                     <div className="space-y-1">
                         <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Description</label>
-                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white uppercase shadow-sm font-bold" />
+                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({ ...productMasterData, name: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white uppercase shadow-sm font-bold" />
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Purchase Price</label>
-                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({ ...productMasterData, purchasePrice: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Selling Price</label>
-                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({ ...productMasterData, sellingPrice: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Pack Size</label>
-                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="1" />
+                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({ ...productMasterData, packSize: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="1" />
                         </div>
                     </div>
                     <div className="bg-blue-50/50 p-3.5 rounded-[3px] border border-blue-100/50 flex items-start gap-3">

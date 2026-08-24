@@ -28,6 +28,8 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [rows, setRows] = useState([]);
     const [entry, setEntry] = useState({ prodCode: '', prodName: '', qty: '', sellingPrice: '', amount: '0.00' });
+    const [errors, setErrors] = useState({});
+    const [entryErrors, setEntryErrors] = useState({});
 
     const [lookups, setLookups] = useState({ customers: [], products: [] });
     const [existingDocs, setExistingDocs] = useState([]);
@@ -98,6 +100,8 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
             subject: '',
             comment: ''
         }));
+        setErrors({});
+        setEntryErrors({});
         loadInitialData();
     };
 
@@ -183,9 +187,20 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
 
 
     const handleSaveLine = async () => {
-        if (!formData.customerId) return showErrorToast("Please select a customer first.");
-        if (!entry.prodCode) return showErrorToast("Please select a product.");
-        if (!entry.qty || parseFloat(entry.qty) <= 0) return showErrorToast("Enter a valid quantity.");
+        const newEntryErrors = {};
+        if (!entry.prodCode) newEntryErrors.prodCode = 'Product required';
+        if (!entry.qty || parseFloat(entry.qty) <= 0) newEntryErrors.qty = 'Invalid quantity';
+
+        if (Object.keys(newEntryErrors).length > 0) {
+            setEntryErrors(newEntryErrors);
+            return showErrorToast("Please enter valid item details.");
+        }
+
+        if (!formData.customerId) {
+            setErrors({ customerId: 'Customer required' });
+            setShowQtyModal(false);
+            return showErrorToast("Please select a customer first.");
+        }
 
         try {
             const payload = {
@@ -239,7 +254,10 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSaveDraft = async () => {
-        if (!formData.customerId) return showErrorToast("Please select a customer first.");
+        if (!formData.customerId) {
+            setErrors({ customerId: 'Customer required' });
+            return showErrorToast("Please select a customer first.");
+        }
 
         setIsSaving(true);
         try {
@@ -388,7 +406,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div> */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer <span className="text-red-500">*</span></label>
                                 <select
                                     value={formData.customerId || ""}
                                     onChange={(e) => {
@@ -398,8 +416,9 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                             customerId: sel?.code || '',
                                             customerName: sel?.name || ''
                                         }));
+                                        if (errors.customerId) setErrors(prev => ({ ...prev, customerId: null }));
                                     }}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer"
+                                    className={`w-full h-10 border ${errors.customerId ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer`}
                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                 >
                                     <option value="">Select customer...</option>
@@ -409,6 +428,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                         </option>
                                     ))}
                                 </select>
+                                {errors.customerId && <div className="text-[11px] text-red-500 mt-1">{errors.customerId}</div>}
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Subject</label>
@@ -589,6 +609,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                                 qty: '',
                                                 amount: '0.00'
                                             });
+                                            setEntryErrors({});
                                             setShowQtyModal(true);
                                         }}>
                                             <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
@@ -634,7 +655,9 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                 <input type="number" ref={qtyRef} value={entry.qty} onChange={(e) => {
                                     const q = e.target.value;
                                     setEntry(prev => ({ ...prev, qty: q, amount: (parseFloat(q || 0) * parseFloat(prev.sellingPrice || 0)).toFixed(2) }));
-                                }} onKeyDown={e => { if (e.key === 'Enter') handleSaveLine(); }} className="w-full h-12 border border-[#0285fd] px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none bg-blue-50/20 focus:ring-1 focus:ring-[#0285fd] transition-all shadow-inner" autoFocus />
+                                    if (entryErrors.qty) setEntryErrors(prev => ({ ...prev, qty: null }));
+                                }} onKeyDown={e => { if (e.key === 'Enter') handleSaveLine(); }} className={`w-full h-12 border ${entryErrors.qty ? 'border-red-500 bg-red-50' : 'border-[#0285fd] bg-blue-50/20'} px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none focus:ring-1 focus:ring-[#0285fd] transition-all shadow-inner`} autoFocus />
+                                {entryErrors.qty && <div className="text-[11px] text-red-500 mt-1 text-center">{entryErrors.qty}</div>}
                             </div>
                         </div>
 
