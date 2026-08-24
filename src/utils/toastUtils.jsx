@@ -15,8 +15,8 @@ const ToastLayout = ({
 }) => {
     return createPortal(
         <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans'] ${t.visible ? 'pointer-events-auto animate-in fade-in' : 'pointer-events-none animate-out fade-out'} duration-200`}>
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => toast.remove(t.id)} />
-            
+            <div className="absolute inset-0 bg-slate-900/20 transition-opacity" onClick={() => toast.remove(t.id)} />
+
             <div className={`relative w-[600px] bg-white shadow-[0_10px_40px_rgb(0,0,0,0.3)] overflow-hidden ${t.visible ? 'animate-in fade-in zoom-in-95' : 'animate-out fade-out zoom-out-95'} duration-200 rounded-[3px]`}>
                 {/* Colored Area */}
                 <div className={`relative ${bgClass} overflow-hidden w-full flex flex-col py-6`}>
@@ -30,7 +30,7 @@ const ToastLayout = ({
                         <div className="pb-2 border-b border-black/10 flex justify-between items-center">
                             <h3 className="text-[15px] font-mono font-bold text-white uppercase tracking-widest">{title}</h3>
                         </div>
-                        
+
                         {/* Content */}
                         <div className="pt-3 pb-2">
                             {subtitle && (
@@ -45,7 +45,7 @@ const ToastLayout = ({
                 {/* White Footer Area */}
                 <div className="bg-white py-3 w-full flex relative z-10">
                     <div className="max-w-7xl mx-auto w-full px-6 flex justify-end gap-3">
-                        <button 
+                        <button
                             onClick={() => {
                                 if (options.onCancel) options.onCancel();
                                 toast.remove(t.id);
@@ -54,7 +54,7 @@ const ToastLayout = ({
                         >
                             Cancel
                         </button>
-                        <button 
+                        <button
                             onClick={() => {
                                 if (options.onConfirm) options.onConfirm();
                                 toast.remove(t.id);
@@ -93,7 +93,7 @@ export const showSuccessToast = (message, subMessageOrOptions) => {
                 hugeIcon={(
                     <>
                         <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
-                             <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
+                            <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
                         <Check size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
                     </>
@@ -128,10 +128,10 @@ export const showErrorToast = (message, subMessageOrOptions) => {
                 hugeIcon={(
                     <>
                         <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
-                             <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
+                            <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
                         <svg width="120" height="120" viewBox="0 0 100 100" className="fill-black opacity-[0.08] absolute right-[40px]">
-                             <path d="M20,5 L50,35 L80,5 L95,20 L65,50 L95,80 L80,95 L50,65 L20,95 L5,80 L35,50 L5,20 Z" />
+                            <path d="M20,5 L50,35 L80,5 L95,20 L65,50 L95,80 L80,95 L50,65 L20,95 L5,80 L35,50 L5,20 Z" />
                         </svg>
                     </>
                 )}
@@ -165,7 +165,7 @@ export const showInfoToast = (message, subMessageOrOptions) => {
                 hugeIcon={(
                     <>
                         <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
-                             <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
+                            <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
                         <Info size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
                     </>
@@ -200,7 +200,7 @@ export const showPendingToast = (message, subMessageOrOptions) => {
                 hugeIcon={(
                     <>
                         <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
-                             <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
+                            <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
                         <Clock size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
                     </>
@@ -235,7 +235,7 @@ export const showPermissionDeniedToast = (message, subMessageOrOptions) => {
                 hugeIcon={(
                     <>
                         <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
-                             <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
+                            <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
                         <Lock size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
                     </>
