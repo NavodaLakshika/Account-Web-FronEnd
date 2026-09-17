@@ -81,6 +81,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setHeader(getInitialHeader());
             const { companyCode: comp, userName } = getSessionData();
             setCompanyCode(comp);
@@ -168,6 +169,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             handleReset();
         }
     }, [isOpen, companyCode]);

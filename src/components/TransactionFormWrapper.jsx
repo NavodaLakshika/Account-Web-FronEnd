@@ -131,11 +131,25 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
           }
         `}</style>
       )}
-      {formSettings?.borderStyle && formSettings.borderStyle !== 'Default' && (
+      {formSettings.borderStyle && formSettings.borderStyle !== 'Default' && (
         <style>{`
             ${formSettings.borderStyle === 'Sharp' ? '* { border-radius: 0px !important; }' : ''}
             ${formSettings.borderStyle === 'Round' ? 'button, input, select, textarea, [class~="rounded"], [class*="rounded-"] { border-radius: 10px !important; }' : ''}
             ${formSettings.borderStyle === 'Pill' ? 'button, input, select, textarea { border-radius: 9999px !important; }' : ''}
+        `}</style>
+      )}
+      {formSettings.darkMode && (
+        <style>{`
+            /* Force all text to black so the invert(0.92) filter perfectly renders it as crisp white */
+            span, p, h1, h2, h3, h4, h5, h6, label, input, button, select, textarea, table th, table td, a, strong, b, i, em {
+                color: #000000 !important;
+            }
+            .text-white, .text-gray-500, .text-gray-700, .text-slate-800 {
+                color: #000000 !important;
+            }
+            ::placeholder {
+                color: #555555 !important;
+            }
         `}</style>
       )}
       <div

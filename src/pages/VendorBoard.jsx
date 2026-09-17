@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
+import { Search, RotateCcw, Save, Trash2, Loader2, X, Plus } from 'lucide-react';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import { supplierService } from '../services/supplier.service';
+import VendorTypesMasterBoard from './VendorTypesMasterBoard';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -42,6 +43,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [showVendorTypeModal, setShowVendorTypeModal] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -63,6 +65,16 @@ const VendorBoard = ({ isOpen, onClose }) => {
                 supplierService.getVendorTypes()
             ]);
             setBanks(banksData);
+            setVendorTypes(typesData);
+        } catch (error) {
+            console.error('Lookup fetch error:', error);
+        }
+    };
+
+    const handleVendorTypeModalClose = async () => {
+        setShowVendorTypeModal(false);
+        try {
+            const typesData = await supplierService.getVendorTypes();
             setVendorTypes(typesData);
         } catch (error) {
             console.error('Lookup fetch error:', error);
@@ -310,16 +322,34 @@ const VendorBoard = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        <FormRow label="Vender Type">
-                            <select 
-                                name="Vend_Typ" 
-                                value={formData.Vend_Typ} 
-                                onChange={handleInputChange}
-                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer shadow-sm"
-                            >
-                                <option value="">Select Type</option>
-                                {vendorTypes.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
+                        <FormRow label="Vendor Type">
+                            <div className="flex gap-2">
+                                <select 
+                                    name="Vend_Typ" 
+                                    value={formData.Vend_Typ} 
+                                    onChange={handleInputChange}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer shadow-sm uppercase"
+                                >
+                                    <option value="">Select Type</option>
+                                    {vendorTypes.map((t, idx) => {
+                                        const name = typeof t === 'object' ? (t.vendorTypes || t.VendorTypes || t.vend_Typ || t.Vend_Typ || '') : t;
+                                        const id = typeof t === 'object' ? (t.id || t.ID || '') : '';
+                                        return (
+                                            <option key={id || idx} value={name}>
+                                                {id ? `${id} - ${name}` : name}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowVendorTypeModal(true)}
+                                    className="h-10 w-10 flex-shrink-0 bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-[3px] flex items-center justify-center transition-colors shadow-sm"
+                                    title="Create Vendor Type"
+                                >
+                                    <Plus size={18} />
+                                </button>
+                            </div>
                         </FormRow>
 
                         <FormRow label="Bank Detail">
@@ -442,6 +472,11 @@ const VendorBoard = ({ isOpen, onClose }) => {
                 loading={isDeleting}
                 confirmText="Delete"
                 variant="danger"
+            />
+
+            <VendorTypesMasterBoard
+                isOpen={showVendorTypeModal}
+                onClose={handleVendorTypeModalClose}
             />
         </>
     );

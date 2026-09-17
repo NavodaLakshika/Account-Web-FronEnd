@@ -152,8 +152,7 @@ import ChartOfAccountantModal from '../components/modals/ChartOfAccountsModels/C
 import FixedAssetsBoard from './FixedAssetsProfileBoard';
 import LongTermLiabilityBoard from './LongTermLiabilityProfileBoard';
 import DepreciationBoard from './DepreciationRateBoard';
-import FixedIncomeBoard from './FixedIncomeEntryBoard';
-import FixedExpensesBoard from './FixedExpensesEntryBoard';
+import FixedTransactionEntryBoard from './FixedTransactionEntryBoard';
 
 
 // View and Utility Boards
@@ -503,8 +502,7 @@ const Dashboard = () => {
     const [showFixedAssetsBoard, setShowFixedAssetsBoard] = useState(false);
     const [showLiabilityBoard, setShowLiabilityBoard] = useState(false);
     const [showDepreciationBoard, setShowDepreciationBoard] = useState(false);
-    const [showFixedIncomeBoard, setShowFixedIncomeBoard] = useState(false);
-    const [showFixedExpensesBoard, setShowFixedExpensesBoard] = useState(false);
+    const [showFixedTransactionsBoard, setShowFixedTransactionsBoard] = useState(false);
     const [showCustomerModal, setShowCustomerModal] = useState(false);
     const [showVendorModal, setShowVendorModal] = useState(false);
     const [showEnterBillModal, setShowEnterBillModal] = useState(false);
@@ -949,7 +947,7 @@ const Dashboard = () => {
                     try {
                         const roleId = currentUser?.UserRoleId || currentUser?.userRoleId || currentUser?.role || currentUser?.Role || currentUser?.userrole_id;
                         if (roleId) {
-                            const permRes = await api.get(`/UserRole/functions?userRoleId=${roleId}&company=${companyCode}`);
+                            const permRes = await api.get(`/UserRole/functions?userRoleId=${roleId}&company=${companyCode}&empCode=${empCode}`);
                             setDeniedFunctions(permRes.data?.deniedFunctions || []);
                         }
                     } catch (e) {
@@ -1435,7 +1433,6 @@ const Dashboard = () => {
                 group: 'Finance & Accounting',
                 items: [
                     { label: 'Chart of Accounts', onClick: () => setShowChartOfAccountantModal(true), lockId: 'master_chartOfAccount', perm: 'MST_CHART_OF_ACCOUNT' },
-                    { label: 'Card Sale Commission', onClick: () => setShowCardCommissionBoard(true), lockId: 'master_cardSale' },
                 ]
             },
             {
@@ -2140,18 +2137,17 @@ const Dashboard = () => {
             <ChartOfAccountantModal
                 isOpen={showChartOfAccountantModal}
                 onClose={() => setShowChartOfAccountantModal(false)}
+                deniedFunctions={deniedFunctions}
                 onCreateNewAccount={() => { setShowChartOfAccountantModal(false); setShowNewAccountModal(true); }}
                 onOpenFixedAssets={() => { setShowChartOfAccountantModal(false); setShowFixedAssetsBoard(true); }}
                 onOpenLiability={() => { setShowChartOfAccountantModal(false); setShowLiabilityBoard(true); }}
                 onOpenDepreciation={() => { setShowChartOfAccountantModal(false); setShowDepreciationBoard(true); }}
-                onOpenFixedIncome={() => { setShowChartOfAccountantModal(false); setShowFixedIncomeBoard(true); }}
-                onOpenFixedExpenses={() => { setShowChartOfAccountantModal(false); setShowFixedExpensesBoard(true); }}
+                onOpenFixedTransactions={() => { setShowChartOfAccountantModal(false); setShowFixedTransactionsBoard(true); }}
             />
             {showFixedAssetsBoard && <FixedAssetsBoard isOpen={showFixedAssetsBoard} onClose={() => setShowFixedAssetsBoard(false)} />}
             {showLiabilityBoard && <LongTermLiabilityBoard isOpen={showLiabilityBoard} onClose={() => setShowLiabilityBoard(false)} />}
             {showDepreciationBoard && <DepreciationBoard isOpen={showDepreciationBoard} onClose={() => setShowDepreciationBoard(false)} />}
-            {showFixedIncomeBoard && <FixedIncomeBoard isOpen={showFixedIncomeBoard} onClose={() => setShowFixedIncomeBoard(false)} />}
-            {showFixedExpensesBoard && <FixedExpensesBoard isOpen={showFixedExpensesBoard} onClose={() => setShowFixedExpensesBoard(false)} />}
+            {showFixedTransactionsBoard && <FixedTransactionEntryBoard isOpen={showFixedTransactionsBoard} onClose={() => setShowFixedTransactionsBoard(false)} />}
 
             <CalculatorBoard isOpen={showCalculatorModal} onClose={() => setShowCalculatorModal(false)} />
 
@@ -2875,9 +2871,9 @@ const Dashboard = () => {
                             </span>
                             <div style={{ width: '1px', height: '16px', background: '#eceef1' }} />
                             <span style={{
-                                fontSize: '10px', fontWeight: 700, color: '#0078d4',
-                                background: '#eff6ff', border: '1px solid #bfdbfe',
-                                borderRadius: '20px', padding: '1px 8px', letterSpacing: '0.04em',
+                                fontSize: '10px', fontWeight: 900, color: '#dc2626',
+                                background: 'transparent', border: 'none',
+                                padding: '1px 8px', letterSpacing: '0.04em',
                             }}>
                                 v{appVersion}
                             </span>
@@ -2909,9 +2905,9 @@ const Dashboard = () => {
                             </span>
                             <div style={{ width: '1px', height: '12px', background: '#eceef1' }} />
                             <span style={{
-                                fontSize: '10px', fontWeight: 700, color: '#16a34a',
-                                background: '#f0fdf4', border: '1px solid #bbf7d0',
-                                borderRadius: '20px', padding: '1px 8px', letterSpacing: '0.04em',
+                                fontSize: '10px', fontWeight: 900, color: '#dc2626',
+                                background: 'transparent', border: 'none',
+                                padding: '1px 8px', letterSpacing: '0.04em',
                             }}>
                                 ENTERPRISE
                             </span>

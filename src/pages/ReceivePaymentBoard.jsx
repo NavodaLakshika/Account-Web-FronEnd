@@ -55,6 +55,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             const { companyCode: initCompany, userName: initUser } = getSessionData();
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));

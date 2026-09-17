@@ -36,16 +36,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             handleClear();
             const user = authService.getCurrentUser();
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
-            if (companyData) {
-                try {
-                    const p = JSON.parse(companyData);
-                    companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData;
-                } catch (e) {
-                    companyCode = companyData;
-                }
-            }
+            const { companyCode } = getSessionData();
             if (user) {
                 setFormData(prev => ({ ...prev, CurrentUser: user.empName || user.username || 'SYSTEM', Company: companyCode }));
             }
@@ -91,14 +82,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
     const handleClear = () => {
         const user = authService.getCurrentUser();
-        const companyData = sessionStorage.getItem('selectedCompany');
-        let companyCode = 'C001';
-        if (companyData) {
-            try {
-                const p = JSON.parse(companyData);
-                companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData;
-            } catch (e) { }
-        }
+        const { companyCode } = getSessionData();
         setFormData({ ...initialState, CurrentUser: user?.empName || user?.username || 'SYSTEM', Company: companyCode });
         setIsEditMode(false);
     };

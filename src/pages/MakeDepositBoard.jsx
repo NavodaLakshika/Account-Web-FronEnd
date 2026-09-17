@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, CheckCircle, RotateCcw, Save , FileText} from 'lucide-react';
+import { Search, Calendar, CheckCircle, RotateCcw, Save, FileText } from 'lucide-react';
 import { makeDepositService } from '../services/makeDeposit.service';
 import CalendarModal from '../components/CalendarModal';
 import { getSessionData } from '../utils/session';
@@ -27,11 +27,13 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
     const [funds, setFunds] = useState([]);
     const [selectedDocNos, setSelectedDocNos] = useState(new Set());
     const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState({});
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('dateFrom');
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             const { companyCode: comp, userName: user } = getSessionData();
             loadInitialData(comp);
@@ -86,6 +88,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
             newSet.delete(docNo);
         } else {
             newSet.add(docNo);
+            if (errors.grid) setErrors(prev => ({ ...prev, grid: null }));
         }
         setSelectedDocNos(newSet);
     };
@@ -95,6 +98,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
             setSelectedDocNos(new Set());
         } else {
             setSelectedDocNos(new Set(funds.map(f => f.documentNo || f.docNo)));
+            if (errors.grid) setErrors(prev => ({ ...prev, grid: null }));
         }
     };
 
@@ -109,10 +113,12 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
             dateFrom: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
             dateTo: new Date().toISOString().split('T')[0],
         }));
+        setErrors({});
     };
 
     const handleDone = async () => {
         if (selectedDocNos.size === 0) {
+            setErrors({ grid: true });
             showErrorToast('Please select at least one document to deposit.');
             return;
         }
@@ -135,6 +141,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
 
     const handleSaveDraft = async () => {
         if (selectedDocNos.size === 0) {
+            setErrors({ grid: true });
             showErrorToast('Please select at least one document to deposit.');
             return;
         }
@@ -203,7 +210,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
             <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
                 <div className="bg-white p-4 border border-gray-200 rounded-[3px] shadow-sm space-y-4">
                     <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                        
+
                         <div className="col-span-4">
                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
                             <input type="text" name="costCenter" value={formData.costCenter} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Optional" />
@@ -270,7 +277,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                <div className="border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[350px] overflow-hidden">
+                <div className={`border ${errors.grid ? 'border-red-500 border-2' : 'border-gray-200'} rounded-[3px] bg-white shadow-sm flex flex-col min-h-[350px] overflow-hidden`}>
                     <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
                         <div className="w-12 py-2.5 px-3 border-r border-gray-200 text-center flex justify-center">
                             <input type="checkbox" checked={funds.length > 0 && selectedDocNos.size === funds.length} onChange={toggleAll} className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />

@@ -44,7 +44,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             const companyData = sessionStorage.getItem('selectedCompany');
             const user = JSON.parse(sessionStorage.getItem('user'));
-            let companyCode = 'C001';
+            let companyCode = '';
             
             if (companyData) {
                 try {
@@ -67,28 +67,35 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
     const fetchLookups = async () => {
         try {
             const data = await fixedAssetService.getLookups();
-            const formatted = [];
-            let lastCode = "";
-            data.forEach(item => {
-                if (item.sub_Code !== lastCode) {
-                    formatted.push({ 
-                        code: item.sub_Code, 
-                        name: item.sub_Acc_Name, 
-                        isMain: true 
-                    });
-                    lastCode = item.sub_Code;
+            const accountMap = new Map();
+
+            // Filter lookup data from database to strictly include only 15000 series (Fixed Assets)
+            (data || []).forEach(item => {
+                const subCode = item.sub_Code ? String(item.sub_Code).trim() : '';
+                const subName = item.sub_Acc_Name ? item.sub_Acc_Name.trim() : '';
+                const custCode = item.sub_Cust_Acc_Code ? String(item.sub_Cust_Acc_Code).trim() : '';
+                const custName = item.sub_Cust_Acc_Name ? item.sub_Cust_Acc_Name.trim() : '';
+
+                if (subCode.startsWith('15') && subName) {
+                    accountMap.set(subCode, { code: subCode, name: subName });
                 }
-                if (item.sub_Cust_Acc_Code) {
-                    formatted.push({ 
-                        code: item.sub_Cust_Acc_Code, 
-                        name: `      ${item.sub_Cust_Acc_Name}`, 
-                        isMain: false 
-                    });
+
+                if (custCode.startsWith('15') && custName) {
+                    accountMap.set(custCode, { code: custCode, name: custName });
                 }
             });
-            setAccounts(formatted);
+
+            const sorted = Array.from(accountMap.values()).sort((a, b) => {
+                const numA = parseInt(a.code, 10);
+                const numB = parseInt(b.code, 10);
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return a.code.localeCompare(b.code);
+            });
+
+            setAccounts(sorted);
         } catch (error) {
             console.error('Lookup fetch error:', error);
+            setAccounts([]);
         }
     };
 

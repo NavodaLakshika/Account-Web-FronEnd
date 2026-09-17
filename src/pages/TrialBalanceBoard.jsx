@@ -262,7 +262,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                                 </div>
                             </div>
 
-                            <div className="col-span-2 flex items-end gap-4">
+                            <div className="col-span-2 flex items-end gap-3">
                                 <div
                                     className="flex items-center gap-2 cursor-pointer group"
                                     onClick={() => {
@@ -285,8 +285,8 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                                 >
                                     <div
                                         className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all cursor-pointer ${formData.costCenter === "all"
-                                                ? "bg-[#0285fd] border-[#0285fd]"
-                                                : "border-gray-300 bg-white"
+                                            ? "bg-[#0285fd] border-[#0285fd]"
+                                            : "border-gray-300 bg-white"
                                             }`}
                                     >
                                         {formData.costCenter === "all" && (
@@ -301,7 +301,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                                 <button
                                     onClick={runReport}
                                     disabled={loading}
-                                    className="h-10 px-6 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
+                                    className="h-10 w-[105px] bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 shrink-0"
                                 >
                                     {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
                                     {loading ? 'RUNNING' : 'RUN'}

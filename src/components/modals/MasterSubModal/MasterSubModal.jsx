@@ -9,8 +9,7 @@ import ChartOfAccountantModal from '../ChartOfAccountsModels/ChartOfAccountantMo
 import FixedAssetsBoard from '../ChartOfAccountsModels/FixedAssetsBoard';
 import LongTermLiabilityBoard from '../ChartOfAccountsModels/LongTermLiabilityBoard';
 import DepreciationBoard from '../ChartOfAccountsModels/DepreciationBoard';
-import FixedIncomeBoard from '../ChartOfAccountsModels/FixedIncomeBoard';
-import FixedExpensesBoard from '../ChartOfAccountsModels/FixedExpensesBoard';
+import FixedTransactionBoard from '../ChartOfAccountsModels/FixedTransactionBoard';
 import NewAccountBoard from '../../../pages/NewAccountBoard';
 
 import CompanyBoard from './CompanyBoard';
@@ -61,7 +60,6 @@ const menuGroups = [
         title: 'Finance & Accounting',
         items: [
             { icon: PieChart, label: 'Chart of Accountant', id: 'master_chartOfAccount', desc: 'Full chart of accounts management', board: 'chartOfAccount' },
-            { icon: CreditCard, label: 'Card Sale Commission', id: 'master_cardSale', desc: 'Commission rate configuration', board: 'cardSale' },
         ]
     },
     {
@@ -93,8 +91,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
     const [showFixedAssetsBoard, setShowFixedAssetsBoard] = useState(false);
     const [showLiabilityBoard, setShowLiabilityBoard] = useState(false);
     const [showDepreciationBoard, setShowDepreciationBoard] = useState(false);
-    const [showFixedIncomeBoard, setShowFixedIncomeBoard] = useState(false);
-    const [showFixedExpensesBoard, setShowFixedExpensesBoard] = useState(false);
+    const [showFixedTransactionsBoard, setShowFixedTransactionsBoard] = useState(false);
     const [showUserProfileBoard, setShowUserProfileBoard] = useState(false);
     const [showVendorTypesBoard, setShowVendorTypesBoard] = useState(false);
     const [showChangePasswordBoard, setShowChangePasswordBoard] = useState(false);
@@ -269,8 +266,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                     onOpenFixedAssets={() => { setShowChartOfAccountantModal(false); setShowFixedAssetsBoard(true); }}
                     onOpenLiability={() => { setShowChartOfAccountantModal(false); setShowLiabilityBoard(true); }}
                     onOpenDepreciation={() => { setShowChartOfAccountantModal(false); setShowDepreciationBoard(true); }}
-                    onOpenFixedIncome={() => { setShowChartOfAccountantModal(false); setShowFixedIncomeBoard(true); }}
-                    onOpenFixedExpenses={() => { setShowChartOfAccountantModal(false); setShowFixedExpensesBoard(true); }}
+                    onOpenFixedTransactions={() => { setShowChartOfAccountantModal(false); setShowFixedTransactionsBoard(true); }}
                 />
             )}
 
@@ -278,8 +274,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
             {showFixedAssetsBoard && <FixedAssetsBoard isOpen={showFixedAssetsBoard} onClose={() => setShowFixedAssetsBoard(false)} />}
             {showLiabilityBoard && <LongTermLiabilityBoard isOpen={showLiabilityBoard} onClose={() => setShowLiabilityBoard(false)} />}
             {showDepreciationBoard && <DepreciationBoard isOpen={showDepreciationBoard} onClose={() => setShowDepreciationBoard(false)} />}
-            {showFixedIncomeBoard && <FixedIncomeBoard isOpen={showFixedIncomeBoard} onClose={() => setShowFixedIncomeBoard(false)} />}
-            {showFixedExpensesBoard && <FixedExpensesBoard isOpen={showFixedExpensesBoard} onClose={() => setShowFixedExpensesBoard(false)} />}
+            {showFixedTransactionsBoard && <FixedTransactionBoard isOpen={showFixedTransactionsBoard} onClose={() => setShowFixedTransactionsBoard(false)} />}
 
             <ThankYouModal isOpen={showThankYouModal} onClose={() => { setShowThankYouModal(false); onClose(); }} />
             <LogoutConfirmModal isOpen={showLogoutConfirmModal} onClose={() => setShowLogoutConfirmModal(false)} onConfirm={() => { setShowLogoutConfirmModal(false); setShowThankYouModal(true); }} />

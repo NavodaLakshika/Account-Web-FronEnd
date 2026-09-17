@@ -80,7 +80,9 @@ const JournalEntryEditorBoard = ({ isOpen, onClose }) => {
     const totalCredit = rows.reduce((sum, row) => sum + (parseFloat(row.credit) || 0), 0);
 
     useEffect(() => {
-        if (isOpen) { fetchLookups(); }
+        if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
+            if (typeof setEntryErrors === "function") setEntryErrors({}); fetchLookups(); }
     }, [isOpen]);
 
     const fetchLookups = async () => {

@@ -4,7 +4,7 @@ import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import ColumnSelectionModal from '../components/modals/ColumnSelectionModal';
 import { Search, FileUp, FileDown, Trash2, RotateCcw, FileText, CheckCircle, Loader2, Save } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { grnService } from '../services/grn.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -30,6 +30,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormDataTemplate(getInitialFormDataTemplate());
             const { companyCode: initCompany, userName: initUser } = getSessionData();
             setFormDataTemplate(prev => ({ ...prev, company: initCompany, createUser: initUser }));
@@ -46,14 +47,32 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const handleTemplateDownload = (selectedColumns) => {
+    const handleTemplateDownload = async (selectedColumns) => {
         try {
+            const dynamicSampleData = await grnService.getTemplateSuggestions();
+            
+            const suggestionRow = {};
+            selectedColumns.forEach(col => {
+                suggestionRow[col] = dynamicSampleData[col] ? `e.g. ${dynamicSampleData[col]}` : '';
+            });
             const row = {};
             selectedColumns.forEach(col => row[col] = '');
-            const template = [row];
+            const template = [suggestionRow, row];
             const ws = XLSX.utils.json_to_sheet(template);
+
+            // Add styles to the suggestion row
+            selectedColumns.forEach((col, index) => {
+                const cellRef = XLSX.utils.encode_cell({ r: 1, c: index }); // row 1 (0 is header)
+                if (ws[cellRef] && ws[cellRef].v) {
+                    ws[cellRef].s = {
+                        font: { sz: 9, color: { rgb: "FF999999" }, italic: true }
+                    };
+                }
+            });
+
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Bulk_GRN_Template");
+
             XLSX.writeFile(wb, "Bulk_GRN_Template.xlsx");
             showSuccessToast("Bulk Template Downloaded!");
         } catch (error) {
@@ -72,7 +91,13 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                 const wb = XLSX.read(bstr, { type: 'binary' });
                 const wsname = wb.SheetNames[0];
                 const ws = wb.Sheets[wsname];
-                const data = XLSX.utils.sheet_to_json(ws);
+                let data = XLSX.utils.sheet_to_json(ws);
+                
+                // Filter out the suggestion row if it's still there
+                data = data.filter(r => {
+                    const sc = (r['Supplier Code'] || r['Supplier'] || r['Product Code'] || r['prodCode'] || '').toString().trim();
+                    return !sc.startsWith('e.g.');
+                });
 
                 if (data.length === 0) return showErrorToast("Excel file is empty.");
 

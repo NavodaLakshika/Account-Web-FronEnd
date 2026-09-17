@@ -138,6 +138,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setHeader(getInitialHeader());
             const { companyCode: sessCompany, userName: sessUser } = getSessionData();
             setCompanyCode(sessCompany);

@@ -1,7 +1,7 @@
 import api from './api';
 
 export const mainCashService = {
-    getLookups: async (companyCode = 'C001') => {
+    getLookups: async (companyCode = '') => {
         try {
             const resp = await api.get(`maincash/lookups?companyCode=${companyCode}`); 
             return resp.data;
@@ -11,7 +11,7 @@ export const mainCashService = {
         }
     },
 
-    generateDocNo: async (companyCode = 'C001') => {
+    generateDocNo: async (companyCode = '') => {
         try {
             const resp = await api.get(`maincash/gen-docno?companyCode=${companyCode}`);
             return resp.data;

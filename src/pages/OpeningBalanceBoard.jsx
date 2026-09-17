@@ -82,6 +82,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     const [activeModal, setActiveModal] = useState(null);
     const [showDateModal, setShowDateModal] = useState(false);
@@ -91,6 +92,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
             setFormData(prev => ({
@@ -142,11 +144,17 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
             isDebit: false,
             currentBalance: 0
         });
+        setErrors({});
         loadInitialData();
     };
 
     const handleSave = async () => {
-        if (!formData.entityId || !formData.accountCode) {
+        const newErrors = {};
+        if (activeTab !== 'Account' && !formData.entityId) newErrors.entityId = `${activeTab} is required`;
+        if (!formData.accountCode) newErrors.accountCode = 'Account is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             showErrorToast(`Please select a ${activeTab} and an account.`);
             return;
         }
@@ -248,7 +256,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Account */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab === 'Vendor' ? 'A/P Account' : activeTab === 'Customer' ? 'A/R Account' : 'G/L Account'}</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab === 'Vendor' ? 'A/P Account' : activeTab === 'Customer' ? 'A/R Account' : 'G/L Account'} *</label>
                                 <div className="relative">
                                     <select
                                         value={formData.accountCode || ''}
@@ -256,11 +264,14 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                             const val = ev.target.value;
                                             const item = (getAccountItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
-                                                const handler = (item) => { setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name })); };
+                                                const handler = (item) => {
+                                                    setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name }));
+                                                    if (errors.accountCode) setErrors(prev => ({ ...prev, accountCode: null }));
+                                                };
                                                 handler(item);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.accountCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -271,6 +282,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.accountCode && <div className="text-[11px] text-red-500 mt-1">{errors.accountCode}</div>}
                             </div>
 
                             {/* Cost Center */}
@@ -303,29 +315,33 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                             {/* Entity Select */}
                             {activeTab !== 'Account' && (
                                 <div className="col-span-8">
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab}</label>
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab} *</label>
                                     <div className="relative">
                                         <select
-                                        value={formData.entityName}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const item = (getEntityItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
-                                            if (item) {
-                                                const handler = (item) => { setFormData(prev => ({ ...prev, entityId: item.code, entityName: item.name, address: item.address || '' })); };
-                                                handler(item);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(getEntityItems() || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
-                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                            value={formData.entityName}
+                                            onChange={(ev) => {
+                                                const val = ev.target.value;
+                                                const item = (getEntityItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                                if (item) {
+                                                    const handler = (item) => {
+                                                        setFormData(prev => ({ ...prev, entityId: item.code, entityName: item.name, address: item.address || '' }));
+                                                        if (errors.entityId) setErrors(prev => ({ ...prev, entityId: null }));
+                                                    };
+                                                    handler(item);
+                                                }
+                                            }}
+                                            className={`w-full h-10 border ${errors.entityId ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select...</option>
+                                            {(getEntityItems() || []).map((item, idx) => (
+                                                <option key={idx} value={item.code || item.name || item}>
+                                                    {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
+                                    {errors.entityId && <div className="text-[11px] text-red-500 mt-1">{errors.entityId}</div>}
                                 </div>
                             )}
 

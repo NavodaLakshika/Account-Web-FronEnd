@@ -59,8 +59,10 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholde
 
 const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [entryErrors, setEntryErrors] = useState({});
     const [lookups, setLookups] = useState({ banks: [] });
-    
+
     const getInitialHeader = () => ({
         bankCode: '',
         bankName: '',
@@ -87,6 +89,8 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
+            if (typeof setEntryErrors === "function") setEntryErrors({});
             setHeader(getInitialHeader());
             const { companyCode, userName } = getSessionData();
 
@@ -95,7 +99,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                 company: companyCode,
                 createUser: userName
             }));
-            
+
             loadInitialData(companyCode);
         }
     }, [isOpen]);
@@ -118,7 +122,12 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
     };
 
     const handleAddItem = () => {
-        if (!entry.chequeNo || entry.amount <= 0) {
+        const newEntryErrors = {};
+        if (!entry.chequeNo) newEntryErrors.chequeNo = 'Required';
+        if (entry.amount <= 0) newEntryErrors.amount = 'Invalid Amount';
+
+        if (Object.keys(newEntryErrors).length > 0) {
+            setEntryErrors(newEntryErrors);
             showErrorToast("Please provide valid cheque number and valuation.");
             return;
         }
@@ -130,6 +139,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
             chequeNo: '',
             amount: 0
         });
+        setEntryErrors({});
     };
 
     const handleRemoveItem = (id) => {
@@ -137,8 +147,15 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!header.bankCode) return showErrorToast("Please select a target Bank Portfolio.");
-        if (items.length === 0) return showErrorToast("Deployment list is empty. Add at least one instrument.");
+        const newErrors = {};
+        if (!header.bankCode) newErrors.bankCode = 'Bank Account is required';
+        if (items.length === 0) newErrors.items = 'Deployment list is empty';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            showErrorToast(newErrors.bankCode || newErrors.items);
+            return;
+        }
 
         try {
             setLoading(true);
@@ -167,6 +184,8 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
             chequeNo: '',
             amount: 0
         });
+        setErrors({});
+        setEntryErrors({});
         loadInitialData();
     };
 
@@ -197,7 +216,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px]">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Source Bank Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Source Bank Account *</label>
                                 <div className="relative">
                                     <select
                                         value={header.bankCode || ''}
@@ -206,12 +225,13 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => {
-                    setHeader({...header, bankCode: item.code, bankName: item.name});
-                };
+                                                    setHeader({ ...header, bankCode: item.code, bankName: item.name });
+                                                    if (errors.bankCode) setErrors(prev => ({ ...prev, bankCode: null }));
+                                                };
                                                 handler(item);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.bankCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -222,6 +242,8 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.bankCode && <div className="text-[11px] text-red-500 mt-1">{errors.bankCode}</div>}
+                                {errors.items && <div className="text-[11px] text-red-500 mt-1">{errors.items}</div>}
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Protocol Reference</label>
@@ -252,7 +274,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                                         <td className="px-4 w-32 border-r border-slate-100 font-mono text-slate-700 text-[12px] tabular-nums">{item.chequeDate}</td>
                                         <td className="px-4 flex-1 border-r border-slate-100 font-mono text-slate-700 text-[12px] italic">{item.memo || '-'}</td>
                                         <td className="px-4 w-40 border-r border-slate-100 font-mono font-black text-gray-800 text-[13px] tracking-widest text-center">{item.chequeNo}</td>
-                                        <td className="px-4 w-36 text-right border-r border-slate-100 font-mono font-black text-[#0285fd] text-[13px] tabular-nums group-hover:bg-white">{item.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                                        <td className="px-4 w-36 text-right border-r border-slate-100 font-mono font-black text-[#0285fd] text-[13px] tabular-nums group-hover:bg-white">{item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                         <td className="px-4 w-16 flex items-center justify-center">
                                             <button onClick={() => handleRemoveItem(item.id)} className="w-6 h-6 rounded flex items-center justify-center hover:bg-red-50 text-red-400 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"><Trash2 size={14} /></button>
                                         </td>
@@ -272,11 +294,11 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
 
                     {/* Entry Protocol Bar */}
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px]">
-                         <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200">
+                        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200">
                             <Plus size={14} className="text-[#0285fd]" />
                             <span className="block text-[13px] font-medium text-gray-700">Add Instrument</span>
-                         </div>
-                         <div className="grid grid-cols-12 gap-x-4 gap-y-3.5 items-end">
+                        </div>
+                        <div className="grid grid-cols-12 gap-x-4 gap-y-3.5 items-end">
                             <div className="col-span-2">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Written On</label>
                                 <div className="relative">
@@ -303,21 +325,23 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Narrative</label>
-                                <input type="text" value={entry.memo} onChange={e => setEntry({...entry, memo: e.target.value})} placeholder="Payee / Purpose..."
+                                <input type="text" value={entry.memo} onChange={e => setEntry({ ...entry, memo: e.target.value })} placeholder="Payee / Purpose..."
                                     className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
                             <div className="col-span-2">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque Serial</label>
-                                <input type="text" value={entry.chequeNo} onChange={e => setEntry({...entry, chequeNo: e.target.value})} placeholder="000000"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold tracking-wider text-center" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque Serial *</label>
+                                <input type="text" value={entry.chequeNo} onChange={e => { setEntry({ ...entry, chequeNo: e.target.value }); if (entryErrors.chequeNo) setEntryErrors({ ...entryErrors, chequeNo: null }); }} placeholder="000000"
+                                    className={`w-full h-10 border ${entryErrors.chequeNo ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold tracking-wider text-center`} />
+                                {entryErrors.chequeNo && <div className="text-[11px] text-red-500 mt-1">{entryErrors.chequeNo}</div>}
                             </div>
                             <div className="col-span-2">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Valuation (LKR)</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Valuation (LKR) *</label>
                                 <div className="relative">
-                                     <input type="number" step="0.01" value={entry.amount} onChange={e => setEntry({...entry, amount: parseFloat(e.target.value) || 0})}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold tabular-nums pr-10" />
-                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400 uppercase">LKR</span>
+                                    <input type="number" step="0.01" value={entry.amount} onChange={e => { setEntry({ ...entry, amount: parseFloat(e.target.value) || 0 }); if (entryErrors.amount) setEntryErrors({ ...entryErrors, amount: null }); }}
+                                        className={`w-full h-10 border ${entryErrors.amount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold tabular-nums pr-10`} />
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400 uppercase">LKR</span>
                                 </div>
+                                {entryErrors.amount && <div className="text-[11px] text-red-500 mt-1">{entryErrors.amount}</div>}
                             </div>
                             <div className="col-span-1 pt-6">
                                 <button onClick={handleAddItem}
@@ -325,7 +349,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                                     <Plus size={14} /> Add
                                 </button>
                             </div>
-                         </div>
+                        </div>
                     </div>
 
                     {/* Summary Bar */}
@@ -337,7 +361,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-baseline gap-2">
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Aggregate Liability</span>
                             <span className="text-lg font-black text-[#0285fd] tabular-nums">
-                                {totalValuation.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                {totalValuation.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </span>
                         </div>
                     </div>
@@ -350,22 +374,22 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                 title="Select Bank"
                 items={lookups.banks}
                 onSelect={(item) => {
-                    setHeader({...header, bankCode: item.code, bankName: item.name});
+                    setHeader({ ...header, bankCode: item.code, bankName: item.name });
                 }}
             />
-            
+
             <CalendarModal
                 isOpen={showWriteDatePicker}
                 onClose={() => setShowWriteDatePicker(false)}
                 currentDate={entry.writeDate}
-                onDateSelect={(date) => setEntry({...entry, writeDate: date})}
+                onDateSelect={(date) => setEntry({ ...entry, writeDate: date })}
             />
-            
+
             <CalendarModal
                 isOpen={showChequeDatePicker}
                 onClose={() => setShowChequeDatePicker(false)}
                 currentDate={entry.chequeDate}
-                onDateSelect={(date) => setEntry({...entry, chequeDate: date})}
+                onDateSelect={(date) => setEntry({ ...entry, chequeDate: date })}
             />
         </>
     );

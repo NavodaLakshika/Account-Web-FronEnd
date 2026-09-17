@@ -19,7 +19,7 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             const user = JSON.parse(sessionStorage.getItem('user'));
             const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
+            let companyCode = '';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; } }
             setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
             setIsEditMode(false);

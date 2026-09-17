@@ -1,7 +1,7 @@
 import api from './api';
 
 export const advancePayService = {
-    getLookups: async (companyCode = 'C001', userName = '') => {
+    getLookups: async (companyCode = '', userName = '') => {
         try {
             const resp = await api.get(`advancepay/lookups?companyCode=${companyCode}&userName=${userName}`); 
             return resp.data;
@@ -10,7 +10,7 @@ export const advancePayService = {
         }
     },
 
-    generateDocNo: async (companyCode = 'C001') => {
+    generateDocNo: async (companyCode = '') => {
         try {
             const resp = await api.get(`advancepay/gen-docno?companyCode=${companyCode}`);
             return resp.data; // returns { docNo: "..." }
@@ -19,7 +19,7 @@ export const advancePayService = {
         }
     },
 
-    validateCheque: async (accCode, chkNo, companyCode = 'C001') => {
+    validateCheque: async (accCode, chkNo, companyCode = '') => {
         try {
             const resp = await api.get(`advancepay/cheque-validate?accCode=${accCode}&chkNo=${chkNo}&companyCode=${companyCode}`);
             return resp.data; // returns { isValid: true/false, message: "..." }

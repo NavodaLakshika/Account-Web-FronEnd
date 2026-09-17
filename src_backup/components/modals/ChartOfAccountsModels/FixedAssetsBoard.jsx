@@ -44,7 +44,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             const companyData = sessionStorage.getItem('selectedCompany');
             const user = JSON.parse(sessionStorage.getItem('user'));
-            let companyCode = 'C001';
+            let companyCode = '';
             
             if (companyData) {
                 try {

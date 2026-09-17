@@ -34,15 +34,16 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    const companyStr = localStorage.getItem('selectedCompany');
+    const companyStr = localStorage.getItem('selectedCompany') || sessionStorage.getItem('selectedCompany');
     if (companyStr) {
       let companyCode = '';
       try {
         const companyObj = JSON.parse(companyStr);
-        companyCode = companyObj.companyCode || companyObj.CompanyCode || companyObj.code || companyObj.Code || companyStr;
+        companyCode = companyObj.companyCode || companyObj.CompanyCode || companyObj.company_Code || companyObj.Company_Code || companyObj.code || companyObj.Code || companyStr;
       } catch (e) {
         companyCode = companyStr;
       }
+      // Hardcode map removed
       if (companyCode) {
         config.headers['x-company-code'] = companyCode;
       }

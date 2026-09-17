@@ -1,7 +1,7 @@
 /**
  * Session Utility
  * Handles retrieval of company and user information from localStorage
- * to avoid hardcoding values like 'C001' or 'SYSTEM'.
+ * to avoid hardcoding values like '' or 'SYSTEM'.
  */
 
 export const getSessionData = () => {
@@ -25,7 +25,7 @@ export const getSessionData = () => {
     }
 
     const companyMap = {
-        'C001': 'COM001',
+        '': 'COM001',
         'C002': 'COM002'
     };
     if (companyCode && companyMap[companyCode]) {

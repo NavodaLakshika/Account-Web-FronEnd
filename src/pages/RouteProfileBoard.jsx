@@ -5,6 +5,7 @@ import { routeService } from '../services/route.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import ConfirmModal from '../components/modals/ConfirmModal';
+import { getSessionData } from '../utils/session';
 
 const RouteProfileBoard = ({ isOpen, onClose }) => {
     const initialState = { Code: '', Route_Name: '', Company: '', CurrentUser: '' };
@@ -17,40 +18,89 @@ const RouteProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = '';
-            if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; } }
-            setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
+            const { companyCode, userName } = getSessionData();
+            const activeCompany = companyCode || 'COM001';
+            setFormData({
+                ...initialState,
+                CurrentUser: userName || 'SYSTEM',
+                Company: activeCompany
+            });
             setIsEditMode(false);
-            fetchRoutes(companyCode);
+            fetchRoutes(activeCompany);
         }
     }, [isOpen]);
 
     const fetchRoutes = async (compCode) => {
-        try { const data = await routeService.getAll(compCode); setRouteList(data || []); } catch (err) { console.error(err); }
+        const targetCompany = compCode || getSessionData().companyCode || 'COM001';
+        try {
+            const data = await routeService.getAll(targetCompany);
+            setRouteList(data || []);
+        } catch (err) {
+            console.error('Fetch routes error:', err);
+        }
     };
 
-    const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
-    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); };
+    const handleClear = () => {
+        const { companyCode, userName } = getSessionData();
+        const activeCompany = companyCode || formData.Company || 'COM001';
+        setFormData({ ...initialState, Company: activeCompany, CurrentUser: userName || formData.CurrentUser || 'SYSTEM' });
+        setIsEditMode(false);
+    };
 
     const handleSave = async () => {
-        if (!formData.Route_Name) { showErrorToast('Route Name is required'); return; }
+        if (!formData.Route_Name?.trim()) {
+            showErrorToast('Route Name is required');
+            return;
+        }
         setLoading(true);
         try {
-            const data = await routeService.save(formData);
-            if (data.message === 'inserted') { showSuccessToast('Route created'); handleClear(); }
-            else { showSuccessToast('Route updated'); }
-            fetchRoutes(formData.Company);
-        } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
+            const { companyCode, userName } = getSessionData();
+            const activeCompany = companyCode || formData.Company || 'COM001';
+            const payload = {
+                ...formData,
+                Company: activeCompany,
+                CurrentUser: formData.CurrentUser || userName || 'SYSTEM'
+            };
+            const data = await routeService.save(payload);
+            if (data.message === 'inserted') {
+                showSuccessToast('Route created');
+                handleClear();
+            } else {
+                showSuccessToast('Route updated');
+            }
+            fetchRoutes(activeCompany);
+        } catch (err) {
+            showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 });
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleDelete = () => { if (!isEditMode || !formData.Code) return; setShowDeleteConfirm(true); };
+    const handleDelete = () => {
+        if (!isEditMode || !formData.Code) return;
+        setShowDeleteConfirm(true);
+    };
 
     const confirmDelete = async () => {
         setLoading(true);
-        try { await routeService.delete(formData.Code, formData.Company); showSuccessToast('Route deleted'); handleClear(); setShowDeleteConfirm(false); } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
+        try {
+            const { companyCode } = getSessionData();
+            const activeCompany = companyCode || formData.Company || 'COM001';
+            await routeService.delete(formData.Code, activeCompany);
+            showSuccessToast('Route deleted');
+            handleClear();
+            setShowDeleteConfirm(false);
+            fetchRoutes(activeCompany);
+        } catch (err) {
+            showErrorToast(err.message || err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleRouteSelect = (e) => {

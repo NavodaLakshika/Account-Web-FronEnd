@@ -66,6 +66,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             const initialData = getInitialFormData();
             setFormData(initialData);
             fetchLookups();
@@ -163,7 +164,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
     const loadVendorBills = async (vendorId) => {
         try {
             setLoading(true);
-            const data = await payBillService.getVendorBills(vendorId, formData.company || 'C001');
+            const data = await payBillService.getVendorBills(vendorId, formData.company || '');
             const enhancedData = data.bills.map(b => ({
                 ...b, selected: false, toPay: b.balance, discount: 0, setOfUse: 0
             }));

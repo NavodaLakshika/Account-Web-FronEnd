@@ -20,7 +20,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
         date: new Date().toLocaleDateString('en-GB'), // DD/MM/YYYY
         startNo: '',
         endNo: '',
-        company: localStorage.getItem('companyCode') || 'C001',
+        company: localStorage.getItem('companyCode') || '',
         createUser: localStorage.getItem('userName') || 'SYSTEM'
     });
 

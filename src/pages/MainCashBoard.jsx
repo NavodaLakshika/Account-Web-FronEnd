@@ -80,8 +80,10 @@ const MainCashBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     const [rows, setRows] = useState([{ id: Date.now(), expAccCode: '', expAccName: '', ccCode: '', amount: 0, memo: '' }]);
+    const [entryErrors, setEntryErrors] = useState([{}]);
 
     const [activeModal, setActiveModal] = useState(null);
     const [activeRowIdx, setActiveRowIdx] = useState(null);
@@ -91,6 +93,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
+            if (typeof setEntryErrors === "function") setEntryErrors({});
             setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
             setFormData(prev => ({
@@ -129,20 +133,29 @@ const MainCashBoard = ({ isOpen, onClose }) => {
         newRows[index][field] = value;
         setRows(newRows);
 
+        const newEntryErrors = [...entryErrors];
+        if (newEntryErrors[index] && newEntryErrors[index][field]) {
+            newEntryErrors[index][field] = null;
+            setEntryErrors(newEntryErrors);
+        }
+
         if (field === 'amount') {
             const total = newRows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
             setFormData(prev => ({ ...prev, amount: total }));
+            if (errors.amount) setErrors(prev => ({ ...prev, amount: null }));
         }
     };
 
     const addRow = () => {
         setRows([...rows, { id: Date.now(), expAccCode: '', expAccName: '', ccCode: '', amount: 0, memo: '' }]);
+        setEntryErrors([...entryErrors, {}]);
     };
 
     const deleteRow = (idx) => {
         if (rows.length === 1) return;
         const newRows = rows.filter((_, i) => i !== idx);
         setRows(newRows);
+        setEntryErrors(entryErrors.filter((_, i) => i !== idx));
         const total = newRows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
         setFormData(prev => ({ ...prev, amount: total }));
     };
@@ -163,12 +176,41 @@ const MainCashBoard = ({ isOpen, onClose }) => {
             amount: 0
         });
         setRows([{ id: Date.now(), expAccCode: '', expAccName: '', ccCode: '', amount: 0, memo: '' }]);
+        setEntryErrors([{}]);
+        setErrors({});
         loadInitialData();
     };
 
     const handleSave = async () => {
-        if (!formData.accountId || formData.amount <= 0) {
-            showErrorToast("Please select an account and enter expense amounts.");
+        let hasErrors = false;
+        const newErrors = {};
+        const newEntryErrors = rows.map(() => ({}));
+
+        if (!formData.accountId) {
+            newErrors.accountId = 'Account is required';
+            hasErrors = true;
+        }
+
+        if (formData.amount <= 0) {
+            newErrors.amount = 'Amount is required';
+            hasErrors = true;
+        }
+
+        rows.forEach((row, i) => {
+            if (!row.expAccCode) {
+                newEntryErrors[i].expAccCode = '*Required';
+                hasErrors = true;
+            }
+            if (!row.amount || parseFloat(row.amount) <= 0) {
+                newEntryErrors[i].amount = '*Invalid';
+                hasErrors = true;
+            }
+        });
+
+        if (hasErrors) {
+            setErrors(newErrors);
+            setEntryErrors(newEntryErrors);
+            showErrorToast("Please select an account and valid expense amounts.");
             return;
         }
 
@@ -244,51 +286,55 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account</label>
                                     <div className="relative">
                                         <select
-                                        value={formData.accountId || ''}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const item = (lookups.mainAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
-                                            if (item) {
-                                                const handler = (item) => setFormData(prev => ({ ...prev, accountId: item.code, accountName: item.name }));
-                                                handler(item);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.mainAccounts || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
-                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                            value={formData.accountId || ''}
+                                            onChange={(ev) => {
+                                                const val = ev.target.value;
+                                                const item = (lookups.mainAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                                if (item) {
+                                                    const handler = (item) => {
+                                                        setFormData(prev => ({ ...prev, accountId: item.code, accountName: item.name }));
+                                                        if (errors.accountId) setErrors(prev => ({ ...prev, accountId: null }));
+                                                    };
+                                                    handler(item);
+                                                }
+                                            }}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select...</option>
+                                            {(lookups.mainAccounts || []).map((item, idx) => (
+                                                <option key={idx} value={item.code || item.name || item}>
+                                                    {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
+                                    {errors.accountId && <div className="text-[11px] text-red-500 mt-1">{errors.accountId}</div>}
                                 </div>
 
                                 <div>
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                     <div className="relative">
                                         <select
-                                        value={formData.costCenterId || ''}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
-                                            if (item) {
-                                                const handler = (item) => setFormData(prev => ({ ...prev, costCenterId: item.code, costCenterName: item.name }));
-                                                handler(item);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.costCenters || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
-                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                            value={formData.costCenterId || ''}
+                                            onChange={(ev) => {
+                                                const val = ev.target.value;
+                                                const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                                if (item) {
+                                                    const handler = (item) => setFormData(prev => ({ ...prev, costCenterId: item.code, costCenterName: item.name }));
+                                                    handler(item);
+                                                }
+                                            }}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select...</option>
+                                            {(lookups.costCenters || []).map((item, idx) => (
+                                                <option key={idx} value={item.code || item.name || item}>
+                                                    {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
 
@@ -296,25 +342,25 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay to the Order</label>
                                     <div className="relative">
                                         <select
-                                        value={formData.payeeId || ''}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const item = (lookups.payees || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
-                                            if (item) {
-                                                const handler = (item) => setFormData(prev => ({ ...prev, payeeId: item.code, payeeName: item.name, address: item.address || '' }));
-                                                handler(item);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.payees || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
-                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                            value={formData.payeeId || ''}
+                                            onChange={(ev) => {
+                                                const val = ev.target.value;
+                                                const item = (lookups.payees || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                                if (item) {
+                                                    const handler = (item) => setFormData(prev => ({ ...prev, payeeId: item.code, payeeName: item.name, address: item.address || '' }));
+                                                    handler(item);
+                                                }
+                                            }}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select...</option>
+                                            {(lookups.payees || []).map((item, idx) => (
+                                                <option key={idx} value={item.code || item.name || item}>
+                                                    {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -348,8 +394,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                 </div>
 
                                 <div className="pt-4">
-                                    <div className="bg-slate-50 border border-gray-200 rounded-[3px] p-5 flex flex-col items-center justify-center h-[130px]">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Total Amount</span>
+                                    <div className={`border ${errors.amount ? 'border-red-500 border-2 bg-red-50' : 'border-gray-200 bg-slate-50'} rounded-[3px] p-5 flex flex-col items-center justify-center h-[130px]`}>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest mb-2 ${errors.amount ? 'text-red-500' : 'text-gray-400'}`}>Total Amount</span>
                                         <div className="text-[26px] font-black text-[#b91c1c] tracking-tighter leading-none">
                                             Rs. {parseFloat(formData.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                         </div>
@@ -398,64 +444,64 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                         <div className="flex-[2] px-2 py-1.5">
                                             <div className="relative">
                                                 <select
-                                        value={row.expAccCode || ''}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const item = (lookups.expenseAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
-                                            if (item) {
-                                                const handler = (item) => {
-                    const newRows = [...rows];
-                    newRows[activeRowIdx].expAccCode = item.code;
-                    newRows[activeRowIdx].expAccName = item.name;
-                    setRows(newRows);
-                };
-                                                handler(item);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.expenseAccounts || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
-                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                    value={row.expAccCode || ''}
+                                                    onChange={(ev) => {
+                                                        const val = ev.target.value;
+                                                        const item = (lookups.expenseAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                                        if (item) {
+                                                            const handler = (item) => {
+                                                                const newRows = [...rows];
+                                                                newRows[activeRowIdx].expAccCode = item.code;
+                                                                newRows[activeRowIdx].expAccName = item.name;
+                                                                setRows(newRows);
+                                                            };
+                                                            handler(item);
+                                                        }
+                                                    }}
+                                                    className={`w-full h-10 border ${entryErrors[idx]?.expAccCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
+                                                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                                >
+                                                    <option value="">Select...</option>
+                                                    {(lookups.expenseAccounts || []).map((item, idx) => (
+                                                        <option key={idx} value={item.code || item.name || item}>
+                                                            {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </div>
                                         <div className="flex-[1.5] px-2 py-1.5">
                                             <div className="relative">
                                                 <select
-                                        value={row.ccCode}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
-                                            if (item) {
-                                                const handler = (item) => {
-                    const newRows = [...rows];
-                    newRows[activeRowIdx].ccCode = item.code;
-                    setRows(newRows);
-                };
-                                                handler(item);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.costCenters || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
-                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                    value={row.ccCode}
+                                                    onChange={(ev) => {
+                                                        const val = ev.target.value;
+                                                        const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                                        if (item) {
+                                                            const handler = (item) => {
+                                                                const newRows = [...rows];
+                                                                newRows[activeRowIdx].ccCode = item.code;
+                                                                setRows(newRows);
+                                                            };
+                                                            handler(item);
+                                                        }
+                                                    }}
+                                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                                >
+                                                    <option value="">Select...</option>
+                                                    {(lookups.costCenters || []).map((item, idx) => (
+                                                        <option key={idx} value={item.code || item.name || item}>
+                                                            {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </div>
                                         <div className="w-32 px-2 py-1.5">
                                             <input type="number" step="0.01" value={row.amount}
                                                 onChange={(e) => handleRowChange(idx, 'amount', e.target.value)}
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                                className={`w-full h-10 border ${entryErrors[idx]?.amount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[13px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]`} />
                                         </div>
                                         <div className="flex-[2] px-2 py-1.5">
                                             <input type="text" value={row.memo}

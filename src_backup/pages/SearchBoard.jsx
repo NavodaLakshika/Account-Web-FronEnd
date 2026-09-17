@@ -34,7 +34,7 @@ const SearchBoard = ({ isOpen, onClose }) => {
         { code: 'JE03', name: 'General Journal Entries' }
     ];
     const entities = [
-        { code: 'C001', name: 'ABC Corporates' },
+        { code: '', name: 'ABC Corporates' },
         { code: 'S-001', name: 'CASH SALES REVENUE' },
         { code: 'V999', name: 'Internal Vendor Ops' }
     ];

@@ -72,12 +72,14 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     const [activeModal, setActiveModal] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
 
@@ -104,12 +106,25 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.accountCode) return showErrorToast("Please select a valid Bank Account.");
-        if (!formData.startNo || !formData.endNo) return showErrorToast("Start and End cheque numbers are required.");
+        const newErrors = {};
+        if (!formData.accountCode) newErrors.accountCode = 'Bank Account is required';
+        if (!formData.startNo) newErrors.startNo = 'Start Serial is required';
+        if (!formData.endNo) newErrors.endNo = 'End Serial is required';
 
         const start = parseInt(formData.startNo);
         const end = parseInt(formData.endNo);
-        if (isNaN(start) || isNaN(end) || start > end) return showErrorToast("Invalid cheque range protocol.");
+
+        if (formData.startNo && formData.endNo) {
+            if (isNaN(start) || isNaN(end) || start > end) {
+                newErrors.startNo = 'Invalid sequence';
+                newErrors.endNo = 'Invalid sequence';
+            }
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return showErrorToast("Please ensure all fields are correctly filled.");
+        }
 
         if (end - start > 1000000) {
             setLoading(false);
@@ -139,6 +154,7 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
             startNo: '',
             endNo: ''
         });
+        setErrors({});
     };
 
     const totalCheques = (formData.startNo && formData.endNo) ?
@@ -170,7 +186,7 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             {/* Target Account */}
                             <div className="col-span-8">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Target Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Target Account <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <select
                                         value={formData.accountCode || ''}
@@ -179,16 +195,17 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                                             const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = async (item) => {
-                    setFormData({ ...formData, accountCode: item.code, accountName: item.name });
-                    try {
-                        const res = await bankingService.getChequeBookLookups(formData.company, item.code);
-                        setFormData(prev => ({ ...prev, bookNo: res.nextBookNo.toString() }));
-                    } catch (e) { }
-                };
+                                                    setFormData({ ...formData, accountCode: item.code, accountName: item.name });
+                                                    try {
+                                                        const res = await bankingService.getChequeBookLookups(formData.company, item.code);
+                                                        setFormData(prev => ({ ...prev, bookNo: res.nextBookNo.toString() }));
+                                                    } catch (e) { }
+                                                };
                                                 handler(item);
+                                                if (errors.accountCode) setErrors(prev => ({ ...prev, accountCode: null }));
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className={`w-full h-10 border ${errors.accountCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -199,6 +216,7 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {errors.accountCode && <div className="text-[11px] text-red-500 mt-1">{errors.accountCode}</div>}
                             </div>
 
                             {/* Book No */}
@@ -231,17 +249,25 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-center">
                             <div className="col-span-5">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Start Serial</label>
-                                <input type="text" value={formData.startNo} onChange={e => setFormData({ ...formData, startNo: e.target.value })}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold tracking-wider" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Start Serial <span className="text-red-500">*</span></label>
+                                <input type="text" value={formData.startNo} onChange={e => {
+                                    setFormData({ ...formData, startNo: e.target.value });
+                                    if (errors.startNo) setErrors(prev => ({ ...prev, startNo: null }));
+                                }}
+                                    className={`w-full h-10 border ${errors.startNo ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold tracking-wider`} />
+                                {errors.startNo && <div className="text-[11px] text-red-500 mt-1">{errors.startNo}</div>}
                             </div>
                             <div className="col-span-2 flex items-center justify-center pt-6">
                                 <div className="w-8 h-px bg-gray-300" />
                             </div>
                             <div className="col-span-5">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">End Serial</label>
-                                <input type="text" value={formData.endNo} onChange={e => setFormData({ ...formData, endNo: e.target.value })}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold tracking-wider" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">End Serial <span className="text-red-500">*</span></label>
+                                <input type="text" value={formData.endNo} onChange={e => {
+                                    setFormData({ ...formData, endNo: e.target.value });
+                                    if (errors.endNo) setErrors(prev => ({ ...prev, endNo: null }));
+                                }}
+                                    className={`w-full h-10 border ${errors.endNo ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-800 font-mono font-bold tracking-wider`} />
+                                {errors.endNo && <div className="text-[11px] text-red-500 mt-1">{errors.endNo}</div>}
                             </div>
                         </div>
                     </div>

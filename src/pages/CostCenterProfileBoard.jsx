@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Target, Search, Trash2, RotateCcw, Save } from 'lucide-react';
 import { costCenterService } from '../services/costcenter.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import { getSessionData } from '../utils/session';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import ConfirmModal from '../components/modals/ConfirmModal';
 
@@ -28,13 +29,8 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             handleClear();
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
-            if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { companyCode = companyData; } }
-            if (user) {
-                setFormData(prev => ({ ...prev, CurrentUser: user.emp_Name || user.empName || 'SYSTEM', Company: companyCode }));
-            }
+            const { companyCode, userName } = getSessionData();
+            setFormData(prev => ({ ...prev, CurrentUser: userName || 'SYSTEM', Company: companyCode || '' }));
             fetchLookups(companyCode);
         }
     }, [isOpen]);
@@ -46,11 +42,8 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        const companyData = sessionStorage.getItem('selectedCompany');
-        let companyCode = 'C001';
-        if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { } }
-        setFormData({ ...initialState, CurrentUser: user?.emp_Name || user?.empName || 'SYSTEM', Company: companyCode });
+        const { companyCode, userName } = getSessionData();
+        setFormData({ ...initialState, CurrentUser: userName || 'SYSTEM', Company: companyCode || '' });
         setIsEditMode(false);
         setErrors({});
     };

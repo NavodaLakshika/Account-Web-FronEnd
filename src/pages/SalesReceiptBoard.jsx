@@ -55,6 +55,8 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     // --- Initialization ---
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
+            if (typeof setEntryErrors === "function") setEntryErrors({});
             setFormData(getInitialFormData());
             loadInitialData();
         }

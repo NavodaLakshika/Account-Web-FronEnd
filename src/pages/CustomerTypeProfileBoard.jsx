@@ -10,6 +10,7 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
     const initialState = { Code: '', Type_Name: '', Company: '', CurrentUser: '' };
 
     const [formData, setFormData] = useState(initialState);
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [typeList, setTypeList] = useState([]);
@@ -17,6 +18,7 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             handleClear();
             const user = JSON.parse(sessionStorage.getItem('user'));
             const companyData = sessionStorage.getItem('selectedCompany');
@@ -41,12 +43,20 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    };
 
-    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); };
+    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); setErrors({}); };
 
     const handleSave = async () => {
-        if (!formData.Type_Name) { showErrorToast('Type Name is required'); return; }
+        if (!formData.Type_Name) {
+            setErrors({ Type_Name: 'Type Name is required' });
+            showErrorToast('Type Name is required');
+            return;
+        }
         setLoading(true);
         try {
             const data = await customerTypeService.save(formData);
@@ -101,7 +111,7 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer Type Name</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer Type Name *</label>
                                 <div className="relative">
                                     <input
                                         type="text"
@@ -112,11 +122,13 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
                                             const val = e.target.value.toUpperCase();
                                             const found = typeList.find(t => (t.name || t.Type_Name || t.Name || '').toUpperCase() === val);
                                             setFormData(prev => ({ ...prev, Type_Name: val, Code: found ? (found.code || found.Code) : '' }));
+                                            if (errors.Type_Name) setErrors(prev => ({ ...prev, Type_Name: null }));
                                             setIsEditMode(!!found);
                                         }}
                                         placeholder="Select or enter customer type name"
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase"
+                                        className={`w-full h-10 border ${errors.Type_Name ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase`}
                                     />
+                                    {errors.Type_Name && <div className="text-[11px] text-red-500 mt-1">{errors.Type_Name}</div>}
                                     <datalist id="customerTypesList">
                                         {typeList.map((t, i) => (
                                             <option key={i} value={t.name || t.Type_Name || t.Name}>

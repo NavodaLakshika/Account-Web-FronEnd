@@ -1,3 +1,4 @@
+import { getSessionData } from '../utils/session';
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, RotateCcw, Trash2, Loader2, CheckCircle } from 'lucide-react';
@@ -10,6 +11,7 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
     const initialState = { Code: '', Dept_Name: '', Company: '', CurrentUser: 'SYSTEM' };
 
     const [formData, setFormData] = useState(initialState);
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [deptList, setDeptList] = useState([]);
@@ -17,10 +19,8 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
-            if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; } }
+            if (typeof setErrors === "function") setErrors({});
+            const { companyCode, userName } = getSessionData();
             setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
             setIsEditMode(false);
             fetchDepartments(companyCode);
@@ -31,12 +31,20 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
         try { const data = await departmentService.searchDepartments(company, ''); setDeptList(data || []); } catch (err) { console.error('Failed to load departments'); }
     };
 
-    const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    };
 
-    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); };
+    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); setErrors({}); };
 
     const handleSave = async () => {
-        if (!formData.Dept_Name) { showErrorToast('Department Name is required'); return; }
+        if (!formData.Dept_Name) {
+            setErrors({ Dept_Name: 'Department Name is required' });
+            showErrorToast('Department Name is required');
+            return;
+        }
         setLoading(true);
         try {
             const data = await departmentService.save(formData);
@@ -110,8 +118,9 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Dept. Name</label>
-                                <input type="text" name="Dept_Name" value={formData.Dept_Name} onChange={handleInputChange} placeholder="Enter department name" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Dept. Name *</label>
+                                <input type="text" name="Dept_Name" value={formData.Dept_Name} onChange={handleInputChange} placeholder="Enter department name" className={`w-full h-10 border ${errors.Dept_Name ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.Dept_Name && <div className="text-[11px] text-red-500 mt-1">{errors.Dept_Name}</div>}
                             </div>
                         </div>
                     </div>
@@ -135,3 +144,4 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
 };
 
 export default DepartmentProfileBoard;
+

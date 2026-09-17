@@ -8,6 +8,7 @@ const DepreciationRateBoard = ({ isOpen, onClose }) => {
     const initialState = { AccCode: '', AccountName: '', DepRate: '', CreateUser: 'SYSTEM' };
 
     const [formData, setFormData] = useState(initialState);
+    const [errors, setErrors] = useState({});
     const [lookups, setLookups] = useState([]);
     const [rateList, setRateList] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -15,6 +16,7 @@ const DepreciationRateBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             const user = JSON.parse(sessionStorage.getItem('user'));
             setFormData(prev => ({ ...prev, CreateUser: user?.emp_Name || user?.empName || 'SYSTEM' }));
             fetchLookups();
@@ -33,10 +35,12 @@ const DepreciationRateBoard = ({ isOpen, onClose }) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleClear = () => {
         setFormData({ ...initialState, CreateUser: formData.CreateUser });
+        setErrors({});
         setIsEditMode(false);
     };
 
@@ -45,12 +49,20 @@ const DepreciationRateBoard = ({ isOpen, onClose }) => {
         if (!item) { setFormData(prev => ({ ...prev, AccCode: '', AccountName: '' })); setIsEditMode(false); return; }
         const existing = rateList.find(r => r.accCode === code);
         setFormData(prev => ({ ...prev, AccCode: item.code, AccountName: item.name, DepRate: existing ? existing.depRate : '' }));
+        if (errors.AccCode) setErrors(prev => ({ ...prev, AccCode: null }));
         setIsEditMode(!!existing);
     };
 
     const handleSave = async () => {
-        if (!formData.AccCode) { showErrorToast('Please select an account.'); return; }
-        if (formData.DepRate === '' || isNaN(formData.DepRate)) { showErrorToast('Please enter a valid depreciation rate.'); return; }
+        const newErrors = {};
+        if (!formData.AccCode) newErrors.AccCode = 'Account is required';
+        if (formData.DepRate === '' || isNaN(formData.DepRate)) newErrors.DepRate = 'Valid rate is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            showErrorToast('Please fill all required fields correctly.');
+            return;
+        }
         setLoading(true);
         try {
             if (isEditMode) {
@@ -67,6 +79,7 @@ const DepreciationRateBoard = ({ isOpen, onClose }) => {
 
     const handleRowClick = (rate) => {
         setFormData({ AccCode: rate.accCode, AccountName: rate.accountName, DepRate: rate.depRate, CreateUser: formData.CreateUser });
+        setErrors({});
         setIsEditMode(true);
     };
 
@@ -97,24 +110,26 @@ const DepreciationRateBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-7">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Asset Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Asset Account *</label>
                                 <select
                                     value={formData.AccCode}
                                     onChange={(e) => handleAccountSelect(e.target.value)}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                    className={`w-full h-10 border ${errors.AccCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer`}
                                 >
                                     <option value="">Select account...</option>
                                     {lookups.map((acc, idx) => (
                                         <option key={idx} value={acc.code}>{acc.code} - {acc.name}</option>
                                     ))}
                                 </select>
+                                {errors.AccCode && <div className="text-[11px] text-red-500 mt-1">{errors.AccCode}</div>}
                             </div>
                             <div className="col-span-5">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Depreciation Rate (%)</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Depreciation Rate (%) *</label>
                                 <div className="relative">
-                                    <input type="number" name="DepRate" value={formData.DepRate} onChange={handleInputChange} step="0.1" placeholder="0.0" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-center pr-8" />
+                                    <input type="number" name="DepRate" value={formData.DepRate} onChange={handleInputChange} step="0.1" placeholder="0.0" className={`w-full h-10 border ${errors.DepRate ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-center pr-8`} />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-black text-gray-400">%</span>
                                 </div>
+                                {errors.DepRate && <div className="text-[11px] text-red-500 mt-1">{errors.DepRate}</div>}
                             </div>
                         </div>
                     </div>

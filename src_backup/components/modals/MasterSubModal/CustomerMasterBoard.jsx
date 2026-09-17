@@ -37,7 +37,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             handleClear();
             const user = authService.getCurrentUser();
             const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
+            let companyCode = '';
             if (companyData) {
                 try {
                     const p = JSON.parse(companyData);
@@ -92,7 +92,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
     const handleClear = () => {
         const user = authService.getCurrentUser();
         const companyData = sessionStorage.getItem('selectedCompany');
-        let companyCode = 'C001';
+        let companyCode = '';
         if (companyData) {
             try {
                 const p = JSON.parse(companyData);

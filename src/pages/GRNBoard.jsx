@@ -11,7 +11,7 @@ import { grnService } from '../services/grn.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import SupplierMasterBoard from '../components/modals/MasterSubModal/SupplierMasterBoard';
 import NewAccountBoard from './NewAccountBoard';
 import { vendorTypeService } from '../services/vendorType.service';
@@ -46,6 +46,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
+            if (typeof setEntryErrors === "function") setEntryErrors({});
             setIsAddProductLocked(localStorage.getItem('isAddProductLocked') === 'true');
         }
     }, [isOpen]);
@@ -109,6 +111,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
+            if (typeof setEntryErrors === "function") setEntryErrors({});
             setFormData(getInitialFormData());
             const { companyCode: initCompany, userName: initUser } = getSessionData();
 
@@ -318,14 +322,32 @@ const GRNBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast('Failed to fetch PO details.'); }
     };
 
-    const handleTemplateDownload = (selectedColumns) => {
+    const handleTemplateDownload = async (selectedColumns) => {
         try {
+            const dynamicSampleData = await grnService.getTemplateSuggestions();
+            
+            const suggestionRow = {};
+            selectedColumns.forEach(col => {
+                suggestionRow[col] = dynamicSampleData[col] ? `e.g. ${dynamicSampleData[col]}` : '';
+            });
             const row = {};
             selectedColumns.forEach(col => row[col] = '');
-            const template = [row];
+            const template = [suggestionRow, row];
             const ws = XLSX.utils.json_to_sheet(template);
+
+            // Add styles to the suggestion row
+            selectedColumns.forEach((col, index) => {
+                const cellRef = XLSX.utils.encode_cell({ r: 1, c: index }); // row 1 (0 is header)
+                if (ws[cellRef] && ws[cellRef].v) {
+                    ws[cellRef].s = {
+                        font: { sz: 9, color: { rgb: "FF999999" }, italic: true }
+                    };
+                }
+            });
+
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "GRN_Template");
+
             XLSX.writeFile(wb, "GRN_Full_Template.xlsx");
             showSuccessToast("Template downloaded. You can now import header data too!");
         } catch (error) {
@@ -344,7 +366,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 const wb = XLSX.read(bstr, { type: 'binary' });
                 const wsname = wb.SheetNames[0];
                 const ws = wb.Sheets[wsname];
-                const data = XLSX.utils.sheet_to_json(ws);
+                let data = XLSX.utils.sheet_to_json(ws);
+                
+                // Filter out the suggestion row if it's still there
+                data = data.filter(r => {
+                    const sc = (r['Supplier Code'] || r['Supplier'] || r['Product Code'] || r['prodCode'] || '').toString().trim();
+                    return !sc.startsWith('e.g.');
+                });
 
                 if (data.length === 0) return showErrorToast("Excel file is empty.");
 

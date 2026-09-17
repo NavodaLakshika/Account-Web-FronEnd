@@ -21,6 +21,7 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
     };
 
     const [formData, setFormData] = useState(initialState);
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [countries, setCountries] = useState([]);
@@ -33,6 +34,7 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             handleClear();
             const fetchMasterData = async () => {
                 try {
@@ -55,8 +57,12 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
-    const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
-    const handleClear = () => { setFormData(initialState); setIsEditMode(false); };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    };
+    const handleClear = () => { setFormData(initialState); setIsEditMode(false); setErrors({}); };
 
 
 
@@ -71,7 +77,11 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.Comp_Name) { showErrorToast('Company Name is required.'); return; }
+        if (!formData.Comp_Name) {
+            setErrors({ Comp_Name: 'Company Name is required' });
+            showErrorToast('Company Name is required.');
+            return;
+        }
         setLoading(true);
         try {
             const payload = { ...formData };
@@ -162,8 +172,9 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Company Name</label>
-                                <input type="text" name="Comp_Name" value={formData.Comp_Name} onChange={handleInputChange} maxLength={50} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Company Name <span className="text-red-500">*</span></label>
+                                <input type="text" name="Comp_Name" value={formData.Comp_Name} onChange={handleInputChange} maxLength={50} className={`w-full h-10 border ${errors.Comp_Name ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.Comp_Name && <div className="text-[11px] text-red-500 mt-1">{errors.Comp_Name}</div>}
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Legal Name</label>

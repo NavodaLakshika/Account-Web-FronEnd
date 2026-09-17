@@ -90,6 +90,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
             setFormData(prev => ({

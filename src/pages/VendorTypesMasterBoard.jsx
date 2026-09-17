@@ -7,6 +7,7 @@ import { vendorTypeService } from '../services/vendorType.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import SearchableSelect from '../components/SearchableSelect';
 import ConfirmModal from '../components/modals/ConfirmModal';
+import { getSessionData } from '../utils/session';
 
 const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
     const initialState = { VendorType: '', PaybleAccCode: '', PaybleAccName: '', CurrentUser: '', Company: '', Loca: '01' };
@@ -30,11 +31,13 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
-            if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { companyCode = companyData; } }
-            setFormData(prev => ({ ...prev, CurrentUser: user ? (user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '') : '', Company: companyCode }));
+            const { companyCode, userName } = getSessionData();
+            const activeCompany = companyCode || 'COM001';
+            setFormData(prev => ({
+                ...prev,
+                CurrentUser: userName || 'SYSTEM',
+                Company: activeCompany
+            }));
             fetchInitialData();
         }
     }, [isOpen]);
@@ -67,14 +70,24 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
         
         setLoading(true);
         try {
-            await vendorTypeService.save(formData);
+            const { companyCode, userName } = getSessionData();
+            const activeCompany = companyCode || formData.Company || 'COM001';
+            await vendorTypeService.save({
+                ...formData,
+                Company: activeCompany,
+                CurrentUser: formData.CurrentUser || userName || 'SYSTEM'
+            });
             showSuccessToast('Vendor Type saved successfully');
-            setFormData({ ...initialState, CurrentUser: formData.CurrentUser, Company: formData.Company });
+            setFormData({ ...initialState, CurrentUser: formData.CurrentUser || userName || 'SYSTEM', Company: activeCompany });
             fetchInitialData();
         } catch (error) { showErrorToast(typeof error === 'string' ? error : (error.message || 'Failed to save')); } finally { setLoading(false); }
     };
 
-    const handleClear = () => { setFormData({ ...initialState, CurrentUser: formData.CurrentUser, Company: formData.Company }); setIsEditMode(false); };
+    const handleClear = () => {
+        const { companyCode, userName } = getSessionData();
+        setFormData({ ...initialState, CurrentUser: userName || formData.CurrentUser || 'SYSTEM', Company: companyCode || formData.Company || 'COM001' });
+        setIsEditMode(false);
+    };
 
     const handleDelete = () => { if (!isEditMode || !formData.VendorType) return; setShowDeleteConfirm(true); };
 

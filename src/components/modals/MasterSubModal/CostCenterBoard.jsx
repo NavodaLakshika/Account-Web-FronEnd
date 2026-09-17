@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Target } from 'lucide-react';
 import { costCenterService } from '../../../services/costcenter.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+import { getSessionData } from '../../../utils/session';
 import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
 import ConfirmModal from '../../../components/modals/ConfirmModal';
 
@@ -24,13 +25,8 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             handleClear();
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
-            if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { companyCode = companyData; } }
-            if (user) {
-                setFormData(prev => ({ ...prev, CurrentUser: user.emp_Name || user.empName || 'SYSTEM', Company: companyCode }));
-            }
+            const { companyCode, userName } = getSessionData();
+            setFormData(prev => ({ ...prev, CurrentUser: userName || 'SYSTEM', Company: companyCode || '' }));
             fetchLookups(companyCode);
         }
     }, [isOpen]);
@@ -41,11 +37,8 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        const companyData = sessionStorage.getItem('selectedCompany');
-        let companyCode = 'C001';
-        if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) {} }
-        setFormData({ ...initialState, CurrentUser: user?.emp_Name || user?.empName || 'SYSTEM', Company: companyCode });
+        const { companyCode, userName } = getSessionData();
+        setFormData({ ...initialState, CurrentUser: userName || 'SYSTEM', Company: companyCode || '' });
         setIsEditMode(false);
     };
 
@@ -92,8 +85,14 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
     const selectCostCenter = (code) => {
         const item = costCentersList.find(c => (c.code || c.Code) === code);
         if (item) {
-            
-            handleClear();
+            setFormData({
+                Code: item.code || item.Code,
+                Name: item.name || item.Name,
+                Inactive: item.inactive || item.Inactive,
+                CurrentUser: formData.CurrentUser,
+                Company: formData.Company
+            });
+            setIsEditMode(true);
         }
     };
 

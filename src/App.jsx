@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { authService } from './services/auth.service';
+import { desktopNotificationService } from './services/desktopNotification.service';
+import { enterBillService } from './services/enterBill.service';
+import { getSessionData } from './utils/session';
 
 import AuthPage from './pages/AuthPage';
 import RegisterPage from './pages/RegisterPage';
@@ -36,6 +39,20 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+  useEffect(() => {
+    // Request permission & listen for network connection to trigger desktop alerts for unpaid bills
+    desktopNotificationService.initNetworkDesktopNotifier(async () => {
+      const { companyCode } = getSessionData();
+      if (!companyCode) return [];
+      try {
+        const bills = await enterBillService.searchBills('', companyCode);
+        return bills || [];
+      } catch (err) {
+        return [];
+      }
+    });
+  }, []);
+
   return (
     <HelmetProvider>
       <Router>

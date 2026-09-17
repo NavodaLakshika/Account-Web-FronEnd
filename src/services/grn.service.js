@@ -3,6 +3,33 @@ import api from './api';
 
 
 export const grnService = {
+  async getTemplateSuggestions() {
+    try {
+      const response = await api.get('/Grn/template-suggestions');
+      return response.data;
+    } catch (error) {
+      console.error('API failed, returning fallback template suggestions', error);
+      return {
+          'Supplier Code': 'SUPP-001',
+          'Supplier Invoice': 'INV-2023-001',
+          'PO Number': 'PO-9923',
+          'Payment Method': 'Cash',
+          'Comment': 'First batch of goods',
+          'Product Code': 'PROD-1001',
+          'Product Name': 'Sample Product A',
+          'Unit': 'Nos',
+          'Pack Size': '1',
+          'Category': 'Electronics',
+          'Department': 'Hardware',
+          'Available Stock': '50',
+          'Purchase Price': '150.00',
+          'Selling Price': '200.00',
+          'Qty': '10',
+          'Free Qty': '2'
+      };
+    }
+  },
+
   async getLookups(company) {
     try {
       const response = await api.get('/Grn/lookups', { params: { company } });

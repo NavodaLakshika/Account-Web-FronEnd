@@ -45,9 +45,11 @@ const CustomerBoard = ({ isOpen, onClose }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             fetchLookups();
             const { userName } = getSessionData();
@@ -78,6 +80,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleClear = () => {
@@ -86,16 +89,18 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             CurrentUser: formData.CurrentUser
         });
         setIsEditMode(false);
+        setErrors({});
         showSuccessToast('Form cleared');
     };
 
     const handleSave = async () => {
-        if (!formData.Cust_Name) {
-            showErrorToast('Customer Name is required');
-            return;
-        }
-        if (!formData.Type) {
-            showErrorToast('Customer Type is required');
+        const newErrors = {};
+        if (!formData.Cust_Name) newErrors.Cust_Name = 'Customer Name is required';
+        if (!formData.Type) newErrors.Type = 'Customer Type is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            showErrorToast('Please fill all required fields');
             return;
         }
 
@@ -247,19 +252,20 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     className="w-full h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold appearance-none"
                                     placeholder="AUTO"
                                     readOnly={isEditMode}
-                                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
                         <div className="col-span-9">
-                            <label className="block text-xs font-bold text-gray-700 mb-1">Customer Name</label>
+                            <label className="block text-xs font-bold text-gray-700 mb-1">Customer Name <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="Cust_Name"
                                 value={formData.Cust_Name}
                                 onChange={handleInputChange}
-                                className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none"
+                                className={`w-full h-8 border ${errors.Cust_Name ? 'border-red-500 bg-red-50' : 'border-gray-300'} px-2 text-sm focus:border-blue-500 outline-none`}
                                 placeholder="Enter customer name..."
                             />
+                            {errors.Cust_Name && <div className="text-[11px] text-red-500 mt-1">{errors.Cust_Name}</div>}
                         </div>
                     </div>
 
@@ -346,16 +352,19 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                         <h3 className="text-xs font-bold text-gray-700 uppercase">Categorization & Geography</h3>
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-2">
-                                <FormRow label="Type">
-                                    <select
-                                        name="Type"
-                                        value={formData.Type}
-                                        onChange={handleInputChange}
-                                        className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
-                                    >
-                                        <option value="">Select Type...</option>
-                                        {types.map(t => <option key={t} value={t}>{t}</option>)}
-                                    </select>
+                                <FormRow label="Type *">
+                                    <div>
+                                        <select
+                                            name="Type"
+                                            value={formData.Type}
+                                            onChange={handleInputChange}
+                                            className={`flex-1 h-7 border ${errors.Type ? 'border-red-500 bg-red-50' : 'border-gray-300'} px-1 text-sm bg-white w-full`}
+                                        >
+                                            <option value="">Select Type...</option>
+                                            {types.map(t => <option key={t} value={t}>{t}</option>)}
+                                        </select>
+                                        {errors.Type && <div className="text-[11px] text-red-500 mt-1">{errors.Type}</div>}
+                                    </div>
                                 </FormRow>
                                 <div className="flex items-center gap-2 ml-[120px]">
                                     <input
@@ -418,7 +427,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             {showSearchModal && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
- <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[80vh]">
+                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[80vh]">
                         <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2 font-['Plus_Jakarta_Sans']">
                             <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
                             <div className="relative flex-1">
@@ -432,8 +441,8 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     autoFocus
                                 />
                             </div>
-                            <button 
-                                onClick={() => setShowSearchModal(false)} 
+                            <button
+                                onClick={() => setShowSearchModal(false)}
                                 className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group shrink-0"
                                 title="Close"
                             >

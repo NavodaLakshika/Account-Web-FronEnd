@@ -1,12 +1,12 @@
 /**
  * Session Utility
  * Handles retrieval of company and user information from localStorage
- * to avoid hardcoding values like 'C001' or 'SYSTEM'.
+ * to avoid hardcoding values.
  */
 
 export const getSessionData = () => {
-    const companyData = localStorage.getItem('selectedCompany');
-    const userData = localStorage.getItem('user');
+    const companyData = localStorage.getItem('selectedCompany') || sessionStorage.getItem('selectedCompany');
+    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
     
     let companyCode = null;
     let companyName = null;
@@ -18,16 +18,13 @@ export const getSessionData = () => {
             if (typeof parsed === 'string') {
                 companyCode = parsed;
             } else {
-                companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                companyName = parsed.company_Name || parsed.companyName || parsed.CompanyName || companyName;
+                companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || parsed.Company_Code || parsed.Code || parsed.code || companyData;
+                companyName = parsed.company_Name || parsed.companyName || parsed.CompanyName || parsed.Comp_Name || parsed.comp_Name || parsed.name || companyName;
             }
         } catch (e) { companyCode = companyData; }
     }
 
-    const companyMap = {
-        'C001': 'COM001',
-        'C002': 'COM002'
-    };
+    const companyMap = {};
     if (companyCode && companyMap[companyCode]) {
         companyCode = companyMap[companyCode];
     }

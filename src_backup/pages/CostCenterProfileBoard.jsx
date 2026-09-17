@@ -30,7 +30,7 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
             handleClear();
             const user = JSON.parse(sessionStorage.getItem('user'));
             const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
+            let companyCode = '';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { companyCode = companyData; } }
             if (user) {
                 setFormData(prev => ({ ...prev, CurrentUser: user.emp_Name || user.empName || 'SYSTEM', Company: companyCode }));
@@ -48,7 +48,7 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
     const handleClear = () => {
         const user = JSON.parse(sessionStorage.getItem('user'));
         const companyData = sessionStorage.getItem('selectedCompany');
-        let companyCode = 'C001';
+        let companyCode = '';
         if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { } }
         setFormData({ ...initialState, CurrentUser: user?.emp_Name || user?.empName || 'SYSTEM', Company: companyCode });
         setIsEditMode(false);

@@ -15,6 +15,7 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
     };
 
     const [formData, setFormData] = useState(initialState);
+    const [errors, setErrors] = useState({});
     const [lookups, setLookups] = useState({ accounts: [], lenders: [], payTypes: [] });
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -25,9 +26,10 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             const companyData = sessionStorage.getItem('selectedCompany');
             const user = JSON.parse(sessionStorage.getItem('user'));
-            let companyCode = 'C001';
+            let companyCode = '';
             if (companyData) {
                 try { const parsed = JSON.parse(companyData); companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData; } catch (e) { companyCode = companyData; }
             }
@@ -51,10 +53,12 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleClear = () => {
         setFormData({ ...initialState, Company: formData.Company, CreateUser: formData.CreateUser });
+        setErrors({});
         setIsEditMode(false);
         fetchNextDocNo(formData.Company);
     };
@@ -62,10 +66,17 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
     const handleDateSelect = (field, date) => { setFormData(prev => ({ ...prev, [field]: date })); };
 
     const handleSave = async () => {
-        if (!formData.LiabCode) { showErrorToast('Liability Number is required.'); return; }
-        if (!formData.LiabName) { showErrorToast('Liability Name is required.'); return; }
-        if (!formData.LiabAccCode) { showErrorToast('Account is not selected.'); return; }
-        if (!formData.LenderCode) { showErrorToast('Vendor is not selected.'); return; }
+        const newErrors = {};
+        if (!formData.LiabCode) newErrors.LiabCode = 'Liability Number is required';
+        if (!formData.LiabName) newErrors.LiabName = 'Liability Name is required';
+        if (!formData.LiabAccCode) newErrors.LiabAccCode = 'Account is required';
+        if (!formData.LenderCode) newErrors.LenderCode = 'Vendor is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            showErrorToast('Please fill all required fields correctly.');
+            return;
+        }
         setLoading(true);
         try {
             await longTermLiabService.save({ ...formData, Amount: parseFloat(formData.Amount), Term: parseFloat(formData.Term), InterestRate: parseFloat(formData.InterestRate), NoOfInstallment: parseInt(formData.NoOfInstallment), MonthlyIns: parseFloat(formData.MonthlyIns) });
@@ -97,6 +108,7 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
                 NoOfInstallment: data.noOfInstallment || data.NoOfInstallment, MonthlyIns: data.monthlyIns || data.MonthlyIns,
                 DueDate: data.dueDate || data.DueDate, Company: data.company || data.Company, CreateUser: formData.CreateUser
             });
+            setErrors({});
             setIsEditMode(true);
             setShowSearchModal(false);
         } catch (error) { showErrorToast('Failed to load liability details.'); } finally { setLoading(false); }
@@ -129,12 +141,14 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-3">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Liability Number</label>
-                                <input type="text" name="LiabCode" value={formData.LiabCode} onChange={handleInputChange} readOnly className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-slate-50 outline-none text-gray-700 font-mono" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Liability Number *</label>
+                                <input type="text" name="LiabCode" value={formData.LiabCode} onChange={handleInputChange} readOnly className={`w-full h-10 border ${errors.LiabCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-slate-50 outline-none text-gray-700 font-mono`} />
+                                {errors.LiabCode && <div className="text-[11px] text-red-500 mt-1">{errors.LiabCode}</div>}
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Liability Name</label>
-                                <input type="text" name="LiabName" value={formData.LiabName} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Liability Name *</label>
+                                <input type="text" name="LiabName" value={formData.LiabName} onChange={handleInputChange} className={`w-full h-10 border ${errors.LiabName ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.LiabName && <div className="text-[11px] text-red-500 mt-1">{errors.LiabName}</div>}
                             </div>
                             <div className="col-span-3 flex items-end">
                                 <button onClick={openSearch} className="w-full h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] text-[13px] transition-all flex items-center justify-center gap-2 border-none">
@@ -144,30 +158,32 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Linked Account</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Linked Account *</label>
                                 <select
                                     value={formData.LiabAccCode}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, LiabAccCode: e.target.value }))}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                    onChange={(e) => { setFormData(prev => ({ ...prev, LiabAccCode: e.target.value })); if (errors.LiabAccCode) setErrors(prev => ({ ...prev, LiabAccCode: null })); }}
+                                    className={`w-full h-10 border ${errors.LiabAccCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer`}
                                 >
                                     <option value="">Select account...</option>
                                     {lookups.accounts.map((acc, idx) => (
                                         <option key={idx} value={acc.code || acc.Code}>{acc.name || acc.Name}</option>
                                     ))}
                                 </select>
+                                {errors.LiabAccCode && <div className="text-[11px] text-red-500 mt-1">{errors.LiabAccCode}</div>}
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Lender / Institution</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Lender / Institution *</label>
                                 <select
                                     value={formData.LenderCode}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, LenderCode: e.target.value }))}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                    onChange={(e) => { setFormData(prev => ({ ...prev, LenderCode: e.target.value })); if (errors.LenderCode) setErrors(prev => ({ ...prev, LenderCode: null })); }}
+                                    className={`w-full h-10 border ${errors.LenderCode ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer`}
                                 >
                                     <option value="">Select lender...</option>
                                     {lookups.lenders.map((lender, idx) => (
                                         <option key={idx} value={lender.code || lender.Code}>{lender.name || lender.Name || lender.supplier_Name}</option>
                                     ))}
                                 </select>
+                                {errors.LenderCode && <div className="text-[11px] text-red-500 mt-1">{errors.LenderCode}</div>}
                             </div>
                         </div>
                     </div>

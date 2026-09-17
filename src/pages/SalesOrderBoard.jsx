@@ -56,6 +56,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialForm());
             const { companyCode } = getSessionData();
             setCompany(companyCode);

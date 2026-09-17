@@ -6,6 +6,7 @@ import { supplierService } from '../../../services/supplier.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 import VendorTypesMasterBoard from '../../../pages/VendorTypesMasterBoard';
 import ConfirmModal from '../ConfirmModal';
+import { getSessionData } from '../../../utils/session';
 
 const SupplierMasterBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -28,20 +29,12 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             handleClear();
             fetchLookups();
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
-            if (companyData) {
-                try {
-                    const p = JSON.parse(companyData);
-                    companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData;
-                } catch (e) {
-                    companyCode = companyData;
-                }
-            }
-            if (user) {
-                setFormData(prev => ({ ...prev, CurrentUser: user.emp_Name || user.empName || user.EmpName || user.Emp_Name || 'SYSTEM', Company: companyCode }));
-            }
+            const { companyCode, userName } = getSessionData();
+            setFormData(prev => ({
+                ...prev,
+                CurrentUser: userName || 'SYSTEM',
+                Company: companyCode || 'COM001'
+            }));
         }
     }, [isOpen]);
 
@@ -73,11 +66,12 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        const companyData = sessionStorage.getItem('selectedCompany');
-        let companyCode = 'C001';
-        if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { } }
-        setFormData({ ...initialState, CurrentUser: user?.emp_Name || user?.empName || 'SYSTEM', Company: companyCode });
+        const { companyCode, userName } = getSessionData();
+        setFormData({
+            ...initialState,
+            CurrentUser: userName || 'SYSTEM',
+            Company: companyCode || 'COM001'
+        });
         setIsEditMode(false);
         setErrors({});
     };

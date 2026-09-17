@@ -78,12 +78,14 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
 
     const [activeModal, setActiveModal] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
 
@@ -116,6 +118,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
 
     const handleSearchCheque = async () => {
         if (!formData.chequeNo && !formData.receiptNo) {
+            setErrors({ chequeNo: 'Provide Cheque No or Receipt No' });
             showErrorToast("Please enter a Cheque No or Receipt No to fetch record.");
             return;
         }
@@ -153,6 +156,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.customerCode || !formData.chequeNo || formData.chequeAmount <= 0) {
+            setErrors({ chequeNo: 'Retrieve a valid cheque first' });
             showErrorToast("Please verify and search for a valid cheque record first.");
             return;
         }
@@ -185,6 +189,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
             remarks: ''
         });
         loadInitialData();
+        setErrors({});
     };
 
     return (
@@ -276,19 +281,25 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
 
-                            {/* Cheque No */}
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque No</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque No <span className="text-red-500">*</span></label>
                                 <div className="relative">
-                                    <input type="text" value={formData.chequeNo} onChange={e => setFormData({ ...formData, chequeNo: e.target.value })}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input type="text" value={formData.chequeNo} onChange={e => {
+                                        setFormData({ ...formData, chequeNo: e.target.value });
+                                        if (errors.chequeNo) setErrors(prev => ({ ...prev, chequeNo: null }));
+                                    }}
+                                        className={`w-full h-10 border ${errors.chequeNo ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono`} />
                                 </div>
+                                {errors.chequeNo && <div className="text-[11px] text-red-500 mt-1">{errors.chequeNo}</div>}
                             </div>
 
                             {/* Receipt No */}
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Receipt No</label>
-                                <input type="text" value={formData.receiptNo} onChange={e => setFormData({ ...formData, receiptNo: e.target.value })}
+                                <input type="text" value={formData.receiptNo} onChange={e => {
+                                    setFormData({ ...formData, receiptNo: e.target.value });
+                                    if (errors.chequeNo) setErrors(prev => ({ ...prev, chequeNo: null }));
+                                }}
                                     className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" />
                             </div>
 

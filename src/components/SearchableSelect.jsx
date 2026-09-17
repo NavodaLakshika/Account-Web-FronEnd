@@ -17,7 +17,18 @@ const SearchableSelect = ({
         (opt.code || opt.value || '').toLowerCase().includes(query.toLowerCase())
     );
 
-    const selectedOption = options.find(opt => opt.value === value || opt.code === value);
+    const selectedOption = options.find(opt => 
+        (opt.value !== undefined && opt.value === value) || 
+        (opt.code && opt.code === value)
+    );
+
+    const getSelectedLabel = () => {
+        if (!selectedOption) return placeholder;
+        if (selectedOption.code) {
+            return `${selectedOption.name || selectedOption.label} (${selectedOption.code})`;
+        }
+        return selectedOption.name || selectedOption.label;
+    };
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -32,11 +43,11 @@ const SearchableSelect = ({
     return (
         <div ref={wrapperRef} className="relative w-full">
             <div 
-                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 flex items-center justify-between bg-white cursor-pointer hover:border-[#0285fd] transition-colors"
+                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 flex items-center justify-between bg-white cursor-pointer hover:border-[#0285fd] transition-colors shadow-sm"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <span className={`text-[13px] truncate ${selectedOption ? 'text-gray-800' : 'text-gray-400'}`}>
-                    {selectedOption ? (selectedOption.name || selectedOption.label) : placeholder}
+                <span className={`text-[13px] truncate ${selectedOption ? 'text-gray-800 font-medium' : 'text-gray-400'}`}>
+                    {getSelectedLabel()}
                 </span>
                 <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </div>

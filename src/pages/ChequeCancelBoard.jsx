@@ -81,11 +81,13 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
+    const [errors, setErrors] = useState({});
     const [activeModal, setActiveModal] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             setSearchTerm('');
             const { companyCode, userName } = getSessionData();
@@ -112,6 +114,7 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
 
     const handleSearchCheque = async () => {
         if (!searchTerm.trim()) {
+            setErrors({ search: 'Find a record' });
             showErrorToast("Please enter a Document No or Cheque No.");
             return;
         }
@@ -147,16 +150,14 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.supplierCode && !formData.supplierName) {
-            showErrorToast("Please search and select a cheque first.");
-            return;
-        }
-        if (!formData.reason) {
-            showErrorToast("Cancellation reason is required.");
-            return;
-        }
-        if (!formData.apAccount) {
-            showErrorToast("A/P Account is required for ledger reversal.");
+        const newErrors = {};
+        if (!formData.supplierCode && !formData.supplierName) newErrors.search = 'Select a cheque first';
+        if (!formData.reason) newErrors.reason = 'Reason is required';
+        if (!formData.apAccount) newErrors.apAccount = 'A/P Account is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            showErrorToast("Please fill all required fields correctly.");
             return;
         }
         try {
@@ -176,6 +177,7 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
     const handleClear = () => {
         setFormData(getInitialFormData());
         setSearchTerm('');
+        setErrors({});
     };
 
     const isReturn = formData.mode === 'Cheque Return';
@@ -222,9 +224,12 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
                             <div className="flex items-center pl-3 pr-2 text-gray-400 bg-white">
                                 <Search size={18} />
                             </div>
-                            <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+                            <input type="text" value={searchTerm} onChange={e => {
+                                setSearchTerm(e.target.value);
+                                if (errors.search) setErrors(prev => ({ ...prev, search: null }));
+                            }}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearchCheque()}
-                                className="flex-1 h-12 px-3 text-[14px] outline-none text-gray-800 placeholder:text-gray-300 bg-white border-none"
+                                className={`flex-1 h-12 px-3 text-[14px] outline-none ${errors.search ? 'bg-red-50 text-red-700' : 'text-gray-800 bg-white'} placeholder:text-gray-300 border-none`}
                                 placeholder="Enter Cheque No or Document No..." autoFocus />
                             <button onClick={handleSearchCheque}
                                 className="px-6 bg-[#0285fd] hover:bg-[#0073ff] text-white text-[11px] font-bold uppercase tracking-widest transition-colors flex items-center gap-2 border-none">
@@ -265,26 +270,30 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
                                         <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{isReturn ? 'Return Account (A/P)' : 'Post Reversal To Account (A/P)'}</label>
                                         <div className="relative">
                                             <select
-                                        value={formData.apAccount || ''}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
-                                            if (item) {
-                                                const handler = (item) => setFormData({ ...formData, apAccount: item.code, apAccountName: item.name });
-                                                handler(item);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.accounts || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
-                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                value={formData.apAccount || ''}
+                                                onChange={(ev) => {
+                                                    const val = ev.target.value;
+                                                    const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                                    if (item) {
+                                                        const handler = (item) => {
+                                                            setFormData({ ...formData, apAccount: item.code, apAccountName: item.name });
+                                                            if (errors.apAccount) setErrors(prev => ({ ...prev, apAccount: null }));
+                                                        };
+                                                        handler(item);
+                                                    }
+                                                }}
+                                                className={`w-full h-10 border ${errors.apAccount ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
+                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                            >
+                                                <option value="">Select...</option>
+                                                {(lookups.accounts || []).map((item, idx) => (
+                                                    <option key={idx} value={item.code || item.name || item}>
+                                                        {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
+                                        {errors.apAccount && <div className="text-[11px] text-red-500 mt-1">{errors.apAccount}</div>}
                                     </div>
                                     <div className="col-span-4">
                                         <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{isReturn ? 'Return Date' : 'Cancellation Date'}</label>
@@ -300,9 +309,13 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
                                     </div>
                                     <div className="col-span-12">
                                         <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Reason *</label>
-                                        <input type="text" value={formData.reason} onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                        <input type="text" value={formData.reason} onChange={e => {
+                                            setFormData({ ...formData, reason: e.target.value });
+                                            if (errors.reason) setErrors(prev => ({ ...prev, reason: null }));
+                                        }}
+                                            className={`w-full h-10 border ${errors.reason ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`}
                                             placeholder="Why is this cancelled?" />
+                                        {errors.reason && <div className="text-[11px] text-red-500 mt-1">{errors.reason}</div>}
                                     </div>
                                 </div>
                                 <div className={`p-3 rounded-[3px] flex gap-3 items-start border ${isReturn ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200'}`}>

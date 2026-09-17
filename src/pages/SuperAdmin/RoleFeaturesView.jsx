@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldAlert, Database, CheckCircle, Loader2, Plus, Edit, Trash2, Search, Power, ShieldCheck, Box } from 'lucide-react';
 import SystemLoader from '../../components/SystemLoader';
+import SearchableSelect from '../../components/SearchableSelect';
 
 const RoleFeaturesView = ({
     handleSeedFunctions,
@@ -21,8 +22,70 @@ const RoleFeaturesView = ({
     handleDeleteUserRole,
     permSearch,
     setPermSearch,
-    handleTogglePermission
+    handleTogglePermission,
+    targetCompany,
+    setTargetCompany,
+    targetEmployee,
+    setTargetEmployee,
+    allCompanies = [],
+    allEmployees = [],
+    hierarchy = []
 }) => {
+    // Robust company list resolution (supports multiple naming conventions and hierarchy fallback)
+    let companyList = [...(allCompanies || [])];
+    if (companyList.length === 0 && hierarchy && hierarchy.length > 0) {
+        const compMap = new Map();
+        hierarchy.forEach(emp => {
+            (emp.companies || []).forEach(c => {
+                const code = c.companyCode || c.code;
+                if (code && !compMap.has(code)) {
+                    compMap.set(code, {
+                        code: code,
+                        comp_Name: c.companyName || c.comp_Name || code
+                    });
+                }
+            });
+        });
+        companyList = Array.from(compMap.values());
+    }
+
+    const companyOptions = [
+        { label: 'Global (All Companies)', name: 'Global (All Companies)', value: '', code: '' },
+        ...companyList.map(c => {
+            const code = c.code || c.Company_Code || c.companyCode || '';
+            const name = c.comp_Name || c.Comp_Name || c.companyName || c.name || code;
+            return {
+                label: name,
+                name: name,
+                value: code,
+                code: code
+            };
+        })
+    ];
+
+    // Robust employee list resolution (supports multiple naming conventions and hierarchy fallback)
+    let employeeList = [...(allEmployees || [])];
+    if (employeeList.length === 0 && hierarchy && hierarchy.length > 0) {
+        employeeList = hierarchy.map(emp => ({
+            emp_Code: emp.empCode || emp.emp_Code,
+            emp_Name: emp.empName || emp.emp_Name
+        }));
+    }
+
+    const employeeOptions = [
+        { label: 'Global (All Employees)', name: 'Global (All Employees)', value: '', code: '' },
+        ...employeeList.map(e => {
+            const code = e.emp_Code || e.Emp_Code || e.empCode || '';
+            const name = e.emp_Name || e.Emp_Name || e.empName || '';
+            return {
+                label: name || code,
+                name: name || code,
+                value: code,
+                code: code
+            };
+        })
+    ];
+
     return (
         <div className="animate-in fade-in zoom-in-95 duration-200">
             {/* Header Block */}
@@ -71,8 +134,48 @@ const RoleFeaturesView = ({
             </div>
 
             {/* Filter and Role Select Panel */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="flex flex-wrap items-center gap-2 w-full md:w-auto overflow-x-auto no-scrollbar">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6 flex flex-col gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest shrink-0">Target Company:</span>
+                            <div className="w-[220px] sm:w-[250px]">
+                                <SearchableSelect 
+                                    options={companyOptions}
+                                    value={targetCompany || ''} 
+                                    onChange={opt => setTargetCompany(opt.value)}
+                                    placeholder="Select Company"
+                                    searchPlaceholder="Search companies..."
+                                />
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest shrink-0">Target Employee:</span>
+                            <div className="w-[220px] sm:w-[250px]">
+                                <SearchableSelect 
+                                    options={employeeOptions}
+                                    value={targetEmployee || ''} 
+                                    onChange={opt => setTargetEmployee(opt.value)}
+                                    placeholder="Select Employee"
+                                    searchPlaceholder="Search employees..."
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="relative w-full md:w-72 shrink-0">
+                        <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
+                        <input
+                            type="text"
+                            placeholder="Search system functions..."
+                            value={permSearch}
+                            onChange={e => setPermSearch(e.target.value)}
+                            className="pl-9 pr-4 py-2 border border-gray-200 shadow-sm bg-white text-gray-700 text-xs w-full outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-lg transition-all"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 w-full overflow-x-auto no-scrollbar pt-2 border-t border-gray-100">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mr-2 shrink-0">Select Identity:</span>
                     <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-lg border border-gray-200 shrink-0">
                         {systemRoles.map(role => (
@@ -119,17 +222,6 @@ const RoleFeaturesView = ({
                             </button>
                         </>
                     )}
-                </div>
-
-                <div className="relative w-full md:w-72 shrink-0">
-                    <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
-                    <input
-                        type="text"
-                        placeholder="Search system functions..."
-                        value={permSearch}
-                        onChange={e => setPermSearch(e.target.value)}
-                        className="pl-9 pr-4 py-2 border border-gray-200 shadow-sm bg-white text-gray-700 text-xs w-full outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-lg transition-all"
-                    />
                 </div>
             </div>
 

@@ -210,7 +210,7 @@ const SuperAdminDashboard = () => {
 
 
     // Role Permissions Editor State
-    const [selectedRole, setSelectedRole] = useState(2); // Default to Accountant
+    const [selectedRole, setSelectedRole] = useState(1); // Default to Admin
     const [systemRoles, setSystemRoles] = useState([]);
     const [permissions, setPermissions] = useState([]);
     const [loadingPermissions, setLoadingPermissions] = useState(false);
@@ -255,6 +255,10 @@ const SuperAdminDashboard = () => {
         message: '',
         variant: 'success'
     });
+
+    // --- Role Features State ---
+    const [targetCompany, setTargetCompany] = useState('');
+    const [targetEmployee, setTargetEmployee] = useState('');
 
     const [showAdminConfig, setShowAdminConfig] = useState(false);
     const [showSystemLogReport, setShowSystemLogReport] = useState(false);
@@ -359,9 +363,9 @@ const SuperAdminDashboard = () => {
                 api.get('/SuperAdmin/module-usage').catch(() => ({ data: [] })),
                 api.get('/UserGroup/all').catch(() => ({ data: [] }))
             ]);
-            let hData = hierarchyRes.data || [];
-            let cData = compRes.data || [];
-            let eData = empRes.data || [];
+            let hData = Array.isArray(hierarchyRes.data) ? hierarchyRes.data : (hierarchyRes.data?.data || []);
+            let cData = Array.isArray(compRes.data) ? compRes.data : (compRes.data?.data || []);
+            let eData = Array.isArray(empRes.data) ? empRes.data : (empRes.data?.data || []);
 
             // Always use real data from the API
 
@@ -541,14 +545,19 @@ const SuperAdminDashboard = () => {
     useEffect(() => {
         if (activeMenu === 'Role Features') {
             fetchSystemRoles();
+            if (!allCompanies || allCompanies.length === 0 || !allEmployees || allEmployees.length === 0) {
+                fetchAdminData();
+            }
         }
     }, [activeMenu]);
 
     useEffect(() => {
         if (activeMenu === 'Role Features' && selectedRole) {
-            fetchRolePermissions(selectedRole);
+            fetchRolePermissions(selectedRole, targetCompany, targetEmployee);
+        } else {
+            setPermissions([]);
         }
-    }, [activeMenu, selectedRole]);
+    }, [activeMenu, selectedRole, targetCompany, targetEmployee]);
 
     const fetchSystemRoles = async () => {
         try {
@@ -588,10 +597,17 @@ const SuperAdminDashboard = () => {
         }
     };
 
-    const fetchRolePermissions = async (roleId) => {
+    const fetchRolePermissions = async (roleId, compCode = targetCompany, empCode = targetEmployee) => {
         setLoadingPermissions(true);
         try {
-            const res = await api.get('/UserRole/system-permissions', { params: { userRoleId: roleId }, hideLoader: true });
+            const res = await api.get('/UserRole/system-permissions', { 
+                params: { 
+                    userRoleId: roleId,
+                    companyCode: compCode || undefined,
+                    empCode: empCode || undefined
+                }, 
+                hideLoader: true 
+            });
             const data = res.data || [];
 
             const uniquePerms = Array.from(new Map(data.map(item => [item.system_Fuction || item.systemFuction || item.System_Fuction, item])).values());
@@ -651,7 +667,7 @@ const SuperAdminDashboard = () => {
         setSeedingFunctions(true);
         try {
             await api.post('/UserRole/seed-system-functions', {}, { hideLoader: true });
-            await fetchRolePermissions(selectedRole);
+            await fetchRolePermissions(selectedRole, targetCompany, targetEmployee);
         } catch (e) {
             console.error("Error seeding functions", e);
         } finally {
@@ -682,7 +698,9 @@ const SuperAdminDashboard = () => {
         setSavingPermissions(true);
         try {
             const payload = {
-                userRoleId: selectedRole.toString(),
+                userRoleId: selectedRole ? selectedRole.toString() : "",
+                companyCode: targetCompany || undefined,
+                empCode: targetEmployee || undefined,
                 permissions: permissions.map(p => {
                     const allowVal = p.allow_Fuction !== undefined ? p.allow_Fuction : (p.allowFuction !== undefined ? p.allowFuction : p.Allow_Fuction);
                     return {
@@ -1567,6 +1585,13 @@ const SuperAdminDashboard = () => {
                             systemRoles={systemRoles}
                             selectedRole={selectedRole}
                             setSelectedRole={setSelectedRole}
+                            targetCompany={targetCompany}
+                            setTargetCompany={setTargetCompany}
+                            targetEmployee={targetEmployee}
+                            setTargetEmployee={setTargetEmployee}
+                            allCompanies={allCompanies}
+                            allEmployees={allEmployees}
+                            hierarchy={hierarchy}
                             setShowCreateRoleModal={setShowCreateRoleModal}
                             userGroups={userGroups}
                             setEditingUserRole={setEditingUserRole}

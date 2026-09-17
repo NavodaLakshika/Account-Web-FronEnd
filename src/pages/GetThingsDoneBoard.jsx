@@ -1379,7 +1379,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
             </div>
           )}
 
-          {loading && <SystemLoader />}
+          {/* loading is handled globally by GlobalLoader to prevent multiple overlays */}
 
           {isPrivacyMode ? (
             <div className="relative mt-6 min-h-[500px]">

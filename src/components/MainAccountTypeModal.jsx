@@ -17,7 +17,7 @@ const MainAccountTypeModal = ({ isOpen, onClose, onSelect }) => {
             console.error('Error parsing company', e);
         }
     }
-    const companyCode = parsedCompany || localStorage.getItem('company') || 'C001';
+    const companyCode = parsedCompany || localStorage.getItem('company') || '';
 
     useEffect(() => {
         if (isOpen) {

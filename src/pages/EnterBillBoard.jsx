@@ -7,7 +7,7 @@ import SupplierMasterBoard from '../components/modals/MasterSubModal/SupplierMas
 import CostCenterProfileBoard from './CostCenterProfileBoard';
 import NewAccountBoard from './NewAccountBoard';
 import { enterBillService } from '../services/enterBill.service';
-
+import { desktopNotificationService } from '../services/desktopNotification.service';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -90,6 +90,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            desktopNotificationService.requestPermission().catch(() => {});
             setFormData(getInitialFormData());
 
             const { companyCode, userName } = getSessionData();
@@ -126,10 +127,10 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 accId: data.header.acc_Id || data.header.accId || '',
                 terms: data.header.terms || '',
                 memo: data.header.memo || '',
-                billNo: data.header.bill_No || data.header.billNo || '',
-                refNo: data.header.ref_No || data.header.refNo || '',
+                billNo: data.header.bill_No || data.header.billNo || data.header.inv_No || '',
+                refNo: data.header.ref_No || data.header.refNo || data.header.reference || data.header.reffNo2 || '',
                 postDate: (data.header.post_Date || data.header.postDate || '').split('T')[0],
-                billDueDate: (data.header.bill_Due_Date || data.header.billDueDate || '').split('T')[0],
+                billDueDate: (data.header.bill_Due_Date || data.header.billDueDate || data.header.expected_Date || '').split('T')[0],
                 costCenter: data.header.costCenter || '',
                 company: prev.company
             }));
@@ -146,7 +147,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             } else { setExpenses([]); }
 
             setShowSearchModal(false);
-            showSuccessToast('Bill loaded successfully');
+            showSuccessToast(`Bill ${docNo} loaded successfully`);
         } catch (error) {
             showErrorToast('Failed to load bill details');
         } finally {
@@ -250,6 +251,20 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 expenses: expenses
             });
             showSuccessToast('Bill saved successfully!');
+
+            // Find vendor name for desktop alert
+            const currentVendor = (lookups.vendors || []).find(v => (v.code || v.itemId || v.id) === formData.vendorId);
+            const vendorName = currentVendor ? (currentVendor.name || currentVendor.itemName || currentVendor.code) : formData.vendorId;
+
+            // Trigger Google Chrome Desktop Notification for unpaid / payment pending bill
+            desktopNotificationService.notifyUnpaidBill({
+                docNo: formData.docNo,
+                refNo: formData.refNo || formData.docNo,
+                vendor: vendorName,
+                amount: parseFloat(calculateTotal()),
+                dueDate: formData.billDueDate
+            });
+
             handleClear();
         } catch (error) {
             showErrorToast(error.message || 'Error saving bill');
@@ -305,15 +320,41 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
                             <div className="">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc No <span className="text-red-500">*</span></label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        name="docNo"
-                                        value={formData.docNo}
-                                        readOnly
-                                        className={`w-full h-10 border ${errors.docNo ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none`}
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Main Doc No <span className="text-red-500">*</span></label>
+                                <div className="flex items-center gap-2">
+                                    <div className="relative cursor-pointer" onClick={() => setShowSearchModal(true)}>
+                                        <input
+                                            type="text"
+                                            name="docNo"
+                                            value={formData.docNo}
+                                            readOnly
+                                            onClick={() => setShowSearchModal(true)}
+                                            placeholder="Select Doc No..."
+                                            className={`w-44 h-10 border ${errors.docNo ? 'border-red-500' : 'border-gray-300'} rounded-[3px] px-3 pr-8 text-[14px] font-semibold text-[#0285fd] bg-slate-50 hover:bg-blue-50/50 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer truncate transition-all`}
+                                        />
+                                        <ChevronDown size={14} className="absolute right-2.5 top-3 text-gray-400 pointer-events-none" />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowSearchModal(true)}
+                                        className="h-10 px-3 bg-blue-50 text-[#0285fd] hover:bg-blue-100 hover:text-blue-700 border border-[#0285fd]/40 font-semibold rounded-[3px] flex items-center justify-center gap-1.5 transition-all text-[12px] shadow-sm active:scale-95 shrink-0"
+                                        title="Search / Select Existing Bill Document"
+                                    >
+                                        <Search size={14} />
+                                        <span>Select Doc</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            handleClear();
+                                            showSuccessToast('New bill initialized');
+                                        }}
+                                        className="h-10 px-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 border border-emerald-300 font-semibold rounded-[3px] flex items-center justify-center gap-1 transition-all text-[12px] shadow-sm active:scale-95 shrink-0"
+                                        title="Create New Bill"
+                                    >
+                                        <Plus size={14} />
+                                        <span>New</span>
+                                    </button>
                                 </div>
                                 {errors.docNo && <div className="text-red-500 text-[11px] mt-1">{errors.docNo}</div>}
                             </div>
@@ -467,7 +508,27 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                 </div>
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Reference No</label>
-                                    <input name="refNo" value={formData.refNo} onChange={handleInputChange} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    <div className="flex gap-2">
+                                        <input
+                                            name="refNo"
+                                            value={formData.refNo}
+                                            onChange={handleInputChange}
+                                            type="text"
+                                            placeholder="Enter Ref No..."
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setBillSearchQuery(formData.refNo || '');
+                                                setShowSearchModal(true);
+                                            }}
+                                            className="h-10 px-3 bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-300 rounded-[3px] flex items-center justify-center gap-1 transition-colors text-[12px] shrink-0"
+                                            title="Search by Reference / Doc No"
+                                        >
+                                            <Search size={14} />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Due Date</label>
@@ -760,44 +821,84 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             />
 
             {/* Bill Search Modal */}
-            <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title={`Existing Bills - ${billSearchResults.length} Found`}>
+            <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title={`Existing Bills & Documents - ${billSearchResults.length} Found`}>
                 <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Document / Vendor</span>
-                        <input
-                            type="text"
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
-                            value={billSearchQuery}
-                            onChange={(e) => setBillSearchQuery(e.target.value)}
-                            placeholder="Enter Doc No or Vendor..."
-                        />
+                    <div className="flex items-center gap-3 bg-slate-50 p-4 border-b border-gray-200 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search Document</span>
+                        <div className="relative flex-1">
+                            <input
+                                type="text"
+                                className="w-full h-10 pl-9 pr-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm"
+                                value={billSearchQuery}
+                                onChange={(e) => setBillSearchQuery(e.target.value)}
+                                placeholder="Search by Doc No, Reference No, Bill No, or Vendor..."
+                            />
+                            <Search size={16} className="absolute left-3 top-3 text-gray-400 pointer-events-none" />
+                        </div>
+                        {billSearchQuery && (
+                            <button
+                                onClick={() => setBillSearchQuery('')}
+                                className="h-10 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-[3px] transition-colors"
+                            >
+                                Clear
+                            </button>
+                        )}
                     </div>
-                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                    <div className="max-h-[55vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 z-10 shadow-sm">
                                 <tr>
-                                    <th className="border-b px-5 py-3">Doc No</th>
-                                    <th className="border-b px-5 py-3">Vendor</th>
-                                    <th className="border-b px-5 py-3">Post Date</th>
-                                    <th className="border-b text-right px-5 py-3">Amount</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                    <th className="border-b px-4 py-3">Doc No</th>
+                                    <th className="border-b px-4 py-3">Ref No / Bill No</th>
+                                    <th className="border-b px-4 py-3">Vendor</th>
+                                    <th className="border-b px-4 py-3">Post Date</th>
+                                    <th className="border-b text-right px-4 py-3">Amount Due</th>
+                                    <th className="border-b text-center px-4 py-3">Status</th>
+                                    <th className="border-b text-center w-24 px-4 py-3">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {billSearchResults.map((b, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{b.docNo}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{lookups.vendors?.find(v => v.code === b.vendorId)?.name || b.vendorId}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{b.date ? b.date.split('T')[0] : ''}</td>
-                                        <td className="text-[11px] text-right font-bold text-red-600 px-5 py-3">{b.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                            <button onClick={() => loadBill(b.docNo)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {billSearchResults.map((b, idx) => {
+                                    const vName = lookups.vendors?.find(v => v.code === b.vendorId)?.name || b.vendorId || '-';
+                                    const refDisplay = b.refNo || b.ref_No || b.reference || b.billNo || b.bill_No || '-';
+                                    return (
+                                        <tr key={idx} className="group hover:bg-blue-50/60 transition-all border-b border-gray-100 cursor-pointer">
+                                            <td className="text-[13px] font-bold text-slate-700 group-hover:text-blue-600 transition-colors px-4 py-3">
+                                                {b.docNo}
+                                            </td>
+                                            <td className="font-mono text-[12px] font-semibold text-slate-600 px-4 py-3">
+                                                {refDisplay}
+                                            </td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-4 py-3">
+                                                {vName}
+                                            </td>
+                                            <td className="font-mono text-[12px] text-gray-500 px-4 py-3">
+                                                {b.date ? b.date.split('T')[0] : '-'}
+                                            </td>
+                                            <td className="text-[12px] text-right font-bold text-red-600 px-4 py-3">
+                                                Rs. {b.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                            </td>
+                                            <td className="text-center px-4 py-3">
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
+                                                    Pending
+                                                </span>
+                                            </td>
+                                            <td className="text-center px-4 py-3">
+                                                <button
+                                                    onClick={() => loadBill(b.docNo)}
+                                                    className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-[#0285fd] hover:text-white text-[11px] px-4 py-1.5 rounded-[3px] font-bold shadow-sm transition-all active:scale-95 uppercase"
+                                                >
+                                                    SELECT
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                                 {billSearchResults.length === 0 && (
                                     <tr>
-                                        <td colSpan="5" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No bills found matching your search.</td>
+                                        <td colSpan="7" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
+                                            No bills found matching your search.
+                                        </td>
                                     </tr>
                                 )}
                             </tbody>

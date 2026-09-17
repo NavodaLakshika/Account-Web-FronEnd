@@ -8,7 +8,7 @@ const AlertModal = ({
     variant = "success", // success, error, info, warning, pending
     confirmText = "ok",
     cancelText = "nope",
-    showCancel = true,
+    showCancel = false,
     onConfirm
 }) => {
     if (!isOpen) return null;

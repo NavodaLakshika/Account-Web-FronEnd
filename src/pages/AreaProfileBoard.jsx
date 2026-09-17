@@ -7,11 +7,13 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import RouteProfileBoard from './RouteProfileBoard';
 import ConfirmModal from '../components/modals/ConfirmModal';
+import { getSessionData } from '../utils/session';
 
 const AreaProfileBoard = ({ isOpen, onClose }) => {
     const initialState = { Code: '', Area_Name: '', Route_Code: '', Route_Name: '', Company: '', CurrentUser: '' };
 
     const [formData, setFormData] = useState(initialState);
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [routeList, setRouteList] = useState([]);
@@ -22,44 +24,76 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
     const handleRouteModalClose = async () => {
         setShowRouteModal(false);
         try {
-            const routes = await routeService.getAll(formData.Company);
+            const { companyCode } = getSessionData();
+            const activeCompany = companyCode || formData.Company || 'COM001';
+            const routes = await routeService.getAll(activeCompany);
             setRouteList(routes || []);
         } catch (error) { console.error('Lookup fetch error:', error); }
     };
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = '';
-            if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; } }
-            setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
+            if (typeof setErrors === "function") setErrors({});
+            const { companyCode, userName } = getSessionData();
+            const activeCompany = companyCode || 'COM001';
+            setFormData({
+                ...initialState,
+                CurrentUser: userName || 'SYSTEM',
+                Company: activeCompany
+            });
             setIsEditMode(false);
             setAreaList([]);
-            fetchRoutes(companyCode);
+            fetchRoutes(activeCompany);
         }
     }, [isOpen]);
 
     const fetchRoutes = async (compCode) => {
+        const targetCompany = compCode || getSessionData().companyCode || 'COM001';
         try {
-            const data = await routeService.getAll(compCode);
+            const data = await routeService.getAll(targetCompany);
             setRouteList(data || []);
-        } catch (e) { console.error(e) }
+        } catch (e) { console.error(e); }
     };
 
-    const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    };
 
-    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); setAreaList([]); };
+    const handleClear = () => {
+        const { companyCode, userName } = getSessionData();
+        const activeCompany = companyCode || formData.Company || 'COM001';
+        setFormData({ ...initialState, Company: activeCompany, CurrentUser: userName || formData.CurrentUser || 'SYSTEM' });
+        setIsEditMode(false);
+        setAreaList([]);
+        setErrors({});
+    };
 
     const handleSave = async () => {
-        if (!formData.Route_Code || !formData.Area_Name) { showErrorToast('Route and Area Name are required'); return; }
+        const newErrors = {};
+        if (!formData.Route_Code) newErrors.Route_Code = 'Route is required';
+        if (!formData.Area_Name) newErrors.Area_Name = 'Area Name is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            showErrorToast('Route and Area Name are required');
+            return;
+        }
         setLoading(true);
         try {
-            const data = await areaService.save(formData);
+            const { companyCode, userName } = getSessionData();
+            const activeCompany = companyCode || formData.Company || 'COM001';
+            const payload = {
+                ...formData,
+                Company: activeCompany,
+                CurrentUser: formData.CurrentUser || userName || 'SYSTEM'
+            };
+            const data = await areaService.save(payload);
             if (data.message === 'inserted') { showSuccessToast('Area created'); handleClear(); }
             else { showSuccessToast('Area updated'); }
 
-            const freshAreas = await areaService.searchAreas(formData.Route_Code, formData.Company, '');
+            const freshAreas = await areaService.searchAreas(formData.Route_Code, activeCompany, '');
             setAreaList(freshAreas || []);
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
     };
@@ -68,18 +102,28 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
 
     const confirmDelete = async () => {
         setLoading(true);
-        try { await areaService.delete(formData.Code, formData.Company); showSuccessToast('Area deleted'); handleClear(); setShowDeleteConfirm(false); } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
+        try {
+            const { companyCode } = getSessionData();
+            const activeCompany = companyCode || formData.Company || 'COM001';
+            await areaService.delete(formData.Code, activeCompany);
+            showSuccessToast('Area deleted');
+            handleClear();
+            setShowDeleteConfirm(false);
+        } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
     };
 
     const handleRouteSelect = async (e) => {
         const routeCode = e.target.value;
         const route = routeList.find(r => r.code === routeCode);
         setFormData(prev => ({ ...prev, Route_Code: routeCode, Route_Name: route ? route.name : '', Code: '', Area_Name: '' }));
+        if (errors.Route_Code) setErrors(prev => ({ ...prev, Route_Code: null }));
         setIsEditMode(false);
         if (routeCode) {
             setLoading(true);
             try {
-                const data = await areaService.searchAreas(routeCode, formData.Company, '');
+                const { companyCode } = getSessionData();
+                const activeCompany = companyCode || formData.Company || 'COM001';
+                const data = await areaService.searchAreas(routeCode, activeCompany, '');
                 setAreaList(data || []);
             } catch (err) {
                 showErrorToast('Failed to load areas');
@@ -129,9 +173,9 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-12">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Route</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Route *</label>
                                 <div className="flex gap-2 relative group">
-                                    <select value={formData.Route_Code} onChange={handleRouteSelect} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                    <select value={formData.Route_Code} onChange={handleRouteSelect} className={`w-full h-10 border ${errors.Route_Code ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none`} style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
                                         <option value="">Select route...</option>
                                         {routeList.map(r => <option key={r.code} value={r.code}>{r.code} - {r.name}</option>)}
                                     </select>
@@ -144,6 +188,7 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
                                         <Plus size={18} strokeWidth={3} />
                                     </button>
                                 </div>
+                                {errors.Route_Code && <div className="text-[11px] text-red-500 mt-1">{errors.Route_Code}</div>}
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Area ID</label>
@@ -155,15 +200,14 @@ const AreaProfileBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Area Name</label>
-                                <input type="text" name="Area_Name" value={formData.Area_Name} onChange={handleInputChange} placeholder="Enter area name" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Area Name *</label>
+                                <input type="text" name="Area_Name" value={formData.Area_Name} onChange={handleInputChange} placeholder="Enter area name" className={`w-full h-10 border ${errors.Area_Name ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.Area_Name && <div className="text-[11px] text-red-500 mt-1">{errors.Area_Name}</div>}
                             </div>
                         </div>
                     </div>
                 </div>
             </TransactionFormWrapper>
-
-            {/* Search Modals Removed */}
 
             <ConfirmModal
                 isOpen={showDeleteConfirm}

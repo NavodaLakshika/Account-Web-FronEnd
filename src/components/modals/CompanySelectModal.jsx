@@ -11,6 +11,7 @@ import { authService } from '../../services/auth.service';
 import { showErrorToast } from '../../utils/toastUtils';
 import ContactSupportModal from './ContactSupportModal';
 import CreateCompanyModal from './CreateCompanyModal';
+import CompanyDateSelectModal from './CompanyDateSelectModal';
 
 const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
 
@@ -21,6 +22,8 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const [selectedCompanyId, setSelectedCompanyId] = useState(null);
     const [connectingCompany, setConnectingCompany] = useState(null);
     const [showSupport, setShowSupport] = useState(false);
+    const [showDateModal, setShowDateModal] = useState(false);
+    const [pendingStartDate, setPendingStartDate] = useState(new Date().toISOString().split('T')[0]);
     const [showCreateCompany, setShowCreateCompany] = useState(false);
 
     const userName = user ? (user.EmpName || user.empName || user.Emp_Name || 'User') : 'Guest';
@@ -116,7 +119,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                             <div className="py-10 flex flex-col items-center gap-4 text-center">
                                 <Building2 size={32} className="text-slate-300" />
                                 <p className="text-slate-500 text-sm font-bold">No companies assigned</p>
-                                <button onClick={() => setShowCreateCompany(true)}
+                                <button onClick={() => setShowDateModal(true)}
                                     className="mt-2 px-6 py-2.5 bg-white border border-[#00acee] text-[#00acee] hover:bg-blue-50 font-bold text-sm rounded-none transition-all flex items-center gap-2">
                                     <PlusCircle size={16} />
                                     Create New Company
@@ -175,7 +178,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                     </div>
 
                     <div className="flex items-center justify-between text-[11px] font-bold text-slate-500">
-                        <button onClick={() => setShowCreateCompany(true)} className="hover:text-[#00acee] transition-colors">
+                        <button onClick={() => setShowDateModal(true)} className="hover:text-[#00acee] transition-colors">
                             + Create Company
                         </button>
                         <button onClick={() => setShowSupport(true)} className="hover:text-[#00acee] transition-colors underline underline-offset-2">
@@ -189,10 +192,21 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                 isOpen={showSupport} 
                 onClose={() => setShowSupport(false)} 
             />
+            <CompanyDateSelectModal
+                isOpen={showDateModal}
+                onClose={() => setShowDateModal(false)}
+                initialDate={pendingStartDate}
+                onConfirm={(date) => {
+                    setPendingStartDate(date);
+                    setShowDateModal(false);
+                    setShowCreateCompany(true);
+                }}
+            />
             <CreateCompanyModal
                 isOpen={showCreateCompany}
                 onClose={() => setShowCreateCompany(false)}
                 user={user}
+                startDate={pendingStartDate}
                 onCreated={async (newCompanyName) => {
                     setShowCreateCompany(false);
                     setFetching(true);

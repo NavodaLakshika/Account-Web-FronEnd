@@ -54,6 +54,7 @@ const EstimateBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             const { companyCode: comp, userName: user } = getSessionData();
             fetchInitialData(comp);

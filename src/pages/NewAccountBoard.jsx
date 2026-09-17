@@ -1,68 +1,125 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import AccountBoard from './AccountBoard';
-import { HelpCircle, PlusCircle, Search, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { HelpCircle, PlusCircle, CheckCircle2, ChevronRight, Layers } from 'lucide-react';
 import { accountService } from '../services/account.service';
-import { toast } from 'react-hot-toast';
 import { getSessionData } from '../utils/session';
 
+export const ACCOUNT_CATEGORIES = [
+    { key: 'Assets', label: 'Assets', code: '10000', baseCode: '10000' },
+    { key: 'Liabilities', label: 'Liabilities', code: '20000', baseCode: '20000' },
+    { key: 'Equity', label: 'Equity', code: '30000', baseCode: '30000' },
+    { key: 'Income', label: 'Income', code: '40000', baseCode: '40000' },
+    { key: 'Cost of Sales', label: 'Cost of Sales', code: '50000', baseCode: '50000' },
+    { key: 'Expenses', label: 'Expenses', code: '60000', baseCode: '60000' },
+    { key: 'Other Income', label: 'Other Income', code: '70000', baseCode: '70000' },
+    { key: 'Other Expenses', label: 'Other Expenses', code: '80000', baseCode: '80000' },
+];
+
+export const ACCOUNT_DETAILS = {
+    Assets: {
+        title: 'ASSETS (10000)',
+        description: 'Tracks valuable resources owned by the company for future economic benefit, including liquid cash, receivables, inventory, and long-term fixed assets.',
+        tip: 'Regularly audit physical assets and maintain depreciation schedules for accurate balance sheet presentation.',
+        examples: [
+            '10000 - CURRENT ASSETS',
+            '11000 - CASH & BANK',
+            '12000 - RECEIVABLES',
+            '13000 - INVENTORY',
+            '15000 - FIXED ASSETS',
+            '16000 - ACCUMULATED DEPRECIATION'
+        ]
+    },
+    Liabilities: {
+        title: 'LIABILITIES (20000)',
+        description: 'Tracks debts and obligations owed by the enterprise to external entities, such as trade creditors, statutory tax payables, and long-term bank loans.',
+        tip: 'Monitor current liabilities against current assets to sustain a healthy working capital ratio.',
+        examples: [
+            '20000 - CURRENT LIABILITIES',
+            '21000 - TRADE CREDITORS',
+            '22000 - VAT PAYABLE',
+            '23000 - SALARY PAYABLE',
+            '25000 - LONG TERM LIABILITIES',
+            '25100 - BANK LOANS'
+        ]
+    },
+    Equity: {
+        title: 'EQUITY (30000)',
+        description: 'Represents owner or shareholder claim on company assets after deducting all existing liabilities.',
+        tip: 'Keep owner capital injections and drawings clearly distinguished from operational retained earnings.',
+        examples: [
+            '30000 - CAPITAL',
+            '31000 - OWNER CAPITAL',
+            '32000 - RETAINED EARNINGS',
+            '33000 - DRAWINGS'
+        ]
+    },
+    Income: {
+        title: 'INCOME (40000)',
+        description: 'Tracks gross earnings originating from standard commercial operations, including domestic product sales, exported goods, and contracted services.',
+        tip: 'Enforce accrual matching to recognize income during the cycle in which goods or services were fulfilled.',
+        examples: [
+            '40000 - SALES REVENUE',
+            '41000 - LOCAL SALES',
+            '42000 - EXPORT SALES',
+            '43000 - SERVICE INCOME'
+        ]
+    },
+    'Cost of Sales': {
+        title: 'COST OF SALES (50000)',
+        description: 'Tracks direct expenditures directly tied to inventory manufacturing or merchandise acquisition sold during the fiscal period.',
+        tip: 'Carefully reconcile direct labor and raw material costs against revenues to assess accurate Gross Margins.',
+        examples: [
+            '50000 - COST OF GOODS SOLD',
+            '51000 - MATERIAL COST',
+            '52000 - DIRECT LABOUR'
+        ]
+    },
+    Expenses: {
+        title: 'OPERATING EXPENSES (60000)',
+        description: 'Tracks periodic operational expenditures that sustain organizational functions, administrative logistics, facilities, and promotional overhead.',
+        tip: 'Differentiate administrative overhead from sales distribution to monitor commercial operational efficiency.',
+        examples: [
+            '60000 - ADMINISTRATIVE EXPENSES',
+            '61000 - SALARIES',
+            '62000 - ELECTRICITY',
+            '66000 - SELLING & DISTRIBUTION',
+            '66100 - MARKETING'
+        ]
+    },
+    'Other Income': {
+        title: 'OTHER INCOME (70000)',
+        description: 'Captures non-operational financial inflows generated outside principal trading activities, such as bank interest or asset disposal gains.',
+        tip: 'Separate non-operating revenues to prevent distortion of core operational profitability metrics (EBITDA).',
+        examples: [
+            '70000 - INTEREST INCOME',
+            '71000 - GAIN ON DISPOSAL'
+        ]
+    },
+    'Other Expenses': {
+        title: 'OTHER EXPENSES (80000)',
+        description: 'Captures financial charges, non-operating costs, foreign currency exchange fluctuations, and loan financing expenses.',
+        tip: 'Keep financing expenses and currency losses segregated from direct operational cost centers.',
+        examples: [
+            '80000 - BANK CHARGES',
+            '81000 - INTEREST EXPENSE',
+            '82000 - EXCHANGE LOSS'
+        ]
+    }
+};
+
 const NewAccountBoard = ({ isOpen, onClose }) => {
-    const [selectedType, setSelectedType] = useState('Expenses');
+    const [selectedType, setSelectedType] = useState('Assets');
     const [showAccountBoard, setShowAccountBoard] = useState(false);
     const [mainTypes, setMainTypes] = useState([]);
     const [dynamicSubGroups, setDynamicSubGroups] = useState([]);
 
-    const accountDetails = {
-        Assets: {
-            title: 'ASSETS (10000)',
-            description: 'Tracks valuable resources owned by the company for future benefit, including cash, inventory, and fixed assets.',
-            tip: 'Regularly audit physical assets for balance sheet accuracy.',
-            examples: ['NON CURRENT ASSETS', 'CURRENT ASSETS']
-        },
-        Liabilities: {
-            title: 'LIABILITIES (20000)',
-            description: 'Tracks money the company owes to external parties, including loans, creditors, and payables.',
-            tip: 'Monitor debt levels to maintain a healthy debt-to-equity ratio.',
-            examples: ['NON CURRENT LIABILITIES', 'CURRENT LIABILITIES']
-        },
-        Equity: {
-            title: 'EQUITY (30000)',
-            description: 'Tracks the net worth of the business belonging to the owners/shareholders.',
-            tip: 'Equity represents the residual interest in the assets after deducting liabilities.',
-            examples: ['Owner Capital', 'Retained Earnings', 'Share Capital']
-        },
-        Income: {
-            title: 'INCOME (40000)',
-            description: 'Tracks revenue generated from primary business operations and sales.',
-            tip: 'Record income when earned for accurate profit tracking.',
-            examples: ['OPERATIONAL INCOME', 'OTHER INCOME']
-        },
-        'Cost of Sales': {
-            title: 'COST OF SALES (50000)',
-            description: 'Tracks direct costs incurred to produce or purchase the goods sold by the company.',
-            tip: 'Accurate COS tracking is vital for calculating Gross Profit.',
-            examples: ['Material Cost', 'Direct Labor', 'Production Overhead']
-        },
-        Expenses: {
-            title: 'OPERATING EXPENSES (60000)',
-            description: 'Tracks day-to-day operational costs not directly tied to production.',
-            tip: 'Clearly categorize expenses for better budget management and tax reporting.',
-            examples: ['ADMINISTRATION', 'SELLING & DISTRIBUTION', 'FINANCE & OTHER']
-        },
-        Other: {
-            title: 'OTHER ACCOUNT TYPES',
-            description: 'Specialized account categories for specific ledger requirements.',
-            tip: 'Use specialized accounts for better balance sheet segmentation.',
-            examples: ['Miscellaneous Accounts']
-        }
-    };
-
-    const currentDetails = accountDetails[selectedType] || accountDetails['Other'];
+    const currentDetails = ACCOUNT_DETAILS[selectedType] || ACCOUNT_DETAILS['Assets'];
 
     useEffect(() => {
         if (!isOpen) {
             setShowAccountBoard(false);
-            setSelectedType('Expenses');
+            setSelectedType('Assets');
         } else {
             const { companyCode } = getSessionData();
             accountService.getMainTypes(companyCode).then(data => {
@@ -71,26 +128,26 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
-    // Removed dynamic subgroups fetch based on user preference
-
     useEffect(() => {
-        if (isOpen && mainTypes.length > 0) {
+        if (isOpen) {
             const { companyCode } = getSessionData();
-            const matched = mainTypes.find(t => 
-                t.main_Acc_Name.toLowerCase() === selectedType.toLowerCase() || 
-                t.main_Acc_Name.toLowerCase().includes(selectedType.toLowerCase())
-            );
-            const apiType = matched ? matched.main_Acc_Name : selectedType;
+            let apiType = selectedType;
+            if (mainTypes.length > 0) {
+                const matched = mainTypes.find(t => 
+                    t.main_Acc_Name.toLowerCase() === selectedType.toLowerCase() || 
+                    t.main_Acc_Name.toLowerCase().includes(selectedType.toLowerCase())
+                );
+                if (matched) apiType = matched.main_Acc_Name;
+            }
             
             accountService.getParentAccounts(apiType, companyCode).then(data => {
-                setDynamicSubGroups(data);
+                setDynamicSubGroups(data || []);
             }).catch(err => {
                 console.error("Failed to load parent accounts", err);
                 setDynamicSubGroups([]);
             });
         }
     }, [selectedType, mainTypes, isOpen]);
-
 
     const handleCreateClick = () => {
         setShowAccountBoard(true);
@@ -112,115 +169,140 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
             onClose={onClose}
             title="CREATE NEW ACCOUNT"
         >
-            <div className="py-1 select-none flex flex-col">
-                <div className="border-b border-gray-200 pb-2 mb-6 flex items-center gap-2">
-                    <PlusCircle size={14} className="text-[#0285fd]" />
-                    <h2 className="text-[12px] font-bold text-gray-600 uppercase tracking-tight">
-                       Select One Account Type and Click Create
-                    </h2>
+            <div className="py-1 select-none flex flex-col font-['Tahoma']">
+                <div className="border-b border-gray-200 pb-2 mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <PlusCircle size={15} className="text-[#0285fd]" />
+                        <h2 className="text-[12px] font-bold text-gray-700 uppercase tracking-tight">
+                            Select One Account Type and Click Create
+                        </h2>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-[#0285fd] rounded border border-blue-100 uppercase tracking-wider">
+                        Chart of Accounts v2.0
+                    </span>
                 </div>
 
-                <div className="flex gap-8 px-1">
-                    {/* Left Column: Radio Options */}
-                    <div className="w-[240px] space-y-4">
-                        <div className="p-5 border border-gray-200 bg-white rounded-[3px] shadow-sm">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-50 pb-1">Categories</p>
-                            <div className="space-y-3.5">
-                                {['Income', 'Cost of Sales', 'Expenses', 'Assets', 'Liabilities', 'Equity'].map(type => (
-                                    <RadioButton
-                                        key={type}
-                                        label={type}
-                                        checked={selectedType === type}
-                                        onChange={() => setSelectedType(type)}
-                                    />
+                <div className="flex gap-6 px-1 items-stretch h-[460px]">
+                    {/* Left Column: Radio Options (8 Categories in standard accounting order) */}
+                    <div className="w-[260px] shrink-0 flex flex-col h-full">
+                        <div className="p-4 border border-gray-200 bg-white rounded-[3px] shadow-sm flex-1 flex flex-col justify-between h-full">
+                            <div className="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                                    Categories (10000 - 80000)
+                                </p>
+                            </div>
+                            <div className="flex-1 flex flex-col justify-between py-0.5">
+                                {ACCOUNT_CATEGORIES.map(cat => (
+                                    <div
+                                        key={cat.key}
+                                        onClick={() => setSelectedType(cat.key)}
+                                        className={`flex items-center justify-between px-3 py-2 rounded-[3px] cursor-pointer transition-all ${
+                                            selectedType === cat.key
+                                                ? 'bg-blue-50/70 border border-blue-200/80 shadow-xs'
+                                                : 'hover:bg-gray-50 border border-transparent'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-2.5">
+                                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                selectedType === cat.key ? 'border-[#0285fd]' : 'border-gray-300 bg-white'
+                                            }`}>
+                                                {selectedType === cat.key && <div className="w-2 h-2 rounded-full bg-[#0285fd]" />}
+                                            </div>
+                                            <span className={`text-[12px] font-bold tracking-tight uppercase ${
+                                                selectedType === cat.key ? 'text-[#0285fd]' : 'text-gray-700'
+                                            }`}>
+                                                {cat.label}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-mono font-bold text-gray-400">
+                                            {cat.code}
+                                        </span>
+                                    </div>
                                 ))}
                             </div>
-                        </div>
-
-                        <div className="p-5 border border-gray-200 bg-white rounded-[3px] shadow-sm">
-                            <RadioButton
-                                label="Other Account Types"
-                                checked={selectedType === 'Other'}
-                                onChange={() => setSelectedType('Other')}
-                            />
                         </div>
                     </div>
 
                     {/* Right Column: Information Pane */}
-                    <div
-                        key={selectedType}
-                        className="flex-1 border border-gray-200 p-6 bg-white rounded-[3px] flex flex-col"
-                    >
-                        <div className="text-center mb-6 border-b border-gray-200 pb-4">
-                            <h3 className="text-[16px] font-bold text-gray-800 uppercase">{currentDetails.title}</h3>
+                    <div className="flex-1 border border-gray-200 p-5 bg-white rounded-[3px] flex flex-col justify-between shadow-sm h-full">
+                        <div className="text-center mb-3 border-b border-gray-100 pb-3">
+                            <h3 className="text-[16px] font-bold text-gray-800 uppercase tracking-tight">
+                                {currentDetails.title}
+                            </h3>
                         </div>
 
-                        <div className="space-y-6 flex-grow">
-                            <div className="space-y-2">
+                        <div className="space-y-3.5 flex-1 flex flex-col justify-between">
+                            <div className="min-h-[44px] space-y-1">
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Description</p>
-                                <p className="text-[12px] text-gray-500 font-bold leading-relaxed">
+                                <p className="text-[12px] text-gray-600 font-medium leading-relaxed">
                                     {currentDetails.description}
                                 </p>
                             </div>
 
-                            <div className="p-4 bg-gray-50 rounded-[3px] border border-gray-200">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                    <HelpCircle size={12} className="text-[#0285fd]" />
-                                    <p className="text-[9px] font-bold text-[#0285fd] uppercase">Professional Tip</p>
+                            <div className="min-h-[64px] p-3.5 bg-blue-50/50 rounded-[3px] border border-blue-100 flex flex-col justify-center">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <HelpCircle size={13} className="text-[#0285fd]" />
+                                    <p className="text-[10px] font-bold text-[#0285fd] uppercase tracking-wider">Professional Accounting Tip</p>
                                 </div>
-                                <p className="text-[12px] text-gray-700 font-bold leading-normal">
+                                <p className="text-[11.5px] text-gray-700 font-medium leading-normal">
                                     {currentDetails.tip}
                                 </p>
                             </div>
 
-                            {(dynamicSubGroups.length > 0 || currentDetails.examples.length > 0) && (
-                                <div className="space-y-3">
-                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Sub-Groups</p>
-                                    <div className="grid grid-cols-1 gap-2 ml-1">
-                                        {dynamicSubGroups.length > 0 ? (
-                                            dynamicSubGroups.slice(0, 3).map((group, i) => (
-                                                <div key={i} className="flex gap-3 items-center">
-                                                    <div className="w-2 h-2 rounded-full bg-[#0285fd] shrink-0"></div>
-                                                    <span className="text-[12px] text-gray-600 font-bold uppercase">{group.code} - {group.name}</span>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            currentDetails.examples.map((ex, i) => (
-                                                <div key={i} className="flex gap-3 items-center">
-                                                    <div className="w-2 h-2 rounded-full bg-[#0285fd] shrink-0"></div>
-                                                    <span className="text-[12px] text-gray-600 font-bold uppercase">{ex}</span>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
+                            {/* Sub-groups display */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                        <Layers size={11} className="text-gray-400" /> Current Sub-Groups / Headings
+                                    </p>
+                                    <span className="text-[10px] font-bold text-gray-400">
+                                        {(dynamicSubGroups.length > 0 ? dynamicSubGroups.length : currentDetails.examples.length)} items
+                                    </span>
                                 </div>
-                            )}
+                                
+                                <div className="h-[140px] overflow-y-auto pr-1 space-y-1.5 custom-scrollbar border border-gray-100 rounded-[3px] p-2 bg-gray-50/50">
+                                    {dynamicSubGroups.length > 0 ? (
+                                        dynamicSubGroups.map((group, i) => (
+                                            <div key={i} className="flex gap-2.5 items-center bg-white px-2.5 py-1.5 rounded-[2px] border border-gray-100 shadow-2xs">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#0285fd] shrink-0"></div>
+                                                <span className="text-[11.5px] text-gray-700 font-bold uppercase tracking-tight">
+                                                    {group.code} - {group.name}
+                                                </span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        currentDetails.examples.map((ex, i) => (
+                                            <div key={i} className="flex gap-2.5 items-center bg-white px-2.5 py-1.5 rounded-[2px] border border-gray-100 shadow-2xs">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#0285fd] shrink-0"></div>
+                                                <span className="text-[11.5px] text-gray-700 font-bold uppercase tracking-tight">
+                                                    {ex}
+                                                </span>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="mt-8 flex justify-end">
+                <div className="mt-5 pt-3 border-t border-gray-100 flex justify-end gap-3">
                     <button
-                        className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
+                        className="px-5 h-9 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold rounded-[3px] text-[12.5px] transition-all"
+                        onClick={onClose}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="px-6 h-9 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[12.5px] transition-all flex items-center gap-2 cursor-pointer"
                         onClick={handleCreateClick}
                     >
-                     Create
+                        Create Account
                     </button>
                 </div>
             </div>
         </SimpleModal>
     );
 };
-
-const RadioButton = ({ label, checked, onChange }) => (
-    <div className="flex items-center gap-3.5 group cursor-pointer" onClick={onChange}>
-        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${checked ? 'border-[#0285fd]' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
-            {checked && <div className="w-2.5 h-2.5 rounded-full bg-[#0285fd]" />}
-        </div>
-        <span className={`text-[12.5px] cursor-pointer transition-colors uppercase font-bold tracking-tight ${checked ? 'text-gray-800' : 'text-gray-400 group-hover:text-gray-600'}`}>
-            {label}
-        </span>
-    </div>
-);
 
 export default NewAccountBoard;

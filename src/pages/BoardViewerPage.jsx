@@ -81,8 +81,7 @@ const ChartOfAccountantModal = lazy(() => import('../components/modals/ChartOfAc
 const FixedAssetsBoard = lazy(() => import('./FixedAssetsProfileBoard'));
 const LongTermLiabilityBoard = lazy(() => import('./LongTermLiabilityProfileBoard'));
 const DepreciationBoard = lazy(() => import('./DepreciationRateBoard'));
-const FixedIncomeBoard = lazy(() => import('./FixedIncomeEntryBoard'));
-const FixedExpensesBoard = lazy(() => import('./FixedExpensesEntryBoard'));
+const FixedTransactionEntryBoard = lazy(() => import('./FixedTransactionEntryBoard'));
 const LetterEnvelopesModal = lazy(() => import('../components/modals/LetterEnvelopesModal'));
 const OfficeDocumentModal = lazy(() => import('../components/modals/OfficeDocumentModal'));
 const ToDoListBoard = lazy(() => import('../components/modals/ViewAndUtilityModels/ToDoListBoard'));
@@ -184,8 +183,7 @@ const boardRegistry = {
     'FixedAssetsBoard': FixedAssetsBoard,
     'LongTermLiabilityBoard': LongTermLiabilityBoard,
     'DepreciationBoard': DepreciationBoard,
-    'FixedIncomeBoard': FixedIncomeBoard,
-    'FixedExpensesBoard': FixedExpensesBoard,
+    'FixedTransactionEntryBoard': FixedTransactionEntryBoard,
     'LetterEnvelopesModal': LetterEnvelopesModal,
     'OfficeDocumentModal': OfficeDocumentModal,
     'ToDoListBoard': ToDoListBoard,

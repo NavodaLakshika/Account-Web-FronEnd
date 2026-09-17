@@ -3,7 +3,7 @@ import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle, Save, X, RotateCcw, ChevronLeft, ChevronRight, ClipboardList, Plus, FileUp, FileDown, Lock , FileText} from 'lucide-react';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import CalendarModal from '../components/CalendarModal';
 import { grnService } from '../services/grn.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
@@ -246,14 +246,32 @@ const GRNBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast('Failed to fetch PO details.'); }
     };
 
-    const handleTemplateDownload = (selectedColumns) => {
+    const handleTemplateDownload = async (selectedColumns) => {
         try {
+            const dynamicSampleData = await grnService.getTemplateSuggestions();
+            
+            const suggestionRow = {};
+            selectedColumns.forEach(col => {
+                suggestionRow[col] = dynamicSampleData[col] ? `e.g. ${dynamicSampleData[col]}` : '';
+            });
             const row = {};
             selectedColumns.forEach(col => row[col] = '');
-            const template = [row];
+            const template = [suggestionRow, row];
             const ws = XLSX.utils.json_to_sheet(template);
+
+            // Add styles to the suggestion row
+            selectedColumns.forEach((col, index) => {
+                const cellRef = XLSX.utils.encode_cell({ r: 1, c: index }); // row 1 (0 is header)
+                if (ws[cellRef] && ws[cellRef].v) {
+                    ws[cellRef].s = {
+                        font: { sz: 9, color: { rgb: "FF999999" }, italic: true }
+                    };
+                }
+            });
+
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "GRN_Template");
+
             XLSX.writeFile(wb, "GRN_Full_Template.xlsx");
             showSuccessToast("Template downloaded. You can now import header data too!");
         } catch (error) {
@@ -272,7 +290,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 const wb = XLSX.read(bstr, { type: 'binary' });
                 const wsname = wb.SheetNames[0];
                 const ws = wb.Sheets[wsname];
-                const data = XLSX.utils.sheet_to_json(ws);
+                let data = XLSX.utils.sheet_to_json(ws);
+                
+                // Filter out the suggestion row if it's still there
+                data = data.filter(r => {
+                    const sc = (r['Supplier Code'] || r['Supplier'] || r['Product Code'] || r['prodCode'] || '').toString().trim();
+                    return !sc.startsWith('e.g.');
+                });
 
                 if (data.length === 0) return showErrorToast("Excel file is empty.");
 

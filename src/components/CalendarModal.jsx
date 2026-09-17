@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const parseDate = (dateStr) => {
     if (!dateStr) return new Date();
@@ -21,203 +20,198 @@ const parseDate = (dateStr) => {
     return isNaN(d.getTime()) ? new Date() : d;
 };
 
+const WheelColumn = ({ options, value, onChange }) => {
+    const scrollRef = useRef(null);
+    const itemHeight = 44;
+    const scrollTimeout = useRef(null);
+    const [localValue, setLocalValue] = useState(value);
+
+    useEffect(() => {
+        if (value !== localValue) {
+            setLocalValue(value);
+            if (scrollRef.current) {
+                const index = options.findIndex(opt => opt.value === value);
+                if (index !== -1) {
+                    scrollRef.current.scrollTo({
+                        top: index * itemHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+    }, [value, itemHeight, options]);
+
+    useEffect(() => {
+        if (scrollRef.current) {
+            const index = options.findIndex(opt => opt.value === value);
+            if (index !== -1) {
+                scrollRef.current.scrollTop = index * itemHeight;
+            }
+        }
+    }, []);
+
+    const handleScroll = (e) => {
+        const scrollTop = e.target.scrollTop;
+        const index = Math.max(0, Math.min(options.length - 1, Math.round(scrollTop / itemHeight)));
+        
+        if (options[index]) {
+            setLocalValue(options[index].value);
+        }
+
+        if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        scrollTimeout.current = setTimeout(() => {
+            const finalIndex = Math.max(0, Math.min(options.length - 1, Math.round(e.target.scrollTop / itemHeight)));
+            if (options[finalIndex]) {
+                onChange(options[finalIndex].value);
+                e.target.scrollTo({
+                    top: finalIndex * itemHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }, 150);
+    };
+
+    return (
+        <div className="flex-1 h-[220px] overflow-hidden relative">
+            <div className="absolute top-1/2 left-0 right-0 h-[44px] -mt-[22px] bg-white/5 rounded pointer-events-none" />
+            
+            <div 
+                ref={scrollRef}
+                className="h-full overflow-y-auto snap-y snap-mandatory"
+                onScroll={handleScroll}
+                style={{ 
+                    paddingTop: `${(220 - 44) / 2}px`, 
+                    paddingBottom: `${(220 - 44) / 2}px`,
+                    msOverflowStyle: 'none',
+                    scrollbarWidth: 'none'
+                }} 
+            >
+                <style dangerouslySetInnerHTML={{__html: `
+                    .h-full::-webkit-scrollbar {
+                        display: none;
+                    }
+                `}} />
+                {options.map((opt, idx) => {
+                    const isSelected = opt.value === localValue;
+                    return (
+                        <div 
+                            key={idx} 
+                            className={`h-[44px] flex items-center justify-center snap-center text-[18px] transition-all cursor-pointer select-none
+                                ${isSelected ? 'text-white font-medium scale-110' : 'text-gray-500 hover:text-gray-400'}`}
+                            onClick={() => {
+                                if (scrollRef.current) {
+                                    scrollRef.current.scrollTo({
+                                        top: idx * itemHeight,
+                                        behavior: 'smooth'
+                                    });
+                                }
+                            }}
+                        >
+                            {opt.label}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
 const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDate, currentDate }) => {
     const activeCallback = (typeof onDateSelect === 'function' ? onDateSelect : null) ||
         (typeof onDateChange === 'function' ? onDateChange : null);
     const activeDate = initialDate || currentDate;
 
     const [viewDate, setViewDate] = useState(() => parseDate(activeDate));
-    const [popupStyle, setPopupStyle] = useState({});
-    const [showYearPicker, setShowYearPicker] = useState(false);
-    const cardRef = useRef(null);
-
+    
     useEffect(() => {
         if (isOpen) {
             setViewDate(parseDate(activeDate));
-            setShowYearPicker(false);
-            const trigger = document.activeElement;
-            if (trigger && trigger.getBoundingClientRect) {
-                const rect = trigger.getBoundingClientRect();
-                const dropdownWidth = 240;
-                const centerX = rect.left + rect.width / 2;
-                const left = Math.max(4, Math.min(centerX - dropdownWidth / 2, window.innerWidth - dropdownWidth - 4));
-                setPopupStyle({
-                    top: `${rect.bottom + 6}px`,
-                    left: `${left}px`
-                });
-            } else {
-                setPopupStyle({
-                    top: '15vh',
-                    left: '50%',
-                    transform: 'translateX(-50%)'
-                });
-            }
         }
     }, [isOpen, activeDate]);
 
-    const handleClickOutside = useCallback((e) => {
-        if (cardRef.current && !cardRef.current.contains(e.target)) {
-            onClose();
-        }
+    const handleEscape = useCallback((e) => {
+        if (e.key === 'Escape') onClose();
     }, [onClose]);
 
     useEffect(() => {
-        if (!isOpen) return;
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [isOpen, handleClickOutside]);
+        if (isOpen) document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [isOpen, handleEscape]);
 
-    const daysOfWeek = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+    if (!isOpen) return null;
+
     const months = [
-        'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
-        'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
-    const currentYear = viewDate.getFullYear();
-    const currentMonth = viewDate.getMonth();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const monthOptions = Array.from({length: 12}, (_, i) => ({ value: i, label: i + 1 }));
+    
+    const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+    const dayOptions = Array.from({length: daysInMonth}, (_, i) => ({ value: i + 1, label: i + 1 }));
+    
+    const yearOptions = Array.from({length: 100}, (_, i) => {
+        const year = new Date().getFullYear() - 50 + i;
+        return { value: year, label: year };
+    });
 
-    const centuryStart = Math.floor(currentYear / 100) * 100;
-
-    const prevMonth = () => setViewDate(new Date(currentYear, currentMonth - 1, 1));
-    const nextMonth = () => setViewDate(new Date(currentYear, currentMonth + 1, 1));
-    const prevCentury = () => setViewDate(new Date(centuryStart - 1, currentMonth, 1));
-    const nextCentury = () => setViewDate(new Date(centuryStart + 100, currentMonth, 1));
-
-    const selectedDate = activeDate ? parseDate(activeDate) : null;
-
-    const isToday = (day) => {
-        const today = new Date();
-        return today.getDate() === day && today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+    const handleMonthChange = (monthIndex) => {
+        setViewDate(new Date(viewDate.getFullYear(), monthIndex, Math.min(viewDate.getDate(), new Date(viewDate.getFullYear(), monthIndex + 1, 0).getDate())));
     };
 
-    const isSelected = (day) => {
-        if (!selectedDate) return false;
-        return selectedDate.getDate() === day && selectedDate.getMonth() === currentMonth && selectedDate.getFullYear() === currentYear;
+    const handleDayChange = (day) => {
+        setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth(), day));
     };
 
-    const handleDateClick = (day, specificDate = null) => {
-        const selected = specificDate || new Date(currentYear, currentMonth, day);
-        const yyyy = selected.getFullYear();
-        const mm = String(selected.getMonth() + 1).padStart(2, '0');
-        const dd = String(selected.getDate()).padStart(2, '0');
+    const handleYearChange = (year) => {
+        setViewDate(new Date(year, viewDate.getMonth(), Math.min(viewDate.getDate(), new Date(year, viewDate.getMonth() + 1, 0).getDate())));
+    };
+
+    const handleOk = () => {
+        const yyyy = viewDate.getFullYear();
+        const mm = String(viewDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(viewDate.getDate()).padStart(2, '0');
         const formatted = `${yyyy}-${mm}-${dd}`;
         if (activeCallback) activeCallback(formatted);
         onClose();
     };
 
-    const handleYearSelect = (year) => {
-        setViewDate(new Date(year, currentMonth, 1));
-        setShowYearPicker(false);
-    };
-
-    const calendarDays = [];
-    for (let i = 0; i < firstDay; i++) calendarDays.push(null);
-    for (let i = 1; i <= daysInMonth; i++) calendarDays.push(i);
-    while (calendarDays.length < 42) calendarDays.push(null);
-
-    if (!isOpen) return null;
-
-    const selectedYear = selectedDate ? selectedDate.getFullYear() : null;
-
     return (
-        <div className="fixed inset-0 z-[2000]" style={{ pointerEvents: 'none' }}>
-            <div
-                ref={cardRef}
-                className="calendar-dropdown-container w-[240px] bg-white border border-gray-300 rounded-[3px] shadow-[0_4px_20px_rgb(0,0,0,0.15)] overflow-hidden font-sans"
-                style={{ ...popupStyle, pointerEvents: 'auto', position: 'fixed' }}
-                onClick={(e) => e.stopPropagation()}
+        <div className="fixed inset-0 z-[2000] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-[2px] transition-opacity" onClick={onClose}>
+            <div 
+                className="w-full sm:w-[320px] bg-[#1c1c1e] sm:rounded-[20px] rounded-t-[20px] overflow-hidden shadow-2xl border-t sm:border border-white/10 font-sans animate-in slide-in-from-bottom sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200"
+                onClick={e => e.stopPropagation()}
             >
-                {/* Header */}
-                <div className="bg-[#0388cc] px-3 py-2">
-                    <div className="flex items-center justify-between">
-                        <button onClick={showYearPicker ? prevCentury : prevMonth} className="text-white/80 hover:text-white hover:bg-white/10 p-0.5 rounded transition-all">
-                            <ChevronLeft size={14} />
-                        </button>
-                        {showYearPicker ? (
-                            <h2 className="text-[11px] font-bold text-white uppercase tracking-wider">
-                                {centuryStart} - {centuryStart + 99}
-                            </h2>
-                        ) : (
-                            <h2 className="text-[11px] font-bold text-white uppercase tracking-wider cursor-pointer hover:text-white/80" onClick={() => setShowYearPicker(true)}>
-                                {months[currentMonth]} {currentYear}
-                            </h2>
-                        )}
-                        <button onClick={showYearPicker ? nextCentury : nextMonth} className="text-white/80 hover:text-white hover:bg-white/10 p-0.5 rounded transition-all">
-                            <ChevronRight size={14} />
-                        </button>
-                    </div>
+                <div className="pt-6 pb-4 px-6 text-center">
+                    <h2 className="text-white text-[17px] font-semibold tracking-wide">
+                        {months[viewDate.getMonth()]} {viewDate.getDate()}, {viewDate.getFullYear()}
+                    </h2>
+                </div>
+                
+                <div className="flex px-4 py-2 relative">
+                    <WheelColumn options={monthOptions} value={viewDate.getMonth()} onChange={handleMonthChange} />
+                    <WheelColumn options={dayOptions} value={viewDate.getDate()} onChange={handleDayChange} />
+                    <WheelColumn options={yearOptions} value={viewDate.getFullYear()} onChange={handleYearChange} />
+                    
+                    {/* Gradient masks for fading top and bottom edges */}
+                    <div className="absolute top-0 left-0 right-0 h-[70px] bg-gradient-to-b from-[#1c1c1e] to-transparent pointer-events-none z-10" />
+                    <div className="absolute bottom-0 left-0 right-0 h-[70px] bg-gradient-to-t from-[#1c1c1e] to-transparent pointer-events-none z-10" />
                 </div>
 
-                {/* Body */}
-                <div className="p-2">
-                    {showYearPicker ? (
-                        <div className="grid grid-cols-4 gap-1 py-1 max-h-[200px] overflow-y-auto no-scrollbar">
-                            {Array.from({ length: 100 }, (_, i) => centuryStart + i).map(year => (
-                                <button
-                                    key={year}
-                                    onClick={() => handleYearSelect(year)}
-                                    className={`h-7 flex items-center justify-center text-[11px] font-medium rounded-[2px] transition-all
-                                        ${selectedYear === year
-                                            ? 'bg-[#0388cc] text-white'
-                                            : year === new Date().getFullYear()
-                                                ? 'border border-[#0388cc] text-[#0388cc]'
-                                                : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    {year}
-                                </button>
-                            ))}
-                        </div>
-                    ) : (
-                        <>
-                            {/* Day labels */}
-                            <div className="grid grid-cols-7 gap-0 mb-0.5">
-                                {daysOfWeek.map((day, idx) => (
-                                    <div key={day} className={`h-6 flex items-center justify-center text-[9px] font-bold tracking-wider ${idx === 0 || idx === 6 ? 'text-gray-400' : 'text-gray-500'}`}>
-                                        {day}
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Day grid */}
-                            <div className="grid grid-cols-7 gap-0">
-                                {calendarDays.map((day, idx) => (
-                                    <div key={idx} className="h-7 flex items-center justify-center">
-                                        {day ? (
-                                            <button
-                                                onClick={() => handleDateClick(day)}
-                                                className={`w-7 h-7 flex items-center justify-center text-[11px] font-medium transition-all rounded-[2px]
-                                                    ${isSelected(day)
-                                                        ? 'bg-[#0388cc] text-white'
-                                                        : isToday(day)
-                                                            ? 'border border-[#0388cc] text-[#0388cc]'
-                                                            : (idx % 7 === 0 || idx % 7 === 6)
-                                                                ? 'text-gray-400 hover:bg-gray-100'
-                                                                : 'text-gray-700 hover:bg-gray-100'
-                                                    }`}
-                                            >
-                                                {day}
-                                            </button>
-                                        ) : (
-                                            <div className="w-7 h-7" />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </>
-                    )}
-
-                    <div className="mt-2 pt-1.5 border-t border-gray-200 flex justify-between items-center">
-                        <span className="text-[8px] text-gray-400 uppercase tracking-wider">Onimta IT</span>
-                        <button
-                            onClick={() => handleDateClick(null, new Date())}
-                            className="text-[9px] font-bold text-white bg-[#0388cc] hover:bg-[#0276a1] transition-colors uppercase tracking-wider px-2 py-0.5 rounded-[2px] active:scale-95"
-                        >
-                            Today
-                        </button>
-                    </div>
+                <div className="flex border-t border-white/10">
+                    <button 
+                        onClick={onClose}
+                        className="flex-1 py-4 text-[#0a84ff] hover:bg-white/5 active:bg-white/10 transition-colors font-medium text-[16px]"
+                    >
+                        Cancel
+                    </button>
+                    <div className="w-[1px] bg-white/10" />
+                    <button 
+                        onClick={handleOk}
+                        className="flex-1 py-4 text-[#0a84ff] hover:bg-white/5 active:bg-white/10 transition-colors font-medium text-[16px]"
+                    >
+                        OK
+                    </button>
                 </div>
             </div>
         </div>

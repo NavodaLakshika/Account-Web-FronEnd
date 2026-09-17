@@ -32,7 +32,7 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             const user = JSON.parse(sessionStorage.getItem('user'));
             const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = 'C001';
+            let companyCode = '';
             if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; } catch (e) { companyCode = companyData; } }
             setFormData(prev => ({ ...prev, CurrentUser: user ? (user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '') : '', Company: companyCode }));
             fetchInitialData();

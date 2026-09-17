@@ -110,6 +110,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
     // Toast Custom Layouts matching JournalEntryBoard & PurchaseOrderBoard
     useEffect(() => {
         if (isOpen) {
+            if (typeof setErrors === "function") setErrors({});
             setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
 

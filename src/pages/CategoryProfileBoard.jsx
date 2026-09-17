@@ -1,3 +1,4 @@
+import { getSessionData } from '../utils/session';
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, RotateCcw, Save, Trash2 } from 'lucide-react';
@@ -10,6 +11,7 @@ const CategoryProfileBoard = ({ isOpen, onClose }) => {
     const initialState = { Code: '', Cat_Name: '', Dept_Code: '', Dept_Name: '', Company: '', CurrentUser: '' };
 
     const [formData, setFormData] = useState(initialState);
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [showDeptSearch, setShowDeptSearch] = useState(false);
@@ -23,21 +25,31 @@ const CategoryProfileBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
-            let companyCode = '';
-            if (companyData) { try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; } }
+            if (typeof setErrors === "function") setErrors({});
+            const { companyCode, userName } = getSessionData();
             setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
             setIsEditMode(false);
         }
     }, [isOpen]);
 
-    const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    };
 
-    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); };
+    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); setErrors({}); };
 
     const handleSave = async () => {
-        if (!formData.Dept_Code || !formData.Cat_Name) { showErrorToast('Department and Category Name are required'); return; }
+        const newErrors = {};
+        if (!formData.Dept_Code) newErrors.Dept_Code = 'Department is required';
+        if (!formData.Cat_Name) newErrors.Cat_Name = 'Category Name is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            showErrorToast('Department and Category Name are required');
+            return;
+        }
         setLoading(true);
         try {
             const data = await categoryService.save(formData);
@@ -59,7 +71,11 @@ const CategoryProfileBoard = ({ isOpen, onClose }) => {
         try { const data = await departmentService.getAll(formData.Company); setDeptList(data || []); setShowDeptSearch(true); } catch (err) { showErrorToast('Failed to load departments'); } finally { setLoading(false); }
     };
 
-    const selectDept = (dept) => { setFormData(prev => ({ ...prev, Dept_Code: dept.code, Dept_Name: dept.name, Code: '' })); setIsEditMode(false); setShowDeptSearch(false); };
+    const selectDept = (dept) => {
+        setFormData(prev => ({ ...prev, Dept_Code: dept.code, Dept_Name: dept.name, Code: '' }));
+        if (errors.Dept_Code) setErrors(prev => ({ ...prev, Dept_Code: null }));
+        setIsEditMode(false); setShowDeptSearch(false);
+    };
 
     const openCatSearch = async () => {
         if (!formData.Dept_Code) { showErrorToast('Select a department first'); return; }
@@ -89,10 +105,11 @@ const CategoryProfileBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-12">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Department</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Department *</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.Dept_Name || formData.Dept_Code} onClick={openDeptSearch} placeholder="Select department..." className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input type="text" readOnly value={formData.Dept_Name || formData.Dept_Code} onClick={openDeptSearch} placeholder="Select department..." className={`w-full h-10 border ${errors.Dept_Code ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none`} style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
+                                {errors.Dept_Code && <div className="text-[11px] text-red-500 mt-1">{errors.Dept_Code}</div>}
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Category ID</label>
@@ -101,8 +118,9 @@ const CategoryProfileBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Category Name</label>
-                                <input type="text" name="Cat_Name" value={formData.Cat_Name} onChange={handleInputChange} placeholder="Enter category name" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Category Name *</label>
+                                <input type="text" name="Cat_Name" value={formData.Cat_Name} onChange={handleInputChange} placeholder="Enter category name" className={`w-full h-10 border ${errors.Cat_Name ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700`} />
+                                {errors.Cat_Name && <div className="text-[11px] text-red-500 mt-1">{errors.Cat_Name}</div>}
                             </div>
                         </div>
                     </div>
@@ -189,3 +207,4 @@ const CategoryProfileBoard = ({ isOpen, onClose }) => {
 };
 
 export default CategoryProfileBoard;
+
