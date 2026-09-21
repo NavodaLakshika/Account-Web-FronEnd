@@ -103,6 +103,9 @@ const TransactionEditorModal = lazy(() => import('../components/modals/SystemAdm
 const CompanyUsersModal = lazy(() => import('../components/modals/SystemAdmin/CompanyUsersModal'));
 const ReportsCenterModal = lazy(() => import('../components/modals/AdminReports/ReportsCenterModal'));
 const DashboardHelpModal = lazy(() => import('../components/modals/DashboardHelpModal'));
+const ProfitLossDashboardBoard = lazy(() => import('./ProfitLossDashboardBoard'));
+const CustomerBoard = lazy(() => import('./CustomerBoard'));
+const VendorBoard = lazy(() => import('./VendorBoard'));
 
 const boardRegistry = {
     'NewAccountBoard': NewAccountBoard,
@@ -206,6 +209,9 @@ const boardRegistry = {
     'CompanyUsersModal': CompanyUsersModal,
     'ReportsCenterModal': ReportsCenterModal,
     'DashboardHelpModal': DashboardHelpModal,
+    'ProfitLossDashboardBoard': ProfitLossDashboardBoard,
+    'CustomerBoard': CustomerBoard,
+    'VendorBoard': VendorBoard,
 };
 
 const BoardViewerPage = () => {
