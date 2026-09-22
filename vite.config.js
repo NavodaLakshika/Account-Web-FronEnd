@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { Resend } from 'resend'
+import path from 'path'
 
 function smtpPlugin() {
   return {
@@ -54,6 +55,11 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     plugins: [react(), smtpPlugin()],
+    resolve: {
+      alias: {
+        stream: path.resolve(__dirname, 'src/utils/emptyStream.js'),
+      },
+    },
     build: {
       minify: false,
     },
