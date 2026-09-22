@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { version as appVersion } from '../../package.json';
 import { useNavigate } from 'react-router-dom';
 import { DotLottiePlayer } from '@dotlottie/react-player';
@@ -38,6 +38,7 @@ import {
     Box,
     Book,
     Megaphone,
+    Flame,
     Star,
     Clock,
     Plus,
@@ -53,7 +54,9 @@ import {
 
 import { authService } from '../services/auth.service';
 import { systemLocksService } from '../services/systemLocks.service';
-import { getSessionData } from '../utils/session';
+import { getSessionData, getCompanyCode } from '../utils/session';
+import { customerService } from '../services/customer.service';
+import { supplierService } from '../services/supplier.service';
 
 import NewAccountBoard from './NewAccountBoard';
 import CustomerMasterBoard from '../components/modals/MasterSubModal/CustomerMasterBoard';
@@ -128,6 +131,9 @@ import SubscriptionExpiredModal from '../components/modals/SubscriptionExpiredMo
 import SubmitReviewModal from '../components/modals/SubmitReviewModal';
 import FirstTimeGuide from '../components/FirstTimeGuide';
 import CompanyPromoBoard from '../components/CompanyPromoBoard';
+import EcommerceAnnouncementBar from '../components/EcommerceAnnouncementBar';
+import EcommercePromoModal from '../components/modals/EcommercePromoModal';
+import DashboardBottomAdsStrip from '../components/DashboardBottomAdsStrip';
 import { showSuccessToast, showErrorToast, showPermissionDeniedToast } from '../utils/toastUtils';
 import api from '../services/api';
 import SubscriptionAdminBoard from '../components/Admin/SubscriptionAdminBoard';
@@ -241,6 +247,8 @@ const PERMISSION_MAP = {
     'Customer Type Master': 'MST_CUSTOMER_TYPE',
     'Vendor Types': 'MST_VENDOR_TYPE',
     'Chart of Accounts': 'MST_CHART_OF_ACCOUNT',
+    'Create New Account': 'MST_NEW_ACCOUNT',
+    'Fixed Assets Master': 'MST_FIXED_ASSETS',
     'Card Sale Commission': 'MST_CARD_SALE',
     'User Profile Maintenance': 'MST_USER_PROFILE',
     'Change Password': 'SYS_CHANGE_PASSWORD',
@@ -424,6 +432,12 @@ const Dashboard = () => {
 
     const [user, setUser] = useState(null);
     const [selectedCompany, setSelectedCompany] = useState(null);
+    const [companyLicenseDetails, setCompanyLicenseDetails] = useState(null);
+    const [companyEntityCounts, setCompanyEntityCounts] = useState({
+        customers: null,
+        suppliers: null,
+        loading: false
+    });
     const [activeCategory, setActiveCategory] = useState('Overview');
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -614,6 +628,7 @@ const Dashboard = () => {
 
     const [showQuickLaunchModal, setShowQuickLaunchModal] = useState(false);
     const [showPromoModal, setShowPromoModal] = useState(false);
+    const [showEcommerceDealsModal, setShowEcommerceDealsModal] = useState(false);
     const [showFirstTimeGuide, setShowFirstTimeGuide] = useState(false);
     const [showDashboardLoader, setShowDashboardLoader] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
@@ -1017,6 +1032,246 @@ const Dashboard = () => {
         }
     }, [navigate, selectedCompany?.Company_Id, selectedCompany?.company_Code, selectedCompany?.companyCode, selectedCompany?.id]);
 
+    // Derive current login company code
+    const compCode = selectedCompany?.company_Code || 
+                     selectedCompany?.companyCode || 
+                     selectedCompany?.CompanyCode || 
+                     selectedCompany?.Company_Code || 
+                     selectedCompany?.Code || 
+                     selectedCompany?.code || 
+                     selectedCompany?.Company_Id ||
+                     selectedCompany?.companyId ||
+                     selectedCompany?.id ||
+                     getCompanyCode();
+
+    // Fetch live company customer and supplier counts
+    const fetchCompanyEntityCounts = useCallback(async (targetCompCode) => {
+        const cCode = targetCompCode || compCode || getCompanyCode();
+        if (!cCode) return;
+
+        setCompanyEntityCounts(prev => ({ ...prev, loading: true }));
+        try {
+            const [custRes, suppRes] = await Promise.allSettled([
+                customerService.getAll(cCode),
+                supplierService.getAll(cCode)
+            ]);
+
+            let customerCount = null;
+            if (custRes.status === 'fulfilled' && Array.isArray(custRes.value)) {
+                const filtered = custRes.value.filter(c => {
+                    const recComp = c.company || c.Company || c.companyCode || c.CompanyCode || c.company_Code || c.Company_Code;
+                    return !recComp || String(recComp).trim().toLowerCase() === String(cCode).trim().toLowerCase();
+                });
+                customerCount = filtered.length;
+            }
+
+            let supplierCount = null;
+            if (suppRes.status === 'fulfilled' && Array.isArray(suppRes.value)) {
+                const filtered = suppRes.value.filter(s => {
+                    const recComp = s.company || s.Company || s.companyCode || s.CompanyCode || s.company_Code || s.Company_Code;
+                    return !recComp || String(recComp).trim().toLowerCase() === String(cCode).trim().toLowerCase();
+                });
+                supplierCount = filtered.length;
+            }
+
+            setCompanyEntityCounts({
+                customers: customerCount !== null ? customerCount : 0,
+                suppliers: supplierCount !== null ? supplierCount : 0,
+                loading: false
+            });
+        } catch (err) {
+            console.warn('Could not fetch company customer/supplier counts:', err);
+            setCompanyEntityCounts(prev => ({ ...prev, loading: false }));
+        }
+    }, [compCode]);
+
+    // Live sync customer and supplier counts on mount, company change, and data mutations
+    useEffect(() => {
+        if (compCode) {
+            fetchCompanyEntityCounts(compCode);
+        }
+
+        const handleDataRefreshed = () => {
+            if (compCode) fetchCompanyEntityCounts(compCode);
+        };
+
+        window.addEventListener('reportDataChanged', handleDataRefreshed);
+        window.addEventListener('customer_data_changed', handleDataRefreshed);
+        window.addEventListener('supplier_data_changed', handleDataRefreshed);
+
+        return () => {
+            window.removeEventListener('reportDataChanged', handleDataRefreshed);
+            window.removeEventListener('customer_data_changed', handleDataRefreshed);
+            window.removeEventListener('supplier_data_changed', handleDataRefreshed);
+        };
+    }, [compCode, fetchCompanyEntityCounts]);
+
+    // Fetch live company license details from backend
+    useEffect(() => {
+        if (compCode) {
+            authService.getCompanyDetails(compCode).then(details => {
+                if (details) {
+                    setCompanyLicenseDetails(details);
+                }
+            }).catch(err => {
+                console.warn("Could not fetch company license details from backend:", err);
+            });
+        }
+    }, [compCode, selectedCompany?.Company_Id, selectedCompany?.company_Code, selectedCompany?.companyCode, selectedCompany?.CompanyCode, selectedCompany?.code, selectedCompany?.id]);
+
+    // License evaluation helper to detect Trial, Active, or Expired from backend and local state
+    const getLicenseInfo = () => {
+        const statusCandidates = [
+            companyLicenseDetails?.licence_Status,
+            companyLicenseDetails?.licenceStatus,
+            companyLicenseDetails?.Licence_Status,
+            companyLicenseDetails?.LicenceStatus,
+            companyLicenseDetails?.license_Status,
+            companyLicenseDetails?.licenseStatus,
+            companyLicenseDetails?.License_Status,
+            companyLicenseDetails?.LicenseStatus,
+            companyLicenseDetails?.subscription_Status,
+            companyLicenseDetails?.subscriptionStatus,
+            companyLicenseDetails?.SubscriptionStatus,
+            companyLicenseDetails?.licence_Type,
+            companyLicenseDetails?.licenceType,
+            companyLicenseDetails?.Licence_Type,
+            companyLicenseDetails?.LicenceType,
+            companyLicenseDetails?.license_Type,
+            companyLicenseDetails?.licenseType,
+            companyLicenseDetails?.License_Type,
+            companyLicenseDetails?.LicenseType,
+            companyLicenseDetails?.licence,
+            companyLicenseDetails?.license,
+            companyLicenseDetails?.Licence,
+            companyLicenseDetails?.License,
+            companyLicenseDetails?.status,
+            companyLicenseDetails?.Status,
+            selectedCompany?.licence_Status,
+            selectedCompany?.licenceStatus,
+            selectedCompany?.Licence_Status,
+            selectedCompany?.LicenceStatus,
+            selectedCompany?.license_Status,
+            selectedCompany?.licenseStatus,
+            selectedCompany?.License_Status,
+            selectedCompany?.LicenseStatus,
+            selectedCompany?.subscription_Status,
+            selectedCompany?.subscriptionStatus,
+            selectedCompany?.SubscriptionStatus,
+            selectedCompany?.licence_Type,
+            selectedCompany?.licenceType,
+            selectedCompany?.Licence_Type,
+            selectedCompany?.LicenceType,
+            selectedCompany?.license_Type,
+            selectedCompany?.licenseType,
+            selectedCompany?.License_Type,
+            selectedCompany?.LicenseType,
+            selectedCompany?.licence,
+            selectedCompany?.license,
+            selectedCompany?.Licence,
+            selectedCompany?.License,
+            selectedCompany?.status,
+            selectedCompany?.Status,
+            user?.SubscriptionStatus,
+            user?.subscriptionStatus,
+            user?.subscription_Status,
+            user?.licence_Status,
+            user?.license_Status,
+            user?.status,
+            user?.Status
+        ];
+
+        const resolvedStatus = statusCandidates.find(s => typeof s === 'string' && s.trim().length > 0) || '';
+        const statusLower = resolvedStatus.toLowerCase();
+
+        const isTrialFlag = 
+            companyLicenseDetails?.isTrial === true ||
+            companyLicenseDetails?.isTrial === 1 ||
+            companyLicenseDetails?.isTrial === '1' ||
+            companyLicenseDetails?.IsTrial === true ||
+            companyLicenseDetails?.is_Trial === true ||
+            companyLicenseDetails?.is_Trial === 1 ||
+            companyLicenseDetails?.is_Trial === '1' ||
+            companyLicenseDetails?.Is_Trial === true ||
+            selectedCompany?.isTrial === true ||
+            selectedCompany?.isTrial === 1 ||
+            selectedCompany?.isTrial === '1' ||
+            selectedCompany?.IsTrial === true ||
+            selectedCompany?.is_Trial === true ||
+            selectedCompany?.is_Trial === 1 ||
+            selectedCompany?.is_Trial === '1' ||
+            selectedCompany?.Is_Trial === true ||
+            user?.isTrial === true ||
+            user?.isTrial === 1 ||
+            user?.IsTrial === true;
+
+        const daysLeft = 
+            companyLicenseDetails?.daysLeft ??
+            companyLicenseDetails?.DaysLeft ??
+            companyLicenseDetails?.days_Left ??
+            selectedCompany?.daysLeft ??
+            selectedCompany?.DaysLeft ??
+            selectedCompany?.days_Left ??
+            null;
+
+        const isExpired = !isTrialFlag && (
+            statusLower.includes('expir') || 
+            statusLower.includes('ended') || 
+            statusLower.includes('suspend') || 
+            statusLower.includes('inactiv')
+        );
+
+        const isTrial = isTrialFlag || (!isExpired && statusLower.includes('trial'));
+        const isActive = !isExpired && !isTrial;
+
+        if (isTrial) {
+            return {
+                isTrial: true,
+                isActive: false,
+                isExpired: false,
+                licenseLabel: daysLeft ? `Trial License (${daysLeft}d left)` : 'Trial License',
+                badgeLabel: 'TRIAL',
+                badgeColor: '#2563eb',
+                badgeBg: 'rgba(37, 99, 235, 0.08)',
+                badgeBorder: '1px solid rgba(37, 99, 235, 0.25)',
+                iconColor: '#2563eb',
+                tooltip: 'Trial License - Click to view subscription plans'
+            };
+        }
+
+        if (isExpired) {
+            return {
+                isTrial: false,
+                isActive: false,
+                isExpired: true,
+                licenseLabel: 'License Expired',
+                badgeLabel: 'EXPIRED',
+                badgeColor: '#dc2626',
+                badgeBg: 'rgba(220, 38, 38, 0.08)',
+                badgeBorder: '1px solid rgba(220, 38, 38, 0.25)',
+                iconColor: '#dc2626',
+                tooltip: 'Subscription Expired - Click to renew'
+            };
+        }
+
+        // Active
+        const isExplicitActive = statusLower.includes('activ');
+        return {
+            isTrial: false,
+            isActive: true,
+            isExpired: false,
+            licenseLabel: 'Active License',
+            badgeLabel: isExplicitActive ? 'ACTIVE' : 'ENTERPRISE',
+            badgeColor: isExplicitActive ? '#16a34a' : '#dc2626',
+            badgeBg: isExplicitActive ? 'rgba(22, 163, 74, 0.08)' : 'transparent',
+            badgeBorder: isExplicitActive ? '1px solid rgba(22, 163, 74, 0.25)' : 'none',
+            iconColor: '#16a34a',
+            tooltip: 'Active License - Click to view subscription details'
+        };
+    };
+
+    const licenseInfo = getLicenseInfo();
+
     // Reset reminder states when user or company changes to prevent leaks across sessions
     useEffect(() => {
         setPendingJobsCount(0);
@@ -1103,7 +1358,25 @@ const Dashboard = () => {
         const onMount = setTimeout(showPromo, 8000);
         const interval = setInterval(showPromo, 10 * 60 * 1000);
 
-        return () => { clearTimeout(onMount); clearInterval(interval); };
+        // Auto popup e-commerce deals strictly one time per day
+        const showEcommercePromo = () => {
+            if (!isAdBlockActiveRef.current) {
+                const today = new Date().toISOString().split('T')[0];
+                const lastAutoPopupDate = localStorage.getItem('lastEcommercePromoAutoPopupDate');
+                const dismissedDate = localStorage.getItem('hideEcommerceDealsDate');
+                if (lastAutoPopupDate !== today && dismissedDate !== today) {
+                    setShowEcommerceDealsModal(true);
+                    localStorage.setItem('lastEcommercePromoAutoPopupDate', today);
+                }
+            }
+        };
+        const dealsTimer = setTimeout(showEcommercePromo, 2500);
+
+        return () => { 
+            clearTimeout(onMount); 
+            clearInterval(interval); 
+            clearTimeout(dealsTimer); 
+        };
     }, []);
 
     // Listen to messages from other tabs (like SpendOverviewPage)
@@ -1433,6 +1706,9 @@ const Dashboard = () => {
                 group: 'Finance & Accounting',
                 items: [
                     { label: 'Chart of Accounts', onClick: () => setShowChartOfAccountantModal(true), lockId: 'master_chartOfAccount', perm: 'MST_CHART_OF_ACCOUNT' },
+                    { label: 'Create New Account', onClick: () => setShowNewAccountModal(true), lockId: 'master_newAccount', perm: 'MST_NEW_ACCOUNT' },
+                    { label: 'Fixed Assets Master', onClick: () => setShowFixedAssetsBoard(true), lockId: 'master_fixedAssets', perm: 'MST_FIXED_ASSETS' },
+                    { label: 'Card Sale Commission', onClick: () => setShowCardCommissionBoard(true), lockId: 'master_cardCommission', perm: 'MST_CARD_SALE' },
                 ]
             },
             {
@@ -1806,15 +2082,13 @@ const Dashboard = () => {
                 }
             `}</style>
             )}
-            {/* Top Subscription Banner OR Marquee Bar */}
+            {/* Top E-Commerce Announcement Bar OR Marquee Bar */}
             {showSubscriptionBanner ? (
-                <div className="bg-[#0078d4] text-white text-[13px] h-9 flex justify-center items-center gap-2 relative z-50 transition-all animate-in slide-in-from-top duration-300 mb-2">
-                    <span>Save 50% for 3 months.</span>
-                    <button onClick={() => setShowPricingPlansModal(true)} className="underline font-bold hover:text-white/80 transition-colors">Subscribe now</button>
-                    <button onClick={() => setShowAdBlockAlert(true)} className="absolute right-4 text-white/70 hover:text-white transition-colors">
-                        <X size={28} strokeWidth={1.5} />
-                    </button>
-                </div>
+                <EcommerceAnnouncementBar 
+                    onOpenPricing={() => setShowPricingPlansModal(true)}
+                    onOpenDeals={() => setShowEcommerceDealsModal(true)}
+                    onBlockAds={() => setShowAdBlockAlert(true)}
+                />
             ) : (
                 <div className="h-9 bg-[#0078d4] border-b border-blue-600 flex items-center px-6 gap-6 relative overflow-hidden z-50 transition-all animate-in slide-in-from-top duration-300 mb-2">
                     <div className="flex-1 overflow-hidden relative h-full flex items-center">
@@ -2040,6 +2314,14 @@ const Dashboard = () => {
                 user={user}
             />
             <CompanyPromoBoard isOpen={showPromoModal} onClose={() => setShowPromoModal(false)} />
+            <EcommercePromoModal 
+                isOpen={showEcommerceDealsModal} 
+                onClose={() => setShowEcommerceDealsModal(false)} 
+                onOpenPricing={() => {
+                    setShowEcommerceDealsModal(false);
+                    setShowPricingPlansModal(true);
+                }} 
+            />
             <SubscriptionExpiredModal
                 isOpen={showSubscriptionExpiredModal}
                 userStatus={user?.SubscriptionStatus || user?.subscriptionStatus || ''}
@@ -2319,36 +2601,57 @@ const Dashboard = () => {
                                             : permissionFilteredItems;
                                         return (
                                             <div
-                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none p-4 sm:p-6 z-[200] border border-gray-200 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none flex flex-col"
-
+                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-2 bg-white shadow-[0_16px_50px_rgba(0,0,0,0.14)] rounded-md p-4 sm:p-6 z-[200] border border-slate-200 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none flex flex-col animate-in fade-in zoom-in-95 duration-150"
                                             >
-
-                                                <div className="flex items-start justify-between gap-6 mb-4">
-                                                    <div className="flex-1 w-full">
+                                                {/* Form Style Top Header */}
+                                                <div className="flex items-center justify-between gap-6 pb-3.5 mb-4 border-b border-slate-100">
+                                                    <div className="flex-1">
                                                         {isReports ? (
-                                                            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[3px] w-full">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" /></svg>
+                                                            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[4px] w-full max-w-sm focus-within:border-[#0078d4] focus-within:bg-white transition-all">
+                                                                <Search size={14} className="text-slate-400 shrink-0" />
                                                                 <input
                                                                     type="text"
                                                                     placeholder="Search reports..."
                                                                     value={navReportSearch}
                                                                     onChange={e => setNavReportSearch(e.target.value)}
                                                                     autoFocus
-                                                                    className="flex-1 text-[13px] font-medium text-gray-800 bg-transparent outline-none placeholder:text-gray-400 min-w-[220px]"
+                                                                    className="flex-1 text-[12.5px] font-medium text-slate-800 bg-transparent outline-none placeholder:text-slate-400 min-w-[200px]"
                                                                 />
                                                                 {navReportSearch && (
-                                                                    <button onClick={() => setNavReportSearch('')} className="text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-wide">?</button>
+                                                                    <button onClick={() => setNavReportSearch('')} className="text-slate-400 hover:text-slate-600 text-[10px] font-bold uppercase tracking-wide">✕</button>
                                                                 )}
                                                             </div>
                                                         ) : (
-                                                            <div />
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-[4px] bg-blue-50 border border-blue-100 text-[#0078d4] flex items-center justify-center font-bold shrink-0 shadow-xs">
+                                                                    {item === 'Master File' && <Building2 size={16} />}
+                                                                    {item === 'Transaction' && <ArrowDownLeft size={16} />}
+                                                                    {item === 'System Admin' && <ShieldCheck size={16} />}
+                                                                </div>
+                                                                <div className="flex flex-col">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">{item}</span>
+                                                                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-[#0078d4] uppercase tracking-wide border border-blue-100/80">Navigation</span>
+                                                                    </div>
+                                                                    <span className="text-[11px] font-normal text-slate-400">
+                                                                        {item === 'Master File' && 'Master directory, organizational structure and accounting setup'}
+                                                                        {item === 'Transaction' && 'Sales, purchases, accounting entries and banking operations'}
+                                                                        {item === 'System Admin' && 'Administrative management, maintenance and data controls'}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    <button onClick={() => setActiveMenu(null)} className="text-slate-400 hover:text-red-500 transition-colors bg-transparent border-none p-1 cursor-pointer shrink-0 mt-0.5" title="Close">
-                                                        <X size={20} strokeWidth={2} />
+                                                    <button
+                                                        onClick={() => setActiveMenu(null)}
+                                                        className="w-7 h-7 flex items-center justify-center rounded-[4px] text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all border-none p-0 cursor-pointer shrink-0"
+                                                        title="Close menu"
+                                                    >
+                                                        <X size={18} strokeWidth={2} />
                                                     </button>
                                                 </div>
-                                                <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pr-2">
+
+                                                <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pr-1">
                                                     {filteredItems.length === 0 ? (
                                                         <div className="py-8 text-center text-[13px] text-gray-400 min-w-[220px]">
                                                             No reports match <span className="font-bold text-gray-600">"{navReportSearch}"</span>
@@ -2360,11 +2663,17 @@ const Dashboard = () => {
                                                                 cols[i % numCols].push(item);
                                                             });
                                                             return cols.map((colItems, colIndex) => (
-                                                                <div key={colIndex} className="flex flex-col gap-6 sm:gap-8">
+                                                                <div key={colIndex} className="flex flex-col gap-6 sm:gap-7 border-r border-slate-100 last:border-r-0 pr-6 sm:pr-8 last:pr-0">
                                                                     {colItems.map((menuItem, i) => (
                                                                         <div key={i} className="flex flex-col">
-                                                                            <h3 className="text-[11px] font-sans font-bold text-gray-500 uppercase tracking-widest mb-3 sm:mb-4">{menuItem.group}</h3>
-                                                                            <div className="flex flex-col gap-2 sm:gap-3">
+                                                                            <div className="flex items-center gap-2 pb-1.5 mb-2.5 border-b border-slate-100">
+                                                                                <span className="w-1.5 h-1.5 rounded-full bg-[#0078d4]" />
+                                                                                <h3 className="text-[11px] font-sans font-bold text-slate-700 uppercase tracking-wider">{menuItem.group}</h3>
+                                                                                <span className="text-[9px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-[3px] ml-auto">
+                                                                                    {menuItem.items.length}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="flex flex-col gap-1">
                                                                                 {menuItem.items.map((subItem, j) => {
                                                                                     const isLockedReport = (isReports && (hiddenReports.includes(subItem.label) || hiddenReports.includes(subItem.label.toLowerCase().replace(/ /g, '-').replace(/\//g, '-')))) || (subItem.lockId && isModuleLocked(subItem.lockId));
                                                                                     const isDeniedReport = isItemDenied(subItem);
@@ -2377,18 +2686,22 @@ const Dashboard = () => {
                                                                                                     setActiveMenu(null);
                                                                                                     setNavReportSearch('');
                                                                                                 }}
-                                                                                                className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport || isDeniedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-[3px] transition-all flex items-start justify-between pr-8`}
+                                                                                                className={`w-full text-left text-[12.5px] font-sans font-medium text-slate-600 ${isLockedReport || isDeniedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f0f7ff] hover:pl-2.5'} px-2 py-1.5 rounded-[4px] transition-all flex items-center justify-between pr-7`}
                                                                                                 title={isDeniedReport || isLockedReport ? `You do not have access to ${subItem.label}` : subItem.label}
                                                                                             >
-                                                                                                <span className="whitespace-normal leading-snug pt-0.5">{subItem.label}</span>
-                                                                                                {(isLockedReport || isDeniedReport) && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2 mt-0.5" />}
+                                                                                                <span className="whitespace-normal leading-snug">{subItem.label}</span>
+                                                                                                {(isLockedReport || isDeniedReport) ? (
+                                                                                                    <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2" />
+                                                                                                ) : (
+                                                                                                    <ChevronRight size={12} className="text-slate-300 opacity-0 group-hover/item:opacity-100 group-hover/item:text-[#0078d4] transition-all -translate-x-1 group-hover/item:translate-x-0 shrink-0 ml-2" />
+                                                                                                )}
                                                                                             </button>
                                                                                             {isReports && !isLockedReport && (
                                                                                                 <button
                                                                                                     onClick={(e) => toggleFavoriteReport(e, subItem.label)}
-                                                                                                    className={`absolute right-2 p-1.5 transition-opacity ${favoriteReports.includes(subItem.label) ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-100'}`}
+                                                                                                    className={`absolute right-1.5 p-1 transition-opacity ${favoriteReports.includes(subItem.label) ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-100'}`}
                                                                                                 >
-                                                                                                    <Star size={14} className={favoriteReports.includes(subItem.label) ? "fill-[#eab308] text-[#eab308]" : "text-gray-400 hover:text-[#eab308]"} />
+                                                                                                    <Star size={13} className={favoriteReports.includes(subItem.label) ? "fill-[#eab308] text-[#eab308]" : "text-gray-400 hover:text-[#eab308]"} />
                                                                                                 </button>
                                                                                             )}
                                                                                         </div>
@@ -2415,7 +2728,7 @@ const Dashboard = () => {
 
                                                         return (
                                                             <>
-                                                                <div className="hidden lg:flex flex-row gap-8 xl:gap-12">
+                                                                <div className="hidden lg:flex flex-row gap-8 xl:gap-10">
                                                                     {renderMasonry(lgCols)}
                                                                 </div>
                                                                 <div className="hidden sm:flex lg:hidden flex-row gap-8">
@@ -2427,7 +2740,7 @@ const Dashboard = () => {
                                                             </>
                                                         );
                                                     })() : (
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2 sm:gap-y-3 min-w-0 sm:min-w-[320px]">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2 min-w-0 sm:min-w-[340px]">
                                                             {filteredItems.map((menuItem, i) => (
                                                                 <button
                                                                     key={i}
@@ -2435,9 +2748,10 @@ const Dashboard = () => {
                                                                         menuItem.onClick();
                                                                         setActiveMenu(null);
                                                                     }}
-                                                                    className="w-full text-left text-[13px] font-sans font-medium text-gray-600 hover:text-[#0078d4] hover:bg-[#f4f5f8] px-2 py-1.5 -mx-2 rounded-[3px] transition-all block"
+                                                                    className="w-full text-left text-[12.5px] font-sans font-medium text-slate-600 hover:text-[#0078d4] hover:bg-[#f0f7ff] hover:pl-2.5 px-2 py-1.5 rounded-[4px] transition-all flex items-center justify-between group/item"
                                                                 >
-                                                                    {menuItem.label}
+                                                                    <span>{menuItem.label}</span>
+                                                                    <ChevronRight size={12} className="text-slate-300 opacity-0 group-hover/item:opacity-100 group-hover/item:text-[#0078d4] transition-all -translate-x-1 group-hover/item:translate-x-0 shrink-0 ml-2" />
                                                                 </button>
                                                             ))}
                                                         </div>
@@ -2796,14 +3110,20 @@ const Dashboard = () => {
                                                 <Search size={14} className="text-slate-400" />
                                                 Search
                                             </button>
+                                            <button
+                                                data-tour="special-deals"
+                                                onClick={() => setShowEcommerceDealsModal(true)}
+                                                className="group flex items-center gap-1.5 px-3.5 h-[40px] bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-300/80 hover:border-rose-400 rounded-[8px] text-[13px] font-bold text-amber-800 hover:text-rose-700 hover:shadow-sm active:scale-95 transition-all duration-200"
+                                                title="Special Deals & E-Commerce Add-Ons"
+                                            >
+                                                <Flame size={14} className="text-amber-500 fill-amber-400 group-hover:text-rose-500 group-hover:fill-rose-400 transition-colors animate-pulse" />
+                                                <span>Special Deals</span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
-
 
                         {/* Category Tabs */}
                         <div className="flex justify-center overflow-x-auto no-scrollbar gap-2 mb-6 pb-4 border-b border-slate-200">
@@ -2834,14 +3154,30 @@ const Dashboard = () => {
                                         const Icon = item.icon;
                                         const locked = isModuleLocked(item.lockId);
                                         const denied = isItemDenied(item);
+                                        const count = item.label === 'Customers' 
+                                            ? companyEntityCounts.customers 
+                                            : (item.label === 'Vendors' ? companyEntityCounts.suppliers : undefined);
                                         return (
-                                            <ModuleCard key={item.label} item={item} Icon={Icon} setIsLoaderStopped={setIsLoaderStopped} isLocked={locked} isDenied={denied} onDeniedClick={handleAccessDenied} />
+                                            <ModuleCard 
+                                                key={item.label} 
+                                                item={item} 
+                                                Icon={Icon} 
+                                                setIsLoaderStopped={setIsLoaderStopped} 
+                                                isLocked={locked} 
+                                                isDenied={denied} 
+                                                onDeniedClick={handleAccessDenied} 
+                                                count={count}
+                                                companyName={selectedCompany?.CompanyName || selectedCompany?.companyName || selectedCompany?.name}
+                                            />
                                         );
                                     })}
                                 </div>
                             </div>
                         ))}
                     </div>
+
+                    {/* Animated Promotional Bottom Ads Strip (Auto-hide & Auto-popup) */}
+                    <DashboardBottomAdsStrip onOpenDealsModal={() => setShowEcommerceDealsModal(true)} />
 
                     {/* ===== System Version and License Footer ===== */}
                     <div style={{
@@ -2867,7 +3203,7 @@ const Dashboard = () => {
                                 Accounts
                             </span>
                             <span style={{ fontSize: '10px', fontWeight: 600, color: '#6b6c72', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                                Enterprise Suite
+                                {licenseInfo.isTrial ? 'Enterprise Suite (Trial)' : 'Enterprise Suite'}
                             </span>
                             <div style={{ width: '1px', height: '16px', background: '#eceef1' }} />
                             <span style={{
@@ -2881,11 +3217,17 @@ const Dashboard = () => {
 
                         {/* Center: License and Build */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <div 
+                                onClick={() => setShowSubscriptionModal(true)}
+                                style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
+                                title={licenseInfo.tooltip}
+                            >
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={licenseInfo.iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                 </svg>
-                                <span style={{ fontSize: '11px', color: '#6b6c72', fontWeight: 600 }}>Licensed Software</span>
+                                <span style={{ fontSize: '11px', color: licenseInfo.badgeColor, fontWeight: 600 }}>
+                                    {licenseInfo.licenseLabel}
+                                </span>
                             </div>
                             <div style={{ width: '1px', height: '12px', background: '#eceef1' }} />
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -2901,15 +3243,25 @@ const Dashboard = () => {
                         {/* Right: Copyright + Edition Badge */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>
-                                � {new Date().getFullYear()} ONIMTA Information Technology. All rights reserved.
+                                © {new Date().getFullYear()} ONIMTA Information Technology. All rights reserved.
                             </span>
                             <div style={{ width: '1px', height: '12px', background: '#eceef1' }} />
-                            <span style={{
-                                fontSize: '10px', fontWeight: 900, color: '#dc2626',
-                                background: 'transparent', border: 'none',
-                                padding: '1px 8px', letterSpacing: '0.04em',
-                            }}>
-                                ENTERPRISE
+                            <span 
+                                onClick={() => setShowSubscriptionModal(true)}
+                                style={{
+                                    fontSize: '10px', 
+                                    fontWeight: 900, 
+                                    color: licenseInfo.badgeColor,
+                                    background: licenseInfo.badgeBg, 
+                                    border: licenseInfo.badgeBorder,
+                                    borderRadius: '3px',
+                                    padding: '1px 8px', 
+                                    letterSpacing: '0.04em',
+                                    cursor: 'pointer'
+                                }}
+                                title={licenseInfo.tooltip}
+                            >
+                                {licenseInfo.badgeLabel}
                             </span>
                         </div>
                     </div>
@@ -3156,7 +3508,7 @@ const Dashboard = () => {
 
 // Custom Rectangular Bento Card Component
 // Module Card Component
-const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false, isDenied = false, onDeniedClick }) => {
+const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false, isDenied = false, onDeniedClick, count, companyName }) => {
     const animatedLabels = ['Dashboard', 'Accounts', 'Customers', 'Vendors', 'Billing', 'Pay Bills', 'Cheques', 'Cash', 'Deposit', 'Journal', 'Rec.', 'Report'];
     const isAnimated = item.gif && animatedLabels.includes(item.label);
     const color = item.color || '#0078d4';
@@ -3187,6 +3539,14 @@ const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false, isDenied
                 style={{ borderColor: 'rgba(0,0,0,0.06)', boxShadow: 'none' }}
                 title={`${item.label} - You do not have permission to access this feature`}
             >
+                {count !== undefined && count !== null && (
+                    <div 
+                        className="absolute top-2.5 right-2.5 px-2 py-0.5 text-[10px] font-semibold bg-slate-200/80 text-slate-500 border border-slate-300/80 flex items-center gap-1 z-20"
+                    >
+                        <span className="font-bold font-mono">{count}</span>
+                        <span className="text-[9.5px]">{item.label === 'Customers' ? (count === 1 ? 'Customer' : 'Customers') : (count === 1 ? 'Supplier' : 'Suppliers')}</span>
+                    </div>
+                )}
                 <div className="relative z-10 flex items-center justify-center mb-3">
                     <div className="w-14 h-14 flex items-center justify-center bg-[#c0392b]/10 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -3209,6 +3569,14 @@ const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false, isDenied
                 style={{ borderColor: 'rgba(0,0,0,0.06)', boxShadow: 'none' }}
                 title={`${item.label} is locked by the administrator`}
             >
+                {count !== undefined && count !== null && (
+                    <div 
+                        className="absolute top-2.5 right-2.5 px-2 py-0.5 text-[10px] font-semibold bg-slate-200/80 text-slate-500 border border-slate-300/80 flex items-center gap-1 z-20"
+                    >
+                        <span className="font-bold font-mono">{count}</span>
+                        <span className="text-[9.5px]">{item.label === 'Customers' ? (count === 1 ? 'Customer' : 'Customers') : (count === 1 ? 'Supplier' : 'Suppliers')}</span>
+                    </div>
+                )}
                 <div className="relative z-10 flex items-center justify-center mb-3">
                     <div className="w-14 h-14 flex items-center justify-center bg-red-50 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -3240,6 +3608,19 @@ const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false, isDenied
                 e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
             }}
         >
+            {/* Single Clean Count Badge - Matching Card Style (No Border Radius) */}
+            {count !== undefined && count !== null && (
+                <div 
+                    className="absolute top-2.5 right-2.5 px-2 py-0.5 text-[10.5px] font-semibold bg-slate-50 border border-slate-200/90 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex items-center gap-1.5 z-20 transition-all duration-200 group-hover:bg-blue-50/70 group-hover:border-[#0078d4]/30"
+                    title={`${count} ${item.label === 'Customers' ? 'Customers' : 'Suppliers'} registered in ${companyName || 'this company'}`}
+                >
+                    <span className="font-bold text-[#0078d4] font-mono">{count}</span>
+                    <span className="text-slate-500 group-hover:text-[#0078d4] text-[10px] font-medium transition-colors">
+                        {item.label === 'Customers' ? (count === 1 ? 'Customer' : 'Customers') : (count === 1 ? 'Supplier' : 'Suppliers')}
+                    </span>
+                </div>
+            )}
+
             <div className="relative z-10 transition-all duration-300 flex items-center justify-center mb-3">
                 <div className={`${isAnimated ? 'w-20 h-20' : 'w-14 h-14'} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
                     {item.gif ? (
