@@ -38,7 +38,8 @@ import {
     Plus,
     User,
     UserCog,
-    Clock
+    Clock,
+    Layers
 } from 'lucide-react';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import '@dotlottie/react-player/dist/index.css';
@@ -52,6 +53,7 @@ import CompaniesView from './SuperAdmin/CompaniesView';
 import EmployeesView from './SuperAdmin/EmployeesView';
 import RoleFeaturesView from './SuperAdmin/RoleFeaturesView';
 import UserFeedbackView from './SuperAdmin/UserFeedbackView';
+import AccountTablesView from './SuperAdmin/AccountTablesView';
 
 
 import SystemAnalysisBoard from '../HomeMaster/SystemAnalysisBoard';
@@ -166,6 +168,9 @@ const SuperAdminDashboard = () => {
             'pricing': 'Subscriptions',
             'database': 'Companies',
             'backup': 'Companies',
+            'accounts': 'Account Tables',
+            'account tables': 'Account Tables',
+            'chart of accounts': 'Account Tables',
             'security': 'Role Features',
             'audit': 'Role Features',
             'integrations': 'Integrations',
@@ -1013,6 +1018,7 @@ const SuperAdminDashboard = () => {
         { name: 'Dashboard', icon: LayoutDashboard },
         { name: 'Companies', icon: Building2 },
         { name: 'Employees', icon: Users },
+        { name: 'Account Tables', icon: Layers },
         { name: 'Role Features', icon: ShieldAlert },
         { name: 'Reports', icon: FileText },
         { name: 'Engagement', icon: Megaphone },
@@ -1570,6 +1576,11 @@ const SuperAdminDashboard = () => {
                     {/* DATABASE VIEW */}
                     {activeMenu === 'Database' && (
                         <DatabaseAdminBoard />
+                    )}
+
+                    {/* ACCOUNT TABLES VIEW */}
+                    {activeMenu === 'Account Tables' && (
+                        <AccountTablesView allCompanies={allCompanies} />
                     )}
 
                     {/* ROLE FEATURES VIEW */}

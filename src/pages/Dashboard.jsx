@@ -2601,10 +2601,10 @@ const Dashboard = () => {
                                             : permissionFilteredItems;
                                         return (
                                             <div
-                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-2 bg-white shadow-[0_16px_50px_rgba(0,0,0,0.14)] rounded-md p-4 sm:p-6 z-[200] border border-slate-200 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none flex flex-col animate-in fade-in zoom-in-95 duration-150"
+                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-2 bg-white shadow-[0_16px_50px_rgba(0,0,0,0.14)] rounded-md p-4 sm:p-6 z-[200] border border-slate-200 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[calc(100vh-75px)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
                                             >
                                                 {/* Form Style Top Header */}
-                                                <div className="flex items-center justify-between gap-6 pb-3.5 mb-4 border-b border-slate-100">
+                                                <div className="flex items-center justify-between gap-6 pb-3.5 mb-4 border-b border-slate-100 shrink-0">
                                                     <div className="flex-1">
                                                         {isReports ? (
                                                             <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[4px] w-full max-w-sm focus-within:border-[#0078d4] focus-within:bg-white transition-all">
@@ -2651,7 +2651,7 @@ const Dashboard = () => {
                                                     </button>
                                                 </div>
 
-                                                <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pr-1">
+                                                <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pr-1 pb-4">
                                                     {filteredItems.length === 0 ? (
                                                         <div className="py-8 text-center text-[13px] text-gray-400 min-w-[220px]">
                                                             No reports match <span className="font-bold text-gray-600">"{navReportSearch}"</span>

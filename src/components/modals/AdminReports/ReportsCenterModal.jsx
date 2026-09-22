@@ -159,7 +159,7 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 bg-[#f4f5f8] custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-6 bg-[#f4f5f8] no-scrollbar">
                     {filteredGroups.length === 0 ? (
                         <div className="py-20 text-center flex flex-col items-center">
                             <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-4">

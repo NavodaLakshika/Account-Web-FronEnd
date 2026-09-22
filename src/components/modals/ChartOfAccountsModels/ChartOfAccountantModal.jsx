@@ -23,7 +23,7 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
         { icon: RefreshCcw, label: 'Depreciation Procedure', onClick: onOpenDepreciation, locked: !hasPermission('MST_DEPRECIATION') },
         { icon: TrendingUp, label: 'Fixed Transactions', onClick: onOpenFixedTransactions },
         { icon: FileText, label: 'Create Sales Tax ID', locked: !hasPermission('MST_SALES_TAX_ID') },
-    ];
+    ].filter(item => !item.locked);
 
     return (
         <>
