@@ -4,6 +4,7 @@ import TransactionFormWrapper from '../../../components/TransactionFormWrapper';
 import { Search, Save, RotateCcw, Trash2, CheckCircle, AlertTriangle, Loader2, FileText, Plus } from 'lucide-react';
 import { customerService } from '../../../services/customer.service';
 import { authService } from '../../../services/auth.service';
+import { getSessionData } from '../../../utils/session';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 import CustomerTypeProfileBoard from '../../../pages/CustomerTypeProfileBoard';
 import AreaProfileBoard from '../../../pages/AreaProfileBoard';
