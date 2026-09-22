@@ -1,47 +1,59 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Database, Layout, Cpu, Globe, X, ChevronRight, ExternalLink, Clock } from 'lucide-react';
+import { Database, Layout, Cpu, Globe, X, ChevronRight, ExternalLink, Clock, ShoppingBag, Zap, Cloud, Sparkles } from 'lucide-react';
 import { adService } from '../services/ad.service';
 
 const defaultAds = [
-    // {
-    //     title: 'Merit Plus Finance',
-    //     desc: 'Cloud-native accounting platform with real-time multi-company reporting.',
-    //     icon: Database,
-    //     accent: '#3b82f6',
-    //     bg: 'bg-blue-50',
-    //     border: 'border-blue-200',
-    //     iconBg: 'bg-blue-500'
-    // },
-    // {
-    //     title: 'Web Solutions',
-    //     desc: 'High-performance ERP for textile manufacturing and restaurant chains.',
-    //     icon: Layout,
-    //     accent: '#059669',
-    //     bg: 'bg-emerald-50',
-    //     border: 'border-emerald-200',
-    //     iconBg: 'bg-emerald-500'
-    // },
-    // {
-    //     title: 'AI Platform',
-    //     desc: 'Predictive analytics and intelligent automation for data-driven growth.',
-    //     icon: Cpu,
-    //     accent: '#7c3aed',
-    //     bg: 'bg-purple-50',
-    //     border: 'border-purple-200',
-    //     iconBg: 'bg-purple-500'
-    // },
-    // {
-    //     title: 'ONIMTA Technology',
-    //     desc: 'Enterprise software solutions — EST. 2013, Lake Road, Maharagama.',
-    //     icon: Globe,
-    //     accent: '#78716c',
-    //     bg: 'bg-stone-50',
-    //     border: 'border-stone-200',
-    //     iconBg: 'bg-stone-500'
-    // }
+    {
+        title: '⚡ 50% Off Enterprise Suite',
+        desc: 'Save 50% for 3 months on annual cloud accounting with unlimited companies and users.',
+        icon: Zap,
+        iconName: 'Zap',
+        accent: '#0078d4',
+        bg: 'bg-blue-50',
+        border: 'border-blue-200',
+        iconBg: 'bg-[#0078d4]',
+        price: '$49.50/mo',
+        tag: 'HOT DEAL'
+    },
+    {
+        title: '🛒 E-Commerce & POS Sync',
+        desc: 'Connect Shopify, WooCommerce, and thermal POS hardware directly to your financial ledgers.',
+        icon: ShoppingBag,
+        iconName: 'ShoppingBag',
+        accent: '#059669',
+        bg: 'bg-emerald-50',
+        border: 'border-emerald-200',
+        iconBg: 'bg-emerald-600',
+        price: 'From $24/mo',
+        tag: 'NEW RELEASE'
+    },
+    {
+        title: '☁️ 100GB Free Cloud Vault',
+        desc: 'Automated nightly disaster recovery and encrypted database snapshots for all active tenants.',
+        icon: Cloud,
+        iconName: 'Cloud',
+        accent: '#0284c7',
+        bg: 'bg-sky-50',
+        border: 'border-sky-200',
+        iconBg: 'bg-sky-600',
+        price: 'FREE with Pro',
+        tag: 'FREE PERK'
+    },
+    {
+        title: '✨ Multi-Currency & Pro Pack',
+        desc: 'Forecast cashflows, multi-branch ledger consolations, and live exchange rates.',
+        icon: Sparkles,
+        iconName: 'Sparkles',
+        accent: '#047857',
+        bg: 'bg-emerald-50',
+        border: 'border-emerald-200',
+        iconBg: 'bg-emerald-700',
+        price: 'Pro Upgrade',
+        tag: 'PRO BUNDLE'
+    }
 ];
 
-const AVAILABLE_ICONS = { Database, Layout, Cpu, Globe };
+const AVAILABLE_ICONS = { Database, Layout, Cpu, Globe, ShoppingBag, Zap, Cloud, Sparkles };
 const AUTO_CLOSE_SECONDS = 12;
 
 const CompanyPromoBoard = ({ isOpen, onClose }) => {
