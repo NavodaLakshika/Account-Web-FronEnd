@@ -2,9 +2,13 @@ import api from './api';
 
 export const supplierService = {
   // GET all suppliers
-  async getAll() {
+  async getAll(companyCode, options = {}) {
     try {
-      const response = await api.get('/Supplier');
+      const config = { hideLoader: true, ...options };
+      if (companyCode) {
+        config.params = { ...config.params, companyCode, company: companyCode };
+      }
+      const response = await api.get('/Supplier', config);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch suppliers';
