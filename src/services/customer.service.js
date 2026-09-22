@@ -2,9 +2,13 @@ import api from './api';
 
 export const customerService = {
   // GET all customers (partial info: Code, Cust_Name)
-  async getAll() {
+  async getAll(companyCode, options = {}) {
     try {
-      const response = await api.get('/Customer');
+      const config = { hideLoader: true, ...options };
+      if (companyCode) {
+        config.params = { ...config.params, companyCode, company: companyCode };
+      }
+      const response = await api.get('/Customer', config);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch customers';
