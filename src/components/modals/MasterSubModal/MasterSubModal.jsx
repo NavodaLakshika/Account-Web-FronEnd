@@ -277,7 +277,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
             {showFixedTransactionsBoard && <FixedTransactionBoard isOpen={showFixedTransactionsBoard} onClose={() => setShowFixedTransactionsBoard(false)} />}
 
             <ThankYouModal isOpen={showThankYouModal} onClose={() => { setShowThankYouModal(false); onClose(); }} />
-            <LogoutConfirmModal isOpen={showLogoutConfirmModal} onClose={() => setShowLogoutConfirmModal(false)} onConfirm={() => { setShowLogoutConfirmModal(false); setShowThankYouModal(true); }} />
+            <LogoutConfirmModal isOpen={showLogoutConfirmModal} onClose={() => setShowLogoutConfirmModal(false)} onConfirm={() => { setShowLogoutConfirmModal(false); authService.logout(); setShowThankYouModal(true); }} />
         </>
     );
 };
