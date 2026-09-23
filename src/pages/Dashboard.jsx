@@ -3113,17 +3113,18 @@ const Dashboard = () => {
                                             <button
                                                 data-tour="special-deals"
                                                 onClick={() => setShowEcommerceDealsModal(true)}
-                                                className="group relative flex items-center justify-center w-[42px] h-[40px] bg-gradient-to-tr from-amber-500/15 via-orange-500/20 to-red-500/15 hover:from-amber-500/25 hover:via-orange-500/30 hover:to-red-500/25 border border-amber-300/90 hover:border-orange-500 rounded-[8px] shadow-sm hover:shadow-[0_0_16px_rgba(249,115,22,0.45)] active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden"
+                                                className="group flex items-center gap-1.5 px-3.5 h-[40px] bg-gradient-to-tr from-amber-500/15 via-orange-500/20 to-red-500/15 hover:from-amber-500/25 hover:via-orange-500/30 hover:to-red-500/25 border border-amber-300/90 hover:border-orange-500 rounded-[8px] text-[13px] font-bold text-amber-900 hover:text-orange-700 shadow-sm hover:shadow-[0_0_16px_rgba(249,115,22,0.4)] active:scale-95 transition-all duration-300 cursor-pointer"
                                                 title="Special Deals & E-Commerce Add-Ons"
-                                            >
+                                             >
                                                 <DotLottiePlayer 
                                                     worker={false} 
                                                     src="/lottiefile/Fire.lottie" 
                                                     autoplay 
                                                     loop 
-                                                    style={{ width: '32px', height: '32px' }} 
-                                                    className="pointer-events-none select-none"
+                                                    style={{ width: '22px', height: '22px' }} 
+                                                    className="pointer-events-none select-none shrink-0"
                                                 />
+                                                <span>Special Deals</span>
                                             </button>
                                         </div>
                                     </div>
