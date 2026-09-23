@@ -2448,6 +2448,12 @@ const Dashboard = () => {
                 onClose={() => setShowLogoutConfirmModal(false)}
                 onConfirm={() => {
                     setShowLogoutConfirmModal(false);
+                    authService.logout();
+                    sessionStorage.clear();
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('selectedCompany');
+                    localStorage.removeItem('company');
                     setShowThankYouModal(true);
                 }}
             />
