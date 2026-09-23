@@ -185,6 +185,12 @@ export const authService = {
   logout() {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('selectedCompany');
+    localStorage.removeItem('company');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('selectedCompany');
+    sessionStorage.clear();
   },
 
   // GET ALL COMPANIES
