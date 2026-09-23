@@ -5,12 +5,27 @@ import { LogOut } from 'lucide-react';
 const ThankYouModal = ({ isOpen, onClose }) => {
     const [progress, setProgress] = useState(0);
 
+    const performLogout = () => {
+        authService.logout();
+        sessionStorage.clear();
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('selectedCompany');
+        localStorage.removeItem('company');
+    };
+
+    const handleLoginNow = () => {
+        performLogout();
+        window.location.href = '/login';
+    };
+
     useEffect(() => {
         if (isOpen) {
+            // Immediately revoke session and clear auth data
+            performLogout();
+
             const redirectTimer = setTimeout(() => {
-                authService.logout();
-                sessionStorage.removeItem('selectedCompany');
-                window.location.href = '/login';
+                handleLoginNow();
             }, 3200);
 
             const duration = 3200;
@@ -84,8 +99,8 @@ const ThankYouModal = ({ isOpen, onClose }) => {
                         </div>
 
                         <button 
-                            onClick={() => window.location.href = '/login'}
-                            className="px-8 py-2.5 bg-[#0285fd] text-white font-medium rounded-[3px] hover:bg-[#0073ff] transition-all text-[13px] uppercase flex items-center justify-center gap-2 shadow-sm whitespace-nowrap"
+                            onClick={handleLoginNow}
+                            className="px-8 py-2.5 bg-[#0285fd] text-white font-medium rounded-[3px] hover:bg-[#0073ff] transition-all text-[13px] uppercase flex items-center justify-center gap-2 shadow-sm whitespace-nowrap cursor-pointer active:scale-95"
                         >
                             Login Now
                         </button>
