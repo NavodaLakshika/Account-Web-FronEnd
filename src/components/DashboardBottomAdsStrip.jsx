@@ -169,7 +169,7 @@ const DashboardBottomAdsStrip = ({ onOpenDealsModal }) => {
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                     </span>
                     <span className="font-bold text-[#0078d4] text-[11px] group-hover:underline truncate">
-                        ⚡ Exclusive Deals Available:
+                        Exclusive Deals Available:
                     </span>
                     <span className="text-slate-600 font-medium text-[11px] truncate hidden sm:inline">
                         {currentAd.title}
