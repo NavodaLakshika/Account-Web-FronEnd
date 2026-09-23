@@ -450,7 +450,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {products.length === 0 ? (
-                                        <tr><td colSpan="7" className="py-10 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No items allocated to this document</td></tr>
+                                        <tr><td colSpan="7" className="py-10 text-center text-gray-300 font-black  text-[11px] uppercase tracking-widest">No items allocated to this document</td></tr>
                                     ) : products.map((p, idx) => (
                                         <tr key={idx} className="text-[12px] font-bold text-gray-700 border-b border-gray-50 hover:bg-slate-50/30 transition-colors">
                                             <td className="px-4 py-2.5 font-mono text-blue-700">{p.prodCode}</td>

@@ -2361,12 +2361,12 @@ const Dashboard = () => {
             <SystemSettingsBoard isOpen={showSystemSettingsModal} onClose={() => setShowSystemSettingsModal(false)} />
             <GRNBoard isOpen={showGRNModal} onClose={() => setShowGRNModal(false)} />
             <BulkGRNBoard isOpen={showBulkGRNModal} onClose={() => setShowBulkGRNModal(false)} />
-            <DepartmentBoard isOpen={showDepartmentModal} onClose={() => setShowDepartmentModal(false)} />
+            <DepartmentBoard isOpen={showDepartmentModal} onClose={() => setShowDepartmentModal(false)} user={user} />
 
             {/* Master File Boards */}
             <CompanyBoard isOpen={showCompanyBoard} onClose={() => setShowCompanyBoard(false)} />
             <CostCenterBoard isOpen={showCostCenterBoard} onClose={() => setShowCostCenterBoard(false)} />
-            <CategoryBoard isOpen={showCategoryBoard} onClose={() => setShowCategoryBoard(false)} />
+            <CategoryBoard isOpen={showCategoryBoard} onClose={() => setShowCategoryBoard(false)} user={user} />
             <RouteBoard isOpen={showRouteBoard} onClose={() => setShowRouteBoard(false)} />
             <AreaBoard isOpen={showAreaBoard} onClose={() => setShowAreaBoard(false)} />
             <SupplierMasterBoard isOpen={showSupplierMasterBoard} onClose={() => setShowSupplierMasterBoard(false)} />
@@ -3113,11 +3113,17 @@ const Dashboard = () => {
                                             <button
                                                 data-tour="special-deals"
                                                 onClick={() => setShowEcommerceDealsModal(true)}
-                                                className="group flex items-center gap-1.5 px-3.5 h-[40px] bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-300/80 hover:border-rose-400 rounded-[8px] text-[13px] font-bold text-amber-800 hover:text-rose-700 hover:shadow-sm active:scale-95 transition-all duration-200"
+                                                className="group relative flex items-center justify-center w-[42px] h-[40px] bg-gradient-to-tr from-amber-500/15 via-orange-500/20 to-red-500/15 hover:from-amber-500/25 hover:via-orange-500/30 hover:to-red-500/25 border border-amber-300/90 hover:border-orange-500 rounded-[8px] shadow-sm hover:shadow-[0_0_16px_rgba(249,115,22,0.45)] active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden"
                                                 title="Special Deals & E-Commerce Add-Ons"
                                             >
-                                                <Flame size={14} className="text-amber-500 fill-amber-400 group-hover:text-rose-500 group-hover:fill-rose-400 transition-colors animate-pulse" />
-                                                <span>Special Deals</span>
+                                                <DotLottiePlayer 
+                                                    worker={false} 
+                                                    src="/lottiefile/Fire.lottie" 
+                                                    autoplay 
+                                                    loop 
+                                                    style={{ width: '32px', height: '32px' }} 
+                                                    className="pointer-events-none select-none"
+                                                />
                                             </button>
                                         </div>
                                     </div>

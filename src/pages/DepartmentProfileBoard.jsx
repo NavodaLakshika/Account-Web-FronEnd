@@ -7,7 +7,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import ConfirmModal from '../components/modals/ConfirmModal';
 
-const DepartmentProfileBoard = ({ isOpen, onClose }) => {
+const DepartmentProfileBoard = ({ isOpen, onClose, user }) => {
     const initialState = { Code: '', Dept_Name: '', Company: '', CurrentUser: 'SYSTEM' };
 
     const [formData, setFormData] = useState(initialState);
@@ -21,11 +21,12 @@ const DepartmentProfileBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             if (typeof setErrors === "function") setErrors({});
             const { companyCode, userName } = getSessionData();
-            setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
+            const currentUserName = user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || userName || '';
+            setFormData({ ...initialState, CurrentUser: currentUserName, Company: companyCode });
             setIsEditMode(false);
             fetchDepartments(companyCode);
         }
-    }, [isOpen]);
+    }, [isOpen, user]);
 
     const fetchDepartments = async (company) => {
         try { const data = await departmentService.searchDepartments(company, ''); setDeptList(data || []); } catch (err) { console.error('Failed to load departments'); }

@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { Loader2, X, Check } from 'lucide-react';
 
 const ConfirmModal = ({ 
@@ -18,7 +19,7 @@ const ConfirmModal = ({
     const btnClass = isDanger ? 'bg-[#ea5b5b] hover:bg-[#d64545]' : 'bg-[#3b82f6] hover:bg-[#2563eb]';
     const WatermarkIcon = isDanger ? X : Check;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 sm:p-6 font-['Plus_Jakarta_Sans'] pointer-events-auto">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => !loading && onClose()} />
             
@@ -75,7 +76,8 @@ const ConfirmModal = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

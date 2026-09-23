@@ -7,7 +7,7 @@ import { departmentService } from '../services/department.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
-const CategoryProfileBoard = ({ isOpen, onClose }) => {
+const CategoryProfileBoard = ({ isOpen, onClose, user }) => {
     const initialState = { Code: '', Cat_Name: '', Dept_Code: '', Dept_Name: '', Company: '', CurrentUser: '' };
 
     const [formData, setFormData] = useState(initialState);
@@ -27,10 +27,10 @@ const CategoryProfileBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             if (typeof setErrors === "function") setErrors({});
             const { companyCode, userName } = getSessionData();
-            setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || '', Company: companyCode });
+            setFormData({ ...initialState, CurrentUser: user?.empName || user?.EmpName || user?.Emp_Name || user?.emp_Name || user?.username || userName || '', Company: companyCode });
             setIsEditMode(false);
         }
-    }, [isOpen]);
+    }, [isOpen, user]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;

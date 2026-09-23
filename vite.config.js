@@ -76,11 +76,6 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
-        '/sms': {
-          target: 'http://sms.airtel.lk:5000',
-          changeOrigin: true,
-          secure: false,
-        },
       },
     },
   }

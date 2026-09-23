@@ -1,18 +1,18 @@
 import api from './api';
 
 export const vendorTypeService = {
-  async searchAccounts(query = '') {
+  async searchAccounts(query = '', company = '') {
     try {
-      const response = await api.get('/VendorTypeMaster/search', { params: { query } });
+      const response = await api.get('/VendorTypeMaster/search', { params: { query, company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search accounts';
     }
   },
 
-  async getVendors(query = '') {
+  async getVendors(query = '', company = '') {
     try {
-      const response = await api.get('/VendorTypeMaster/vendors', { params: { query } });
+      const response = await api.get('/VendorTypeMaster/vendors', { params: { query, company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch vendor types';

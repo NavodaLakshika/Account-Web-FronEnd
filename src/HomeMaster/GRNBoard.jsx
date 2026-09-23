@@ -6,6 +6,9 @@ import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle, Save, X, R
 import * as XLSX from 'xlsx-js-style';
 import CalendarModal from '../components/CalendarModal';
 import { grnService } from '../services/grn.service';
+import { productService } from '../services/product.service';
+import { categoryService } from '../services/category.service';
+import { departmentService } from '../services/department.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { reportService } from '../services/report.service';
 
@@ -248,33 +251,314 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     const handleTemplateDownload = async (selectedColumns) => {
         try {
-            const dynamicSampleData = await grnService.getTemplateSuggestions();
-            
-            const suggestionRow = {};
-            selectedColumns.forEach(col => {
-                suggestionRow[col] = dynamicSampleData[col] ? `e.g. ${dynamicSampleData[col]}` : '';
-            });
-            const row = {};
-            selectedColumns.forEach(col => row[col] = '');
-            const template = [suggestionRow, row];
-            const ws = XLSX.utils.json_to_sheet(template);
+            // 1. Resolve Target Company Code (check form, session, storage, and fallback)
+            let targetCompany = formData?.company || '';
+            if (!targetCompany) {
+                const sess = getSessionData();
+                targetCompany = sess?.companyCode || '';
+            }
+            if (!targetCompany) {
+                const storageKeys = ['selectedCompany', 'company', 'companyCode', 'currentCompany'];
+                for (const k of storageKeys) {
+                    try {
+                        const raw = localStorage.getItem(k) || sessionStorage.getItem(k);
+                        if (raw) {
+                            const p = JSON.parse(raw);
+                            const found = p?.company_Code || p?.companyCode || p?.CompanyCode || p?.Company_Code || p?.Code || p?.code || p?.Company_Id || p?.companyId || (typeof p === 'string' ? p : '');
+                            if (found) { targetCompany = found; break; }
+                        }
+                    } catch (e) {
+                        const raw = localStorage.getItem(k) || sessionStorage.getItem(k);
+                        if (raw && typeof raw === 'string' && raw.trim() && !raw.startsWith('{')) {
+                            targetCompany = raw.trim();
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!targetCompany) {
+                try {
+                    const uRaw = localStorage.getItem('user') || sessionStorage.getItem('user');
+                    if (uRaw) {
+                        const u = JSON.parse(uRaw);
+                        targetCompany = u?.company_Code || u?.companyCode || u?.CompanyCode || u?.Company_Code || u?.company || '';
+                    }
+                } catch (e) {}
+            }
+            if (!targetCompany) {
+                targetCompany = 'COM001';
+            }
 
-            // Add styles to the suggestion row
-            selectedColumns.forEach((col, index) => {
-                const cellRef = XLSX.utils.encode_cell({ r: 1, c: index }); // row 1 (0 is header)
-                if (ws[cellRef] && ws[cellRef].v) {
+            // 2. Fetch categories and departments from productService (Acc_Category & Acc_Department lookups) and fallback services
+            let rawCats = [];
+            let rawDepts = [];
+
+            const extractArray = (res, key) => {
+                if (!res) return [];
+                if (Array.isArray(res)) return res;
+                if (key && Array.isArray(res[key])) return res[key];
+                return [];
+            };
+
+            // Primary: productService.getLookups(targetCompany)
+            try {
+                const prodLookups = await productService.getLookups(targetCompany);
+                const c = extractArray(prodLookups, 'categories');
+                const d = extractArray(prodLookups, 'departments');
+                if (c.length > 0) rawCats = c;
+                if (d.length > 0) rawDepts = d;
+            } catch (e) {
+                console.warn("productService.getLookups notice:", e);
+            }
+
+            // Fallback 1: category & department services for targetCompany
+            if (rawCats.length === 0) {
+                try {
+                    const c = await categoryService.searchCategories('', targetCompany, '');
+                    if (Array.isArray(c) && c.length > 0) rawCats = c;
+                } catch (e) {}
+            }
+            if (rawCats.length === 0) {
+                try {
+                    const c = await categoryService.getAll(targetCompany);
+                    if (Array.isArray(c) && c.length > 0) rawCats = c;
+                } catch (e) {}
+            }
+            if (rawDepts.length === 0) {
+                try {
+                    const d = await departmentService.searchDepartments(targetCompany, '');
+                    if (Array.isArray(d) && d.length > 0) rawDepts = d;
+                } catch (e) {}
+            }
+            if (rawDepts.length === 0) {
+                try {
+                    const d = await departmentService.getAll(targetCompany);
+                    if (Array.isArray(d) && d.length > 0) rawDepts = d;
+                } catch (e) {}
+            }
+
+            // Fallback 2: If still empty and targetCompany was not 'COM001', check 'COM001'
+            if ((rawCats.length === 0 || rawDepts.length === 0) && targetCompany !== 'COM001') {
+                try {
+                    const fallbackLookups = await productService.getLookups('COM001');
+                    const c = extractArray(fallbackLookups, 'categories');
+                    const d = extractArray(fallbackLookups, 'departments');
+                    if (rawCats.length === 0 && c.length > 0) rawCats = c;
+                    if (rawDepts.length === 0 && d.length > 0) rawDepts = d;
+                } catch (e) {}
+            }
+
+            // 3. Normalise department and category lists
+            const deptList = rawDepts.map(d => ({
+                'Department Code': d?.code || d?.Code || d?.dept_Code || d?.Dept_Code || d?.deptCode || d?.DeptCode || '',
+                'Department Name': d?.name || d?.Name || d?.dept_Name || d?.Dept_Name || d?.deptName || d?.DeptName || ''
+            })).filter(d => d['Department Code'] || d['Department Name']);
+
+            const catList = rawCats.map(c => ({
+                'Category Code': c?.code || c?.Code || c?.cat_Code || c?.Cat_Code || c?.catCode || c?.CatCode || '',
+                'Category Name': c?.name || c?.Name || c?.cat_Name || c?.Cat_Name || c?.catName || c?.CatName || '',
+                'Department Code': c?.dept_Code || c?.Dept_Code || c?.deptCode || c?.DeptCode || c?.dept_code || ''
+            })).filter(c => c['Category Code'] || c['Category Name']);
+
+            // 4. Ensure Category and Department columns exist in the template
+            const templateCols = Array.isArray(selectedColumns) && selectedColumns.length > 0
+                ? [...selectedColumns]
+                : [
+                    'Supplier Code', 'Supplier Invoice', 'PO Number', 'Payment Method', 'Comment',
+                    'Product Code', 'Product Name', 'Unit', 'Pack Size',
+                    'Category', 'Department',
+                    'Available Stock', 'Purchase Price', 'Selling Price', 'Qty', 'Free Qty'
+                ];
+
+            if (!templateCols.includes('Category')) {
+                templateCols.splice(Math.min(9, templateCols.length), 0, 'Category');
+            }
+            if (!templateCols.includes('Department')) {
+                const catIdx = templateCols.indexOf('Category');
+                templateCols.splice(catIdx >= 0 ? catIdx + 1 : Math.min(10, templateCols.length), 0, 'Department');
+            }
+
+            // 5. Build Cursor Hover Tooltip Messages: "This data in your company"
+            const catNamesList = catList.map(c => {
+                const code = c['Category Code'] || '';
+                const name = c['Category Name'] || '';
+                if (name && code && name !== code) return `• ${name} (${code})`;
+                return `• ${name || code}`;
+            });
+
+            const deptNamesList = deptList.map(d => {
+                const code = d['Department Code'] || '';
+                const name = d['Department Name'] || '';
+                if (name && code && name !== code) return `• ${name} (${code})`;
+                return `• ${name || code}`;
+            });
+
+            const catCommentText = [
+                "This data in your company:",
+                "----------------------------------------",
+                ...(catNamesList.length > 0 ? catNamesList.slice(0, 30) : ['• (No categories found in Acc_Category)']),
+                catNamesList.length > 30 ? `...and ${catNamesList.length - 30} more (see Acc_Category sheet)` : ''
+            ].filter(Boolean).join('\n');
+
+            const deptCommentText = [
+                "This data in your company:",
+                "----------------------------------------",
+                ...(deptNamesList.length > 0 ? deptNamesList.slice(0, 30) : ['• (No departments found in Acc_Department)']),
+                deptNamesList.length > 30 ? `...and ${deptNamesList.length - 30} more (see Acc_Department sheet)` : ''
+            ].filter(Boolean).join('\n');
+
+            // 6. First Row: Show actual Category and Department names (No "e.g." text)
+            const firstCatName = catList[0] ? (catList[0]['Category Name'] || catList[0]['Category Code']) : '';
+            const firstDeptName = deptList[0] ? (deptList[0]['Department Name'] || deptList[0]['Department Code']) : '';
+
+            const firstDataRow = templateCols.map(col => {
+                if (col === 'Category') return firstCatName;
+                if (col === 'Department') return firstDeptName;
+                return '';
+            });
+
+            // 25 clean rows for user data entry
+            const dataRows = [
+                firstDataRow,
+                ...Array.from({ length: 25 }, () => templateCols.map(() => ''))
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet([templateCols, ...dataRows]);
+
+            // 7. Attach Comments to ONLY row 0 (Header cell) so only one row has the note, and hidden until cursor hovers
+            const catColIdx = templateCols.indexOf('Category');
+            const deptColIdx = templateCols.indexOf('Department');
+            const totalRows = dataRows.length + 1; // Header + data rows
+
+            if (catColIdx >= 0) {
+                const headerCell = XLSX.utils.encode_cell({ r: 0, c: catColIdx });
+                if (ws[headerCell]) {
+                    ws[headerCell].c = [{ a: 'Accounts System', t: catCommentText, hidden: true }];
+                    ws[headerCell].c.hidden = true;
+                }
+            }
+            if (deptColIdx >= 0) {
+                const headerCell = XLSX.utils.encode_cell({ r: 0, c: deptColIdx });
+                if (ws[headerCell]) {
+                    ws[headerCell].c = [{ a: 'Accounts System', t: deptCommentText, hidden: true }];
+                    ws[headerCell].c.hidden = true;
+                }
+            }
+
+            // Style Header Row
+            templateCols.forEach((col, index) => {
+                const cellRef = XLSX.utils.encode_cell({ r: 0, c: index });
+                if (ws[cellRef]) {
+                    const isCatOrDept = col === 'Category' || col === 'Department';
                     ws[cellRef].s = {
-                        font: { sz: 9, color: { rgb: "FF999999" }, italic: true }
+                        fill: { fgColor: { rgb: isCatOrDept ? "1D4ED8" : "1E40AF" } },
+                        font: { name: "Calibri", sz: 11, bold: true, color: { rgb: "FFFFFF" } },
+                        alignment: { vertical: "center", horizontal: "center" },
+                        border: {
+                            top: { style: "thin", color: { rgb: "CBD5E1" } },
+                            bottom: { style: "medium", color: { rgb: "1E3A8A" } },
+                            left: { style: "thin", color: { rgb: "CBD5E1" } },
+                            right: { style: "thin", color: { rgb: "CBD5E1" } }
+                        }
                     };
                 }
             });
 
+            // Style Data Rows
+            for (let r = 1; r < totalRows; r++) {
+                templateCols.forEach((col, cIdx) => {
+                    const cellRef = XLSX.utils.encode_cell({ r, c: cIdx });
+                    if (ws[cellRef]) {
+                        const isCatOrDept = col === 'Category' || col === 'Department';
+                        ws[cellRef].s = {
+                            fill: { fgColor: { rgb: (r === 1 && isCatOrDept) ? "EFF6FF" : (r % 2 === 0 ? "F8FAFC" : "FFFFFF") } },
+                            font: { name: "Calibri", sz: 10, bold: r === 1 && isCatOrDept, color: { rgb: (r === 1 && isCatOrDept) ? "1E40AF" : "1E293B" } },
+                            alignment: { vertical: "center", horizontal: "left" },
+                            border: {
+                                top: { style: "thin", color: { rgb: "E2E8F0" } },
+                                bottom: { style: "thin", color: { rgb: "E2E8F0" } },
+                                left: { style: "thin", color: { rgb: "E2E8F0" } },
+                                right: { style: "thin", color: { rgb: "E2E8F0" } }
+                            }
+                        };
+                    }
+                });
+            }
+
+            ws['!cols'] = templateCols.map(col => ({
+                wch: Math.max(col.length + 6, 20)
+            }));
+
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "GRN_Template");
 
+            // 6. Suggestions Sheet: Side-by-side Acc_Department and Acc_Category for login/active company
+            const maxRows = Math.max(deptList.length, catList.length, 1);
+            const compLabel = targetCompany ? ` (${targetCompany})` : '';
+            const suggestionsAoa = [
+                [`DEPARTMENT SUGGESTIONS${compLabel} - Acc_Department`, '', '', `CATEGORY SUGGESTIONS${compLabel} - Acc_Category`, '', ''],
+                ['Department Code', 'Department Name', '', 'Category Code', 'Category Name', 'Department Code']
+            ];
+
+            for (let i = 0; i < maxRows; i++) {
+                const dept = deptList[i];
+                const cat = catList[i];
+                suggestionsAoa.push([
+                    dept ? dept['Department Code'] : (i === 0 && deptList.length === 0 ? '(No departments in Acc_Department)' : ''),
+                    dept ? dept['Department Name'] : '',
+                    '',
+                    cat ? cat['Category Code'] : (i === 0 && catList.length === 0 ? '(No categories in Acc_Category)' : ''),
+                    cat ? cat['Category Name'] : '',
+                    cat ? cat['Department Code'] : ''
+                ]);
+            }
+
+            const wsSuggestions = XLSX.utils.aoa_to_sheet(suggestionsAoa);
+
+            const headerStyleDept = {
+                fill: { fgColor: { rgb: "0284C7" } },
+                font: { name: "Calibri", sz: 11, bold: true, color: { rgb: "FFFFFF" } },
+                alignment: { vertical: "center", horizontal: "center" }
+            };
+            const headerStyleCat = {
+                fill: { fgColor: { rgb: "4F46E5" } },
+                font: { name: "Calibri", sz: 11, bold: true, color: { rgb: "FFFFFF" } },
+                alignment: { vertical: "center", horizontal: "center" }
+            };
+            const colHeaderStyle = {
+                fill: { fgColor: { rgb: "F1F5F9" } },
+                font: { name: "Calibri", sz: 10, bold: true, color: { rgb: "334155" } },
+                alignment: { vertical: "center", horizontal: "left" }
+            };
+
+            ['A1', 'B1'].forEach(cell => { if (wsSuggestions[cell]) wsSuggestions[cell].s = headerStyleDept; });
+            ['D1', 'E1', 'F1'].forEach(cell => { if (wsSuggestions[cell]) wsSuggestions[cell].s = headerStyleCat; });
+            ['A2', 'B2', 'D2', 'E2', 'F2'].forEach(cell => { if (wsSuggestions[cell]) wsSuggestions[cell].s = colHeaderStyle; });
+
+            wsSuggestions['!cols'] = [
+                { wch: 22 },
+                { wch: 32 },
+                { wch: 5 },
+                { wch: 22 },
+                { wch: 32 },
+                { wch: 22 }
+            ];
+
+            XLSX.utils.book_append_sheet(wb, wsSuggestions, "Suggestions");
+
+            // 7. Dedicated Reference sheets for Acc_Department and Acc_Category
+            const wsDept = XLSX.utils.json_to_sheet(deptList.length > 0 ? deptList : [{'Department Code': '', 'Department Name': ''}]);
+            wsDept['!cols'] = [{ wch: 22 }, { wch: 35 }];
+            XLSX.utils.book_append_sheet(wb, wsDept, "Acc_Department");
+
+            const wsCat = XLSX.utils.json_to_sheet(catList.length > 0 ? catList : [{'Category Code': '', 'Category Name': '', 'Department Code': ''}]);
+            wsCat['!cols'] = [{ wch: 22 }, { wch: 35 }, { wch: 22 }];
+            XLSX.utils.book_append_sheet(wb, wsCat, "Acc_Category");
+
             XLSX.writeFile(wb, "GRN_Full_Template.xlsx");
-            showSuccessToast("Template downloaded. You can now import header data too!");
+            showSuccessToast(`Template downloaded with ${targetCompany || 'company'} Category & Department suggestions!`);
         } catch (error) {
+            console.error("Template download error:", error);
             showErrorToast("Failed to generate template.");
         }
     };
@@ -292,10 +576,12 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 const ws = wb.Sheets[wsname];
                 let data = XLSX.utils.sheet_to_json(ws);
                 
-                // Filter out the suggestion row if it's still there
+                // Filter out empty rows or suggestion rows
                 data = data.filter(r => {
-                    const sc = (r['Supplier Code'] || r['Supplier'] || r['Product Code'] || r['prodCode'] || '').toString().trim();
-                    return !sc.startsWith('e.g.');
+                    const sc = (r['Supplier Code'] || r['Supplier'] || '').toString().trim();
+                    const pc = (r['Product Code'] || r['prodCode'] || r['Item Code'] || '').toString().trim();
+                    if (!sc && !pc) return false;
+                    return !sc.startsWith('e.g.') && !pc.startsWith('e.g.');
                 });
 
                 if (data.length === 0) return showErrorToast("Excel file is empty.");

@@ -39,10 +39,10 @@ import {
     User,
     UserCog,
     Clock,
-    Layers
+    Layers,
+    Sparkles,
+    Bot
 } from 'lucide-react';
-import { DotLottiePlayer } from '@dotlottie/react-player';
-import '@dotlottie/react-player/dist/index.css';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import AlertModal from '../components/modals/AlertModal';
 import AdminVerificationModal from '../components/modals/AdminVerificationModal';
@@ -153,6 +153,28 @@ const SuperAdminDashboard = () => {
     const [showAIChatbot, setShowAIChatbot] = useState(false);
     const [showAITyping, setShowAITyping] = useState(false);
     const [aiTypingText, setAiTypingText] = useState('');
+
+    const handleAIClick = () => {
+        if (showAIChatbot) {
+            setShowAIChatbot(false);
+            return;
+        }
+        setShowAITyping(true);
+        setAiTypingText('');
+        const fullText = "Hello! I'm ONIMTA Intelligence. How can I assist you today?";
+        let idx = 0;
+        const typeInterval = setInterval(() => {
+            idx++;
+            setAiTypingText(fullText.slice(0, idx));
+            if (idx >= fullText.length) {
+                clearInterval(typeInterval);
+                setTimeout(() => {
+                    setShowAITyping(false);
+                    setShowAIChatbot(true);
+                }, 600);
+            }
+        }, 40);
+    };
 
     const handleAIAction = (actionKey) => {
         setShowAIChatbot(false);
@@ -1181,19 +1203,6 @@ const SuperAdminDashboard = () => {
                         {/* Right: Actions & Filters */}
                         <div className="flex items-center gap-3 justify-end h-full">
 
-                            {/* Dashboard Filters */}
-                            {activeMenu === 'Dashboard' && (
-                                <div className="hidden lg:flex items-center gap-2">
-                                    <button onClick={() => {
-                                        showSuccessToast("Preparing dashboard snapshot...");
-                                        setTimeout(() => showSuccessToast("Dashboard snapshot exported successfully!"), 1500);
-                                    }} className="flex items-center gap-2 px-3 py-2 border border-blue-600/20 bg-blue-50 hover:bg-blue-100 rounded-lg text-[13px] font-bold text-blue-700 transition-all shadow-sm">
-                                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>
-                                        Export CSV
-                                    </button>
-                                </div>
-                            )}
-
                             {/* Notifications / Messages */}
                             {!activeMenu.includes('Dashboard') && (
                                 <div className="relative hidden md:block w-full max-w-[280px] mr-4">
@@ -1207,6 +1216,73 @@ const SuperAdminDashboard = () => {
                                     />
                                 </div>
                             )}
+
+                            {/* AI Assistant Button - Ultra Modern Animated AI Button */}
+                            <button
+                                type="button"
+                                onClick={handleAIClick}
+                                className="relative group cursor-pointer select-none transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+                                title="Open ONIMTA Intelligence AI Assistant"
+                            >
+                                {/* Outer Ambient Pulse Glow */}
+                                <div className={`absolute -inset-0.5 rounded-xl blur-[5px] transition-all duration-500 ${
+                                    showAIChatbot
+                                        ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 opacity-90'
+                                        : 'bg-gradient-to-r from-blue-500 via-indigo-500 via-purple-500 to-cyan-400 opacity-40 group-hover:opacity-100 animate-ai-glow'
+                                }`}></div>
+
+                                {/* Animated Gradient Border Frame */}
+                                <div className={`relative p-[1.5px] rounded-xl transition-all duration-300 ${
+                                    showAIChatbot
+                                        ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-lg'
+                                        : 'bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 group-hover:from-blue-600 group-hover:via-indigo-600 group-hover:to-cyan-400'
+                                }`}>
+                                    {/* Inner Surface with Glass Shimmer */}
+                                    <div className={`h-[38px] px-3.5 rounded-[10px] flex items-center gap-2 overflow-hidden relative transition-all duration-300 ${
+                                        showAIChatbot
+                                            ? 'bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 text-white'
+                                            : 'bg-white/95 backdrop-blur-sm group-hover:bg-white text-slate-800'
+                                    }`}>
+                                        {/* Shimmer Light Sweep Effect */}
+                                        <div className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 animate-shimmer pointer-events-none"></div>
+
+                                        {/* AI Icon with AIAsterisk & Live Beacon */}
+                                        <div className="relative flex items-center justify-center shrink-0">
+                                            <AIAsterisk size={17} isThinking={showAITyping || showAIChatbot} />
+                                            {/* Micro Radar Beacon Ping */}
+                                            <span className="absolute -top-1 -right-1 flex h-2 w-2 pointer-events-none">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                            </span>
+                                        </div>
+
+                                        {/* AI Label & Modern Badge */}
+                                        <div className="flex items-center gap-1.5 whitespace-nowrap">
+                                            <span className={`text-[13px] font-bold tracking-tight transition-colors ${
+                                                showAIChatbot
+                                                    ? 'text-white'
+                                                    : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-purple-700'
+                                            }`}>
+                                                AI Assistant
+                                            </span>
+
+                                            {/* Glowing ONIMTA Pill */}
+                                            <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-[6px] tracking-wider transition-all duration-300 ${
+                                                showAIChatbot
+                                                    ? 'bg-white/20 text-white border border-white/30'
+                                                    : 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200/70 group-hover:border-indigo-300'
+                                            }`}>
+                                                ONIMTA
+                                            </span>
+                                        </div>
+
+                                        {/* Sparkle micro-icon */}
+                                        <Sparkles className={`w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 ${
+                                            showAIChatbot ? 'text-amber-300 animate-bounce' : 'text-indigo-500 group-hover:text-purple-600'
+                                        }`} />
+                                    </div>
+                                </div>
+                            </button>
 
                             <div className="h-8 w-px bg-gray-200 hidden md:block mx-1"></div>
 
@@ -2020,44 +2096,20 @@ const SuperAdminDashboard = () => {
                 </div>
             )}
 
-            {/* AI Chatbot Trigger Button */}
-            {!showAIChatbot && !showAITyping && (
-                <div className="fixed bottom-6 right-6 z-[9900]">
-                    <button
-                        onClick={() => {
-                            setShowAITyping(true);
-                            setAiTypingText('');
-                            const fullText = "Hello! I'm ONIMTA Intelligence. How can I assist you today?";
-                            let idx = 0;
-                            const typeInterval = setInterval(() => {
-                                idx++;
-                                setAiTypingText(fullText.slice(0, idx));
-                                if (idx >= fullText.length) {
-                                    clearInterval(typeInterval);
-                                    setTimeout(() => {
-                                        setShowAITyping(false);
-                                        setShowAIChatbot(true);
-                                    }, 800);
-                                }
-                            }, 45);
-                        }}
-                        className="flex items-center justify-center drop-shadow-xl hover:drop-shadow-2xl transition-all duration-300 hover:scale-105"
-                        title="Open Onimta Intelligence"
-                    >
-                        <div className="w-20 h-20">
-                            <DotLottiePlayer worker={false} src="/lottiefile/AI loading.lottie?v=1" autoplay loop style={{ width: '100%', height: '100%' }} />
-                        </div>
-                    </button>
-                </div>
-            )}
-
             {/* AI Typing Animation Overlay */}
             {showAITyping && (
-                <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center">
+                <div 
+                    onClick={() => {
+                        setShowAITyping(false);
+                        setShowAIChatbot(true);
+                    }}
+                    className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-[2px] flex items-center justify-center cursor-pointer"
+                    title="Click to skip"
+                >
                     <div className="flex flex-col items-center gap-8 max-w-2xl px-8">
                         <div className="w-16 h-16 border-4 border-[#2563eb] border-t-transparent rounded-full animate-spin"></div>
                         <div className="h-16 flex items-center justify-center">
-                            <span className="text-white/90 text-2xl md:text-[#2563eb]xl font-light tracking-wide">
+                            <span className="text-white/90 text-2xl md:text-3xl font-light tracking-wide">
                                 {aiTypingText}
                                 <span className="animate-pulse ml-0.5 text-[#2563eb]">|</span>
                             </span>

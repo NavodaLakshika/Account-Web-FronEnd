@@ -38,15 +38,25 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
                 CurrentUser: userName || 'SYSTEM',
                 Company: activeCompany
             }));
-            fetchInitialData();
+            fetchInitialData(activeCompany);
         }
     }, [isOpen]);
 
-    const fetchInitialData = async () => {
+    const fetchInitialData = async (comp) => {
         try {
-            const [vendorList, accountList] = await Promise.all([vendorTypeService.getVendors(), vendorTypeService.searchAccounts()]);
-            setVendors(vendorList);
-            setAccounts(accountList);
+            const { companyCode } = getSessionData();
+            const activeCompany = comp || companyCode || formData.Company || 'COM001';
+            const [vendorList, accountList] = await Promise.all([
+                vendorTypeService.getVendors('', activeCompany), 
+                vendorTypeService.searchAccounts('', activeCompany)
+            ]);
+            setVendors(vendorList || []);
+            // Ensure payable accounts only include Liabilities in 21000 - 21999 range
+            const payableAccounts = (accountList || []).filter(a => {
+                const code = (a.sub_Code || a.code || '').trim();
+                return code.startsWith('21') || code === '21000';
+            });
+            setAccounts(payableAccounts.length > 0 ? payableAccounts : (accountList || []));
         } catch (error) { console.error('Data fetch error:', error); }
     };
 

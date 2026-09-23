@@ -123,44 +123,20 @@ export const authService = {
     }
   },
 
-  // SEND OTP VIA AIRTEL SMS GATEWAY (frontend direct call via Vite proxy)
+  // SEND OTP VIA BACKEND SMS GATEWAY SERVICE
   async sendSmsOtp(phoneNumber, type = 'register') {
-    // Generate a secure 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Normalize phone: remove spaces, dashes, leading +94 or 0, keep digits only
-    let dst = phoneNumber.replace(/[\s\-\(\)]/g, '');
-    if (dst.startsWith('+')) dst = dst.slice(1); // remove leading +
-    // Sri Lanka: if starts with 94, keep; if starts with 0, replace with 94
-    if (dst.startsWith('0')) dst = '94' + dst.slice(1);
-
-    let rawMessage = `Your ONIMTA verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`;
-
-    if (type === 'recovery') {
-      rawMessage = `ONIMTA Security: Your password recovery code is ${otp}. Use this 6-digit code to securely reset your password. Do not share this with anyone.`;
-    }
-
-    const message = encodeURIComponent(rawMessage);
-
-    // In dev, use the Vite proxy (starts with '/sms'). In prod, hit the Airtel gateway directly.
-    const baseUrl = import.meta.env.PROD ? 'http://sms.airtel.lk:5000' : '';
-    const url = `${baseUrl}/sms/send_sms.php?username=onimta&password=gUY2eBbvpr&src=ONIMTA&dst=${dst}&msg=${message}&dr=1`;
-
     try {
-      if (import.meta.env.PROD) {
-        // Use 'no-cors' to prevent the browser from blocking the request.
-        // The SMS will be sent, but we can't read the response text.
-        await fetch(url, { mode: 'no-cors' });
-        return otp;
-      } else {
-        const res = await fetch(url);
-        const text = await res.text();
-        console.log('SMS Gateway response:', text);
-        return otp;
+      const response = await api.post('/Auth/send-sms-otp', {
+        PhoneNumber: phoneNumber,
+        Type: type
+      });
+      if (response.data && response.data.otp) {
+        return response.data.otp;
       }
+      throw new Error(response.data?.message || 'Failed to send OTP.');
     } catch (error) {
-      console.error('SMS Gateway Error:', error);
-      throw 'Failed to send OTP. Please check your phone number and try again.';
+      console.error('Send SMS OTP Error:', error);
+      throw error.response?.data?.message || error.message || 'Failed to send OTP. Please check your phone number and try again.';
     }
   },
 

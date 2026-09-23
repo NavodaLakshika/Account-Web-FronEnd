@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { 
     Layers, Search, Plus, RefreshCw, Edit3, Trash2, X, Check, 
     Building2, Filter, AlertCircle, Loader2, ChevronLeft, ChevronRight,
-    CheckCircle, ShieldCheck, Tag, Hash, FileSpreadsheet, Eye
+    CheckCircle, ShieldCheck, Tag, Hash, FileSpreadsheet, Eye, ChevronDown
 } from 'lucide-react';
 import { accountTablesService } from '../../services/accountTables.service';
 import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
@@ -457,50 +458,62 @@ const AccountTablesView = ({ allCompanies = [] }) => {
                         {/* Company Filter */}
                         <div className="flex items-center gap-2">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest shrink-0">Company:</span>
-                            <select
-                                value={selectedCompanyFilter}
-                                onChange={(e) => setSelectedCompanyFilter(e.target.value)}
-                                className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:border-blue-600 shadow-sm cursor-pointer"
-                            >
-                                <option value="ALL">All Scopes ({subAccounts.length})</option>
-                                <option value="GLOBAL">Global Templates Only</option>
-                                {availableCompanies.map(c => (
-                                    <option key={c} value={c}>{c}</option>
-                                ))}
-                            </select>
+                            <div className="relative inline-flex items-center">
+                                <select
+                                    value={selectedCompanyFilter}
+                                    onChange={(e) => setSelectedCompanyFilter(e.target.value)}
+                                    className="appearance-none pl-3 pr-8 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-sm cursor-pointer"
+                                    style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                                >
+                                    <option value="ALL">All Scopes ({subAccounts.length})</option>
+                                    <option value="GLOBAL">Global Templates Only</option>
+                                    {availableCompanies.map(c => (
+                                        <option key={c} value={c}>{c}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            </div>
                         </div>
 
                         {/* Parent Category Filter */}
                         <div className="flex items-center gap-2">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest shrink-0">Parent Category:</span>
-                            <select
-                                value={selectedParentFilter}
-                                onChange={(e) => setSelectedParentFilter(e.target.value)}
-                                className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:border-blue-600 shadow-sm cursor-pointer max-w-[240px]"
-                            >
-                                <option value="ALL">All Categories</option>
-                                {mainAccounts.map(m => {
-                                    const code = m.main_Acc_Code || m.Main_Acc_Code;
-                                    const name = m.main_Acc_Name || m.Main_Acc_Name;
-                                    return (
-                                        <option key={code} value={code}>{code} - {name}</option>
-                                    );
-                                })}
-                            </select>
+                            <div className="relative inline-flex items-center">
+                                <select
+                                    value={selectedParentFilter}
+                                    onChange={(e) => setSelectedParentFilter(e.target.value)}
+                                    className="appearance-none pl-3 pr-8 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-sm cursor-pointer max-w-[240px] truncate"
+                                    style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                                >
+                                    <option value="ALL">All Categories</option>
+                                    {mainAccounts.map(m => {
+                                        const code = m.main_Acc_Code || m.Main_Acc_Code;
+                                        const name = m.main_Acc_Name || m.Main_Acc_Name;
+                                        return (
+                                            <option key={code} value={code}>{code} - {name}</option>
+                                        );
+                                    })}
+                                </select>
+                                <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            </div>
                         </div>
 
                         {/* Status Filter */}
                         <div className="flex items-center gap-2">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest shrink-0">Status:</span>
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:border-blue-600 shadow-sm cursor-pointer"
-                            >
-                                <option value="ALL">All Status</option>
-                                <option value="ACTIVE">Active</option>
-                                <option value="INACTIVE">Inactive</option>
-                            </select>
+                            <div className="relative inline-flex items-center">
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="appearance-none pl-3 pr-8 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-sm cursor-pointer"
+                                    style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                                >
+                                    <option value="ALL">All Status</option>
+                                    <option value="ACTIVE">Active</option>
+                                    <option value="INACTIVE">Inactive</option>
+                                </select>
+                                <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            </div>
                         </div>
 
                         {(searchTerm || selectedCompanyFilter !== 'ALL' || selectedParentFilter !== 'ALL' || statusFilter !== 'ALL') && (
@@ -779,8 +792,8 @@ const AccountTablesView = ({ allCompanies = [] }) => {
             )}
 
             {/* MODAL 1: Create / Edit Main Account */}
-            {showMainModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+            {showMainModal && createPortal(
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl w-full max-w-[500px] overflow-hidden animate-in fade-in zoom-in-95">
                         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-b from-gray-50/70 to-white">
                             <div className="flex items-center gap-3">
@@ -867,12 +880,13 @@ const AccountTablesView = ({ allCompanies = [] }) => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* MODAL 2: Create / Edit Sub Account */}
-            {showSubModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+            {showSubModal && createPortal(
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl w-full max-w-[620px] overflow-hidden animate-in fade-in zoom-in-95">
                         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-b from-gray-50/70 to-white">
                             <div className="flex items-center gap-3">
@@ -927,21 +941,25 @@ const AccountTablesView = ({ allCompanies = [] }) => {
                                             <Plus size={11} /> New Category
                                         </button>
                                     </div>
-                                    <select
-                                        required
-                                        value={subForm.Main_Acc_Code}
-                                        onChange={(e) => setSubForm({ ...subForm, Main_Acc_Code: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-200 shadow-sm rounded-lg text-xs font-semibold bg-white focus:outline-none focus:border-blue-600 cursor-pointer"
-                                    >
-                                        <option value="">Select Parent Category...</option>
-                                        {mainAccounts.map(m => {
-                                            const code = m.main_Acc_Code || m.Main_Acc_Code;
-                                            const name = m.main_Acc_Name || m.Main_Acc_Name;
-                                            return (
-                                                <option key={code} value={code}>{code} — {name}</option>
-                                            );
-                                        })}
-                                    </select>
+                                    <div className="relative">
+                                        <select
+                                            required
+                                            value={subForm.Main_Acc_Code}
+                                            onChange={(e) => setSubForm({ ...subForm, Main_Acc_Code: e.target.value })}
+                                            className="appearance-none w-full pl-3 pr-8 py-2 border border-gray-200 shadow-sm rounded-lg text-xs font-semibold bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 cursor-pointer"
+                                            style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                                        >
+                                            <option value="">Select Parent Category...</option>
+                                            {mainAccounts.map(m => {
+                                                const code = m.main_Acc_Code || m.Main_Acc_Code;
+                                                const name = m.main_Acc_Name || m.Main_Acc_Name;
+                                                return (
+                                                    <option key={code} value={code}>{code} — {name}</option>
+                                                );
+                                            })}
+                                        </select>
+                                        <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    </div>
                                 </div>
                             </div>
 
@@ -992,16 +1010,20 @@ const AccountTablesView = ({ allCompanies = [] }) => {
                                     <label className="block text-gray-700 font-bold mb-1">
                                         Company Scope
                                     </label>
-                                    <select
-                                        value={subForm.Company_Code}
-                                        onChange={(e) => setSubForm({ ...subForm, Company_Code: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-200 shadow-sm rounded-lg text-xs font-semibold bg-white focus:outline-none focus:border-blue-600 cursor-pointer"
-                                    >
-                                        <option value="">Global Template (Shared across all companies)</option>
-                                        {availableCompanies.map(c => (
-                                            <option key={c} value={c}>Company: {c}</option>
-                                        ))}
-                                    </select>
+                                    <div className="relative">
+                                        <select
+                                            value={subForm.Company_Code}
+                                            onChange={(e) => setSubForm({ ...subForm, Company_Code: e.target.value })}
+                                            className="appearance-none w-full pl-3 pr-8 py-2 border border-gray-200 shadow-sm rounded-lg text-xs font-semibold bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 cursor-pointer"
+                                            style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                                        >
+                                            <option value="">Global Template (Shared across all companies)</option>
+                                            {availableCompanies.map(c => (
+                                                <option key={c} value={c}>Company: {c}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    </div>
                                 </div>
 
                                 <div>
@@ -1049,7 +1071,8 @@ const AccountTablesView = ({ allCompanies = [] }) => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* MODAL 3: Delete Confirmation */}

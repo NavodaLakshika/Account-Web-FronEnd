@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { Check, Info, X, AlertTriangle, Clock } from 'lucide-react';
 
 const AlertModal = ({ 
@@ -92,7 +93,7 @@ const AlertModal = ({
         else onClose();
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
             <div 
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
@@ -141,7 +142,8 @@ const AlertModal = ({
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
