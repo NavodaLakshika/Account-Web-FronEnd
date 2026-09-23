@@ -16,15 +16,15 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             handleClear();
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
+            const userRaw = localStorage.getItem('user') || sessionStorage.getItem('user');
+            const user = userRaw ? JSON.parse(userRaw) : null;
+            const companyData = localStorage.getItem('selectedCompany') || sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) {
                 try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
             }
-            if (user) {
-                setFormData(prev => ({ ...prev, CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '', Company: companyCode }));
-            }
+            const currentUserName = user?.Emp_Name || user?.empName || user?.EmpName || user?.emp_Name || user?.username || '';
+            setFormData(prev => ({ ...prev, CurrentUser: currentUserName, Company: companyCode }));
             customerTypeService.getAll().then(data => setTypeList(data || [])).catch(err => console.error(err));
         }
     }, [isOpen]);
@@ -35,7 +35,10 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser });
+        const userRaw = localStorage.getItem('user') || sessionStorage.getItem('user');
+        const user = userRaw ? JSON.parse(userRaw) : null;
+        const currentUserName = formData.CurrentUser || user?.Emp_Name || user?.empName || user?.EmpName || user?.emp_Name || user?.username || '';
+        setFormData({ ...initialState, Company: formData.Company, CurrentUser: currentUserName });
         setIsEditMode(false);
     };
 
@@ -43,10 +46,13 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
         if (!formData.Type_Name) { showErrorToast('Type Name is required'); return; }
         setLoading(true);
         try {
-            const data = await customerTypeService.save(formData);
+            const userRaw = localStorage.getItem('user') || sessionStorage.getItem('user');
+            const user = userRaw ? JSON.parse(userRaw) : null;
+            const currentUserName = formData.CurrentUser || user?.Emp_Name || user?.empName || user?.EmpName || user?.emp_Name || user?.username || 'SYSTEM';
+            const payload = { ...formData, CurrentUser: currentUserName };
+            const data = await customerTypeService.save(payload);
             if (data.message === 'inserted') {
                 showSuccessToast('Customer Type created');
-                
                 handleClear();
             } else { showSuccessToast('Customer Type updated'); }
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }

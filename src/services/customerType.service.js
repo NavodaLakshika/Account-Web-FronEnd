@@ -21,13 +21,25 @@ export const customerTypeService = {
 
   async save(customerTypeData) {
     try {
-      if (customerTypeData.Code) {
+      let currentUser = customerTypeData.CurrentUser;
+      if (!currentUser) {
+        try {
+          const userRaw = localStorage.getItem('user') || sessionStorage.getItem('user');
+          if (userRaw) {
+            const userObj = JSON.parse(userRaw);
+            currentUser = userObj.Emp_Name || userObj.EmpName || userObj.empName || userObj.emp_Name || userObj.username || '';
+          }
+        } catch (e) {}
+      }
+      const payload = { ...customerTypeData, CurrentUser: currentUser || 'SYSTEM' };
+
+      if (payload.Code) {
         // Update existing
-        const response = await api.put(`/CustomerType/${customerTypeData.Code}`, customerTypeData);
+        const response = await api.put(`/CustomerType/${payload.Code}`, payload);
         return response.data;
       } else {
         // Create new
-        const response = await api.post('/CustomerType', customerTypeData);
+        const response = await api.post('/CustomerType', payload);
         return response.data;
       }
     } catch (error) {

@@ -20,16 +20,16 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             if (typeof setErrors === "function") setErrors({});
             handleClear();
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            const companyData = sessionStorage.getItem('selectedCompany');
+            const userRaw = localStorage.getItem('user') || sessionStorage.getItem('user');
+            const user = userRaw ? JSON.parse(userRaw) : null;
+            const companyData = localStorage.getItem('selectedCompany') || sessionStorage.getItem('selectedCompany');
             let companyCode = '';
             if (companyData) {
                 try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
             }
-            if (user) {
-                setFormData({ ...initialState, CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '', Company: companyCode });
-                setIsEditMode(false);
-            }
+            const currentUserName = user?.Emp_Name || user?.empName || user?.EmpName || user?.emp_Name || user?.username || '';
+            setFormData({ ...initialState, CurrentUser: currentUserName, Company: companyCode });
+            setIsEditMode(false);
             fetchInitialData();
         }
     }, [isOpen]);
@@ -49,7 +49,14 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
-    const handleClear = () => { setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser }); setIsEditMode(false); setErrors({}); };
+    const handleClear = () => { 
+        const userRaw = localStorage.getItem('user') || sessionStorage.getItem('user');
+        const user = userRaw ? JSON.parse(userRaw) : null;
+        const currentUserName = formData.CurrentUser || user?.Emp_Name || user?.empName || user?.EmpName || user?.emp_Name || user?.username || '';
+        setFormData({ ...initialState, Company: formData.Company, CurrentUser: currentUserName }); 
+        setIsEditMode(false); 
+        setErrors({}); 
+    };
 
     const handleSave = async () => {
         if (!formData.Type_Name) {
@@ -59,7 +66,11 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
         }
         setLoading(true);
         try {
-            const data = await customerTypeService.save(formData);
+            const userRaw = localStorage.getItem('user') || sessionStorage.getItem('user');
+            const user = userRaw ? JSON.parse(userRaw) : null;
+            const currentUserName = formData.CurrentUser || user?.Emp_Name || user?.empName || user?.EmpName || user?.emp_Name || user?.username || 'SYSTEM';
+            const payload = { ...formData, CurrentUser: currentUserName };
+            const data = await customerTypeService.save(payload);
             if (data.message === 'inserted') { showSuccessToast('Customer Type created'); handleClear(); }
             else { showSuccessToast('Customer Type updated'); }
             fetchInitialData();
