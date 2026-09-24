@@ -413,7 +413,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.date} onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700" />
+                                    <input type="text" value={formData.date} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" name="date" onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))} />
                                     <button onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
@@ -492,7 +492,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Due Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.dueDate} onClick={() => { setDatePickerField('dueDate'); setShowDatePicker(true); }} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700" />
+                                    <input type="text" value={formData.dueDate} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" name="dueDate" onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))} />
                                     <button onClick={() => { setDatePickerField('dueDate'); setShowDatePicker(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>

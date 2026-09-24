@@ -3,7 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import AccountBoard from './AccountBoard';
 import { HelpCircle, PlusCircle, CheckCircle2, ChevronRight, Layers } from 'lucide-react';
 import { accountService } from '../services/account.service';
-import { getSessionData } from '../utils/session';
+import { getSessionData, getCompanyModule } from '../utils/session';
 
 export const ACCOUNT_CATEGORIES = [
     { key: 'Assets', label: 'Assets', code: '10000', baseCode: '10000' },
@@ -114,23 +114,44 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
     const [mainTypes, setMainTypes] = useState([]);
     const [dynamicSubGroups, setDynamicSubGroups] = useState([]);
 
+    const { companyCode } = getSessionData();
+    const currentModule = getCompanyModule(companyCode);
+    const isServiceModule = currentModule === 'Service';
+
+    // Hide Cost of Sales if Service module is selected
+    const availableCategories = ACCOUNT_CATEGORIES.filter(cat => {
+        if (isServiceModule && (cat.key === 'Cost of Sales' || cat.code === '50000')) {
+            return false;
+        }
+        return true;
+    });
+
     const currentDetails = ACCOUNT_DETAILS[selectedType] || ACCOUNT_DETAILS['Assets'];
+
+    useEffect(() => {
+        if (isServiceModule && selectedType === 'Cost of Sales') {
+            setSelectedType('Assets');
+        }
+    }, [isServiceModule, selectedType]);
 
     useEffect(() => {
         if (!isOpen) {
             setShowAccountBoard(false);
             setSelectedType('Assets');
         } else {
-            const { companyCode } = getSessionData();
-            accountService.getMainTypes(companyCode).then(data => {
-                setMainTypes(data);
+            const { companyCode: comp } = getSessionData();
+            accountService.getMainTypes(comp).then(data => {
+                const filtered = isServiceModule
+                    ? (data || []).filter(t => !t.main_Acc_Name?.toLowerCase().includes('cost of sales') && String(t.main_Acc_Code) !== '50000')
+                    : (data || []);
+                setMainTypes(filtered);
             }).catch(err => console.error("Failed to load main types", err));
         }
-    }, [isOpen]);
+    }, [isOpen, isServiceModule]);
 
     useEffect(() => {
         if (isOpen) {
-            const { companyCode } = getSessionData();
+            const { companyCode: comp } = getSessionData();
             let apiType = selectedType;
             if (mainTypes.length > 0) {
                 const matched = mainTypes.find(t => 
@@ -140,7 +161,7 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                 if (matched) apiType = matched.main_Acc_Name;
             }
             
-            accountService.getParentAccounts(apiType, companyCode).then(data => {
+            accountService.getParentAccounts(apiType, comp).then(data => {
                 setDynamicSubGroups(data || []);
             }).catch(err => {
                 console.error("Failed to load parent accounts", err);
@@ -177,22 +198,31 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                             Select One Account Type and Click Create
                         </h2>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-[#0285fd] rounded border border-blue-100 uppercase tracking-wider">
-                        Chart of Accounts v2.0
-                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
+                            isServiceModule 
+                                ? 'bg-indigo-50 text-indigo-700 border-indigo-200' 
+                                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        }`}>
+                            {isServiceModule ? 'Service Module (Cost of Sales Hidden)' : 'Sales Module'}
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-[#0285fd] rounded border border-blue-100 uppercase tracking-wider">
+                            Chart of Accounts v2.0
+                        </span>
+                    </div>
                 </div>
 
                 <div className="flex gap-6 px-1 items-stretch h-[460px]">
-                    {/* Left Column: Radio Options (8 Categories in standard accounting order) */}
+                    {/* Left Column: Radio Options (Categories in standard accounting order) */}
                     <div className="w-[260px] shrink-0 flex flex-col h-full">
                         <div className="p-4 border border-gray-200 bg-white rounded-[3px] shadow-sm flex-1 flex flex-col justify-between h-full">
                             <div className="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                                    Categories (10000 - 80000)
+                                    Categories ({availableCategories.length} Active)
                                 </p>
                             </div>
                             <div className="flex-1 flex flex-col justify-between py-0.5">
-                                {ACCOUNT_CATEGORIES.map(cat => (
+                                {availableCategories.map(cat => (
                                     <div
                                         key={cat.key}
                                         onClick={() => setSelectedType(cat.key)}

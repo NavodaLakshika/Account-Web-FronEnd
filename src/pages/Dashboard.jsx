@@ -49,12 +49,13 @@ import {
     EyeOff,
     Lock,
     ThumbsUp,
-    ThumbsDown
+    ThumbsDown,
+    Briefcase
 } from 'lucide-react';
 
 import { authService } from '../services/auth.service';
 import { systemLocksService } from '../services/systemLocks.service';
-import { getSessionData, getCompanyCode } from '../utils/session';
+import { getSessionData, getCompanyCode, getCompanyModule } from '../utils/session';
 import { customerService } from '../services/customer.service';
 import { supplierService } from '../services/supplier.service';
 
@@ -432,6 +433,7 @@ const Dashboard = () => {
 
     const [user, setUser] = useState(null);
     const [selectedCompany, setSelectedCompany] = useState(null);
+    const [currentModule, setCurrentModule] = useState(() => getCompanyModule());
     const [companyLicenseDetails, setCompanyLicenseDetails] = useState(null);
     const [companyEntityCounts, setCompanyEntityCounts] = useState({
         customers: null,
@@ -440,6 +442,20 @@ const Dashboard = () => {
     });
     const [activeCategory, setActiveCategory] = useState('Overview');
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+    useEffect(() => {
+        const updateModule = () => {
+            const compCode = selectedCompany?.company_Code || selectedCompany?.companyCode || selectedCompany?.Company_Id || selectedCompany?.CompanyName || selectedCompany?.companyName;
+            setCurrentModule(getCompanyModule(compCode));
+        };
+        updateModule();
+        window.addEventListener('company_module_changed', updateModule);
+        window.addEventListener('storage', updateModule);
+        return () => {
+            window.removeEventListener('company_module_changed', updateModule);
+            window.removeEventListener('storage', updateModule);
+        };
+    }, [selectedCompany]);
 
     const [showBiDashboardView, setShowBiDashboardView] = useState(false);
 
@@ -2554,6 +2570,24 @@ const Dashboard = () => {
                             <div className="text-[15px] font-bold text-[#393a3d] leading-tight tracking-tight">Accounts</div>
                             <div className="text-[10px] font-bold text-[#6b6c72] uppercase tracking-wider">Enterprise Suite</div>
                         </div>
+                        {/* Selected Module Label Top of Dashboard */}
+                        <div className="hidden md:flex items-center ml-2">
+                            <div 
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider shadow-2xs select-none transition-all ${
+                                    currentModule === 'Service'
+                                        ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                                        : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                }`}
+                                title={`Active business operating module: ${currentModule}`}
+                            >
+                                {currentModule === 'Service' ? (
+                                    <Briefcase size={13} className="text-indigo-600 shrink-0" />
+                                ) : (
+                                    <ShoppingCart size={13} className="text-emerald-600 shrink-0" />
+                                )}
+                                <span>{currentModule} Module</span>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Center: Main Navigation Tabs � hidden on mobile */}
@@ -2939,7 +2973,17 @@ const Dashboard = () => {
             {showMobileMenu && (
                 <div className="md:hidden fixed inset-0 top-14 z-[400] bg-white flex flex-col overflow-y-auto">
                     <div className="px-4 py-3 border-b border-slate-100">
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Navigation</p>
+                        <div className="flex items-center justify-between mb-3">
+                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Navigation</p>
+                            <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider ${
+                                currentModule === 'Service'
+                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                                    : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                            }`}>
+                                {currentModule === 'Service' ? <Briefcase size={11} /> : <ShoppingCart size={11} />}
+                                <span>{currentModule} Module</span>
+                            </div>
+                        </div>
                         {menuBar.map((item) => (
                             <button
                                 key={item}

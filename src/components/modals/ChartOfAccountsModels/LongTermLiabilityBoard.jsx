@@ -312,12 +312,7 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                                 <div className="space-y-1">
                                     <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Origination Date</label>
                                     <div className="flex gap-1 items-center">
-                                        <input 
-                                            type="text" 
-                                            value={formData.OrgDate} 
-                                            readOnly 
-                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed" 
-                                        />
+                                        <input type="text" value={formData.OrgDate} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm " name="OrgDate" onChange={(e) => setFormData(prev => ({ ...prev, OrgDate: e.target.value }))} />
                                         <button 
                                             onClick={() => setShowOrgDateModal(true)} 
                                             className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"

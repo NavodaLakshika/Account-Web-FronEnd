@@ -194,13 +194,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date From</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={formData.dateFrom}
-                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
-                                    onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }}
-                                />
+                                <input type="text" value={formData.dateFrom} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" name="dateFrom" onChange={(e) => setFormData(prev => ({ ...prev, dateFrom: e.target.value }))} />
                                 <button
                                     onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }}
                                     className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
@@ -213,13 +207,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date To</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={formData.dateTo}
-                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
-                                    onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }}
-                                />
+                                <input type="text" value={formData.dateTo} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" name="dateTo" onChange={(e) => setFormData(prev => ({ ...prev, dateTo: e.target.value }))} />
                                 <button
                                     onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }}
                                     className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"

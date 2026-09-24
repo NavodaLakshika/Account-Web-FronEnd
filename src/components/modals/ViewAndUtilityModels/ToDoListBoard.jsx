@@ -145,13 +145,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                                     <div className="flex-1">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Date</label>
                                         <div className="flex items-center border border-slate-200 rounded-[3px] overflow-hidden focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all bg-white">
-                                            <input 
-                                                type="text" 
-                                                readOnly
-                                                value={date}
-                                                onClick={() => setShowCalendar(true)}
-                                                className="w-full h-10 px-3 text-sm font-medium outline-none text-slate-700 cursor-pointer" 
-                                            />
+                                            <input type="text" value={date} className="w-full h-10 px-3 text-sm font-medium outline-none text-slate-700 " name="date" onChange={(e) => setDate(e.target.value)} />
                                             <div 
                                                 onClick={() => setShowCalendar(true)} 
                                                 className="w-10 h-10 flex items-center justify-center border-l border-slate-200 bg-slate-50 shrink-0 text-blue-500 cursor-pointer hover:bg-slate-100 transition-colors"

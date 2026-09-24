@@ -376,13 +376,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Post Date</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.postDate ? formatDateToDMY(formData.postDate) : ''}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
-                                        onClick={() => setShowDatePicker(true)}
-                                    />
+                                    <input type="text" value={formData.postDate } className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 truncate" name="postDate" onChange={(e) => setFormData(prev => ({ ...prev, postDate: e.target.value }))} />
                                     <button
                                         type="button"
                                         onClick={() => setShowDatePicker(true)}
@@ -544,14 +538,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                                 <div className="col-span-4">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheq Date</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={formData.chqDate ? formatDateToDMY(formData.chqDate) : ''}
-                                            disabled={formData.payType !== 'CHEQUE'}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate disabled:bg-gray-100 disabled:text-gray-400"
-                                            onClick={() => formData.payType === 'CHEQUE' && setShowChqDatePicker(true)}
-                                        />
+                                        <input type="text" value={formData.chqDate } disabled={formData.payType !== 'CHEQUE'} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 truncate disabled:bg-gray-100 disabled:text-gray-400" name="chqDate" onChange={(e) => setFormData(prev => ({ ...prev, chqDate: e.target.value }))} />
                                         <button
                                             type="button"
                                             onClick={() => setShowChqDatePicker(true)}

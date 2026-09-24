@@ -170,7 +170,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Rec. Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.receiptDate} onClick={() => setShowReceiptDateModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
+                                    <input type="text" value={formData.receiptDate} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold shadow-sm" name="receiptDate" onChange={(e) => setFormData(prev => ({ ...prev, receiptDate: e.target.value }))} />
                                     <button onClick={() => setShowReceiptDateModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
@@ -217,7 +217,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Chq. Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.chequeDate} onClick={() => formData.payType === 'Cheque' && setShowChequeDateModal(true)} disabled={formData.payType !== 'Cheque'} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white disabled:bg-gray-100 text-gray-700 font-bold cursor-pointer shadow-sm" />
+                                    <input type="text" value={formData.chequeDate} disabled={formData.payType !== 'Cheque'} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white disabled:bg-gray-100 text-gray-700 font-bold shadow-sm" name="chequeDate" onChange={(e) => setFormData(prev => ({ ...prev, chequeDate: e.target.value }))} />
                                     <button onClick={() => setShowChequeDateModal(true)} disabled={formData.payType !== 'Cheque'} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>

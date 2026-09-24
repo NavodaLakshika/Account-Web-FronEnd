@@ -39,12 +39,13 @@ api.interceptors.request.use(
       let companyCode = '';
       try {
         const companyObj = JSON.parse(companyStr);
-        companyCode = companyObj.companyCode || companyObj.CompanyCode || companyObj.company_Code || companyObj.Company_Code || companyObj.code || companyObj.Code || companyStr;
+        companyCode = companyObj.company_Code || companyObj.companyCode || companyObj.CompanyCode || companyObj.Company_Code || companyObj.Company_Id || companyObj.companyId || companyObj.CompanyId || companyObj.Comp_Code || companyObj.comp_Code || companyObj.Code || companyObj.code || companyObj.id;
       } catch (e) {
-        companyCode = companyStr;
+        if (typeof companyStr === 'string' && !companyStr.trim().startsWith('{')) {
+          companyCode = companyStr.trim();
+        }
       }
-      // Hardcode map removed
-      if (companyCode) {
+      if (companyCode && typeof companyCode === 'string' && !companyCode.startsWith('{')) {
         config.headers['x-company-code'] = companyCode;
       }
     }

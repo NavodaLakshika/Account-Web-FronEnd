@@ -239,9 +239,8 @@ const FixedTransactionBoard = ({ isOpen, onClose }) => {
                                     <input 
                                         name="StartDate"
                                         value={formData.StartDate}
-                                        readOnly
-                                        onClick={() => setCalendarTarget('start')}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed"
+                                        onChange={handleInputChange}
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-white rounded outline-none font-bold text-gray-700 shadow-sm focus:ring-2"
                                     />
                                     <button 
                                         type="button"
@@ -262,9 +261,8 @@ const FixedTransactionBoard = ({ isOpen, onClose }) => {
                                     <input 
                                         name="EndDate"
                                         value={formData.EndDate}
-                                        readOnly
-                                        onClick={() => setCalendarTarget('end')}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed"
+                                        onChange={handleInputChange}
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-white rounded outline-none font-bold text-gray-700 shadow-sm focus:ring-2"
                                     />
                                     <button 
                                         type="button"

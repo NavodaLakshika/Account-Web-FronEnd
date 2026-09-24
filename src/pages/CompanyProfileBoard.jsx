@@ -270,7 +270,7 @@ const CompanyProfileBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Start Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.Start_Date} onClick={() => setShowCalendar(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700" />
+                                    <input type="text" value={formData.Start_Date} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" name="Start_Date" onChange={(e) => setFormData(prev => ({ ...prev, Start_Date: e.target.value }))} />
                                     <button onClick={() => setShowCalendar(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>

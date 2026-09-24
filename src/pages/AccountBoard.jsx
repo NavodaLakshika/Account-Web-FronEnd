@@ -5,7 +5,7 @@ import { Save, RotateCcw, X, ChevronDown, List, AlertCircle, Info, Search, Chevr
 import { accountService } from '../services/account.service';
 import ConfirmModal from '../components/modals/ConfirmModal';
 
-import { getSessionData } from '../utils/session';
+import { getSessionData, getCompanyModule } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
@@ -37,12 +37,13 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     useEffect(() => {
         if (isOpen) {
             if (typeof setErrors === "function") setErrors({});
-            const initialType = selectedType || 'Assets';
+            const { companyCode: comp, userName: user } = getSessionData();
+            const isService = getCompanyModule(comp) === 'Service';
+            const initialType = (isService && selectedType === 'Cost of Sales') ? 'Assets' : (selectedType || 'Assets');
             setFormData({
                 ...getInitialFormData(),
                 accountType: initialType
             });
-            const { companyCode: comp, userName: user } = getSessionData();
             setCompanyCode(comp);
             setFormData(prev => ({ ...prev, user, accountType: initialType }));
             loadMainAccountTypes(comp);
@@ -53,7 +54,11 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const loadMainAccountTypes = async (comp) => {
         try {
             const data = await accountService.getMainTypes(comp || companyCode);
-            setMainAccountTypes(data || []);
+            const isService = getCompanyModule(comp || companyCode) === 'Service';
+            const filtered = isService
+                ? (data || []).filter(t => !t.main_Acc_Name?.toLowerCase().includes('cost of sales') && String(t.main_Acc_Code) !== '50000')
+                : (data || []);
+            setMainAccountTypes(filtered);
         } catch (error) {
             console.error('Failed to load main types', error);
         }

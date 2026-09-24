@@ -439,13 +439,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Post Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.postDate}
-                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
-                                        onClick={() => { setDatePickerField('postDate'); setShowDatePicker(true); }}
-                                    />
+                                    <input type="text" value={formData.postDate} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" name="postDate" onChange={(e) => setFormData(prev => ({ ...prev, postDate: e.target.value }))} />
                                     <button
                                         onClick={() => { setDatePickerField('postDate'); setShowDatePicker(true); }}
                                         className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
@@ -459,13 +453,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">EDD Timeline</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.expectedDate}
-                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
-                                        onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }}
-                                    />
+                                    <input type="text" value={formData.expectedDate} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" name="expectedDate" onChange={(e) => setFormData(prev => ({ ...prev, expectedDate: e.target.value }))} />
                                     <button
                                         onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }}
                                         className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"

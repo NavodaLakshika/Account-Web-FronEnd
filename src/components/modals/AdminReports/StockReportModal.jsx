@@ -56,12 +56,7 @@ const StockReportModal = ({ isOpen, onClose }) => {
                         <div className="flex items-center gap-3">
                             <label className="font-bold text-black text-[12px]">Date From</label>
                             <div className="flex items-center">
-                                <input 
-                                    type="text" 
-                                    value={dateFrom} 
-                                    readOnly
-                                    className="w-[115px] h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 cursor-default shadow-sm focus:border-blue-400"
-                                />
+                                <input type="text" value={dateFrom} className="w-[115px] h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 shadow-sm focus:border-blue-400" name="dateFrom" onChange={(e) => setDateFrom(e.target.value)} />
                                 <button 
                                     onClick={() => setShowCalendarFrom(true)}
                                     className="w-9 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
@@ -75,12 +70,7 @@ const StockReportModal = ({ isOpen, onClose }) => {
                         <div className="flex items-center gap-3">
                             <label className="font-bold text-black text-[12px]">Date To</label>
                             <div className="flex items-center">
-                                <input 
-                                    type="text" 
-                                    value={dateTo} 
-                                    readOnly
-                                    className="w-[115px] h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 cursor-default shadow-sm focus:border-blue-400"
-                                />
+                                <input type="text" value={dateTo} className="w-[115px] h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 shadow-sm focus:border-blue-400" name="dateTo" onChange={(e) => setDateTo(e.target.value)} />
                                 <button 
                                     onClick={() => setShowCalendarTo(true)}
                                     className="w-9 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"

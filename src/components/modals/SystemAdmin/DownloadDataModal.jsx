@@ -89,12 +89,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                             <div className="flex items-center gap-3">
                                 <label className="font-bold text-gray-700 whitespace-nowrap">Date From</label>
  <div className="flex items-center bg-white rounded-[3px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
-                                    <input 
-                                        type="text" 
-                                        value={dateFrom} 
-                                        readOnly
-                                        className="w-[110px] h-8 px-3 text-[12px] outline-none font-bold text-blue-600 cursor-default"
-                                    />
+                                    <input type="text" value={dateFrom} className="w-[110px] h-8 px-3 text-[12px] outline-none font-bold text-blue-600 " name="dateFrom" onChange={(e) => setDateFrom(e.target.value)} />
                                     <button 
                                         onClick={() => setShowCalendarFrom(true)}
                                         className="h-8 w-8 border-l border-gray-200 bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-gray-500"
@@ -108,12 +103,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                             <div className="flex items-center gap-3">
                                 <label className="font-bold text-gray-700 whitespace-nowrap">Date To</label>
  <div className="flex items-center bg-white rounded-[3px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
-                                    <input 
-                                        type="text" 
-                                        value={dateTo} 
-                                        readOnly
-                                        className="w-[110px] h-8 px-3 text-[12px] outline-none font-bold text-blue-600 cursor-default"
-                                    />
+                                    <input type="text" value={dateTo} className="w-[110px] h-8 px-3 text-[12px] outline-none font-bold text-blue-600 " name="dateTo" onChange={(e) => setDateTo(e.target.value)} />
                                     <button 
                                         onClick={() => setShowCalendarTo(true)}
                                         className="h-8 w-8 border-l border-gray-200 bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-gray-500"

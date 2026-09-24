@@ -100,7 +100,26 @@ const GRNBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             setFormData(getInitialFormData());
-            const { companyCode: initCompany, userName: initUser } = getSessionData();
+            const sess = getSessionData();
+            let initCompany = sess?.companyCode || '';
+            const initUser = sess?.userName || '';
+
+            if (!initCompany || (typeof initCompany === 'string' && initCompany.startsWith('{'))) {
+                const storageKeys = ['selectedCompany', 'company', 'companyCode', 'currentCompany'];
+                for (const k of storageKeys) {
+                    try {
+                        const raw = localStorage.getItem(k) || sessionStorage.getItem(k);
+                        if (raw) {
+                            const p = JSON.parse(raw);
+                            const found = p?.company_Code || p?.companyCode || p?.CompanyCode || p?.Company_Code || p?.Company_Id || p?.companyId || p?.CompanyId || p?.id || (typeof p === 'string' && !p.startsWith('{') ? p : null);
+                            if (found) { initCompany = found; break; }
+                        }
+                    } catch (e) {}
+                }
+            }
+            if (!initCompany || (typeof initCompany === 'string' && initCompany.startsWith('{'))) {
+                initCompany = 'COM001';
+            }
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));
             fetchLookups(initCompany);
@@ -110,20 +129,24 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     const fetchLookups = async (company) => {
         try {
-            const data = await grnService.getLookups(company);
-            const methods = await paymentMethodService.getAll(company);
+            const comp = company || getCompanyCode() || 'COM001';
+            const data = await grnService.getLookups(comp);
+            const methods = await paymentMethodService.getAll(comp).catch(() => []);
             setLookups({ ...data, paymentMethods: methods });
         } catch (error) {
-            showErrorToast('Failed to load lookups.');
+            console.error('Failed to load lookups', error);
         }
     };
 
     const generateDocNo = async (company) => {
         try {
-            const data = await grnService.generateDocNo(company);
-            setFormData(prev => ({ ...prev, docNo: data.docNo }));
+            const comp = company || getCompanyCode() || 'COM001';
+            const data = await grnService.generateDocNo(comp);
+            if (data?.docNo) {
+                setFormData(prev => ({ ...prev, docNo: data.docNo }));
+            }
         } catch (error) {
-            showErrorToast('Failed to generate document number.');
+            console.error('Failed to generate document number', error);
         }
     };
 
@@ -849,14 +872,14 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Post Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.grnDate} onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
+                                <input type="text" value={formData.grnDate} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" name="grnDate" onChange={(e) => setFormData(prev => ({ ...prev, grnDate: e.target.value }))} />
                                 <button onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Exp. Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.expectedDate} onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
+                                <input type="text" value={formData.expectedDate} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" name="expectedDate" onChange={(e) => setFormData(prev => ({ ...prev, expectedDate: e.target.value }))} />
                                 <button onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>

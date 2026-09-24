@@ -19,10 +19,10 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
     const menuItems = [
         { icon: Plus, label: 'Create New Account', onClick: onCreateNewAccount },
         { icon: List, label: 'Fixed Assets Item List', onClick: onOpenFixedAssets },
-        { icon: Landmark, label: 'Long Term Liability', onClick: onOpenLiability, locked: !hasPermission('MST_LONG_TERM_LIAB') },
-        { icon: RefreshCcw, label: 'Depreciation Procedure', onClick: onOpenDepreciation, locked: !hasPermission('MST_DEPRECIATION') },
+        // { icon: Landmark, label: 'Long Term Liability', onClick: onOpenLiability, locked: !hasPermission('MST_LONG_TERM_LIAB') },
+        // { icon: RefreshCcw, label: 'Depreciation Procedure', onClick: onOpenDepreciation, locked: !hasPermission('MST_DEPRECIATION') },
         { icon: TrendingUp, label: 'Fixed Transactions', onClick: onOpenFixedTransactions },
-        { icon: FileText, label: 'Create Sales Tax ID', locked: !hasPermission('MST_SALES_TAX_ID') },
+        // { icon: FileText, label: 'Create Sales Tax ID', locked: !hasPermission('MST_SALES_TAX_ID') },
     ].filter(item => !item.locked);
 
     return (

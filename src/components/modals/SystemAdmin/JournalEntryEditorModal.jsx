@@ -240,12 +240,7 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                         <div className="col-span-4 space-y-2">
                             <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Journal Entry Date</label>
                             <div className="flex gap-1.5">
-                                <input 
-                                    type="text" 
-                                    value={entryDate}
-                                    readOnly
-                                    className="flex-1 h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[13px] shadow-sm"
-                                />
+                                <input type="text" value={entryDate} className="flex-1 h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[13px] shadow-sm" name="entryDate" onChange={(e) => setEntryDate(e.target.value)} />
                                 <button 
                                     onClick={() => setShowCalendar(true)}
                                     className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md transition-all active:scale-90"

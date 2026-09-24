@@ -272,13 +272,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date From</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={dateFrom}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
-                                        onClick={() => openCalendar('from')}
-                                    />
+                                    <input type="text" value={dateFrom} className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" name="dateFrom" onChange={(e) => setDateFrom(e.target.value)} />
                                     <button onClick={() => openCalendar('from')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <CalendarIcon size={16} />
                                     </button>
@@ -289,13 +283,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date To</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={dateTo}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
-                                        onClick={() => openCalendar('to')}
-                                    />
+                                    <input type="text" value={dateTo} className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" name="dateTo" onChange={(e) => setDateTo(e.target.value)} />
                                     <button onClick={() => openCalendar('to')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <CalendarIcon size={16} />
                                     </button>

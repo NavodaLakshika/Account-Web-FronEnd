@@ -12,6 +12,8 @@ import { showErrorToast } from '../../utils/toastUtils';
 import ContactSupportModal from './ContactSupportModal';
 import CreateCompanyModal from './CreateCompanyModal';
 import CompanyDateSelectModal from './CompanyDateSelectModal';
+import CompanyModuleSelectModal from './CompanyModuleSelectModal';
+import { setCompanyModule } from '../../utils/session';
 
 const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
 
@@ -24,6 +26,8 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const [showSupport, setShowSupport] = useState(false);
     const [showDateModal, setShowDateModal] = useState(false);
     const [pendingStartDate, setPendingStartDate] = useState(new Date().toISOString().split('T')[0]);
+    const [showModuleModal, setShowModuleModal] = useState(false);
+    const [pendingModule, setPendingModule] = useState('Sales');
     const [showCreateCompany, setShowCreateCompany] = useState(false);
 
     const userName = user ? (user.EmpName || user.empName || user.Emp_Name || 'User') : 'Guest';
@@ -41,7 +45,8 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
             const data = await authService.getCompaniesByEmployee(empCode);
             const mapped = data.map(c => ({
                 id: c.companyCode || c.CompanyCode,
-                name: c.companyName || c.CompanyName
+                name: c.companyName || c.CompanyName,
+                model: c.model || c.Model || 'Sales'
             }));
             setCompanies(mapped);
             if (mapped.length > 0) {
@@ -57,10 +62,13 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
         }
     };
 
-    const launchCompany = async (id, name) => {
+    const launchCompany = async (id, name, model) => {
         setLoading(true);
         try {
-            await authService.openCompany(empCode, id);
+            const resp = await authService.openCompany(empCode, id);
+            const resolvedModel = model || resp?.model || resp?.Model || 'Sales';
+            setCompanyModule(name, resolvedModel);
+            setCompanyModule(id, resolvedModel);
             setConnectingCompany(name);
 
             const audio = new Audio(SUCCESS_SOUND_URL);
@@ -81,7 +89,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
             showErrorToast('Please select a company first');
             return;
         }
-        await launchCompany(selected.id, selected.name);
+        await launchCompany(selected.id, selected.name, selected.model);
     };
 
     if (!isOpen) return null;
@@ -146,9 +154,18 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                                                 <p className={`font-bold text-sm ${isSelected ? 'text-slate-800' : 'text-slate-600'}`}>
                                                     {company.name}
                                                 </p>
-                                                <p className={`text-[10px] uppercase tracking-wider font-bold mt-0.5 ${isSelected ? 'text-[#00acee]' : 'text-slate-400'}`}>
-                                                    ID: {company.id}
-                                                </p>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <span className={`text-[10px] uppercase tracking-wider font-bold ${isSelected ? 'text-[#00acee]' : 'text-slate-400'}`}>
+                                                        ID: {company.id}
+                                                    </span>
+                                                    <span className={`px-1.5 py-0.2 text-[9px] font-bold rounded uppercase tracking-wider ${
+                                                        company.model === 'Service'
+                                                            ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                                                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                    }`}>
+                                                        {company.model || 'Sales'} Module
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                         {isSelected && <CheckCircle2 size={20} className="text-[#00acee]" />}
@@ -199,18 +216,35 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                 onConfirm={(date) => {
                     setPendingStartDate(date);
                     setShowDateModal(false);
+                    setShowModuleModal(true);
+                }}
+            />
+            <CompanyModuleSelectModal
+                isOpen={showModuleModal}
+                onClose={() => setShowModuleModal(false)}
+                onBack={() => {
+                    setShowModuleModal(false);
+                    setShowDateModal(true);
+                }}
+                onConfirm={(module) => {
+                    setPendingModule(module);
+                    setShowModuleModal(false);
                     setShowCreateCompany(true);
                 }}
+                initialModule={pendingModule}
             />
             <CreateCompanyModal
                 isOpen={showCreateCompany}
                 onClose={() => setShowCreateCompany(false)}
                 user={user}
                 startDate={pendingStartDate}
-                onCreated={async (newCompanyName) => {
+                selectedModule={pendingModule}
+                onCreated={async (newCompanyName, createdModule) => {
+                    const finalModule = createdModule || pendingModule || 'Sales';
                     setShowCreateCompany(false);
                     setFetching(true);
                     try {
+                        setCompanyModule(newCompanyName, finalModule);
                         const data = await authService.getCompaniesByEmployee(empCode);
                         const mapped = data.map(c => ({
                             id: c.companyCode || c.CompanyCode,
@@ -220,6 +254,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                         
                         const created = mapped.find(c => c.name === newCompanyName);
                         if (created) {
+                            setCompanyModule(created.id, finalModule);
                             setSelectedCompanyId(created.id);
                             await launchCompany(created.id, created.name);
                         } else if (mapped.length > 0) {

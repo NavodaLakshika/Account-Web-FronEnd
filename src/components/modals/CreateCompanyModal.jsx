@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Loader2, CheckCircle2, Save, ArrowLeft, Calendar } from 'lucide-react';
+import { Building2, Loader2, CheckCircle2, Save, ArrowLeft, Calendar, ShoppingCart, Briefcase } from 'lucide-react';
 import { authService } from '../../services/auth.service';
 import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
+import { setCompanyModule } from '../../utils/session';
 import TransactionFormWrapper from '../TransactionFormWrapper';
 
-const CreateCompanyModal = ({ isOpen, onClose, onCreated, user, startDate }) => {
+const CreateCompanyModal = ({ isOpen, onClose, onCreated, user, startDate, selectedModule = 'Sales' }) => {
     const [loading, setLoading] = useState(false);
     const [done, setDone] = useState(false);
     const [form, setForm] = useState({
@@ -44,6 +45,7 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreated, user, startDate }) => 
 
             const payload = {
                 Comp_Name: form.CompanyName,
+                Model: selectedModule,
                 User_Name: userName,
                 Start_Date: effectiveStartDate,
                 Acc_Year: startYear,
@@ -54,7 +56,11 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreated, user, startDate }) => 
                 Country: form.Country,
                 Industry: form.Industry
             };
-            await authService.createCompany(payload);
+            const createdRes = await authService.createCompany(payload);
+            setCompanyModule(form.CompanyName, selectedModule);
+            if (createdRes?.companyCode) {
+                setCompanyModule(createdRes.companyCode, selectedModule);
+            }
             setDone(true);
             showSuccessToast('Company created successfully!');
         } catch (err) {
@@ -78,21 +84,31 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreated, user, startDate }) => 
                     </div>
                     <div>
                         <h3 className="text-slate-800 text-2xl font-bold tracking-tight mb-2">{form.CompanyName}</h3>
-                        <p className="text-slate-500 text-sm">Company registered successfully. You can now enter this workspace.</p>
+                        <p className="text-slate-500 text-sm">Company registered successfully with <strong className="text-slate-700">{selectedModule} Module</strong>. You can now enter this workspace.</p>
                     </div>
-                    <button onClick={() => onCreated(form.CompanyName)} className="px-8 py-3 mt-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-bold text-sm rounded-[3px] transition-all active:scale-[0.98] shadow-sm">
+                    <button onClick={() => onCreated(form.CompanyName, selectedModule)} className="px-8 py-3 mt-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-bold text-sm rounded-[3px] transition-all active:scale-[0.98] shadow-sm">
                         Select Company
                     </button>
                 </div>
             ) : (
                 <form id="companyForm" onSubmit={handleSubmit} className="space-y-6 text-slate-700 p-2">
-                    <div className="bg-blue-50/60 border border-blue-200/80 rounded-[3px] p-3.5 mb-2 flex items-center justify-between">
+                    <div className="bg-blue-50/60 border border-blue-200/80 rounded-[3px] p-3.5 mb-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <p className="text-xs text-blue-900 leading-relaxed">
                             <strong>Note:</strong> Please provide your company details below.
                         </p>
-                        <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-blue-200 rounded-[3px] text-xs font-mono font-bold text-[#00acee] shadow-sm whitespace-nowrap">
-                            <Calendar size={13} />
-                            <span>Start Date: {startDate || new Date().toISOString().split('T')[0]}</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-blue-200 rounded-[3px] text-xs font-mono font-bold text-[#00acee] shadow-sm whitespace-nowrap">
+                                <Calendar size={13} />
+                                <span>Start: {startDate || new Date().toISOString().split('T')[0]}</span>
+                            </div>
+                            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] text-xs font-bold shadow-sm whitespace-nowrap border ${
+                                selectedModule === 'Service' 
+                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                                    : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                            }`}>
+                                {selectedModule === 'Service' ? <Briefcase size={13} /> : <ShoppingCart size={13} />}
+                                <span>Module: {selectedModule}</span>
+                            </div>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-5">

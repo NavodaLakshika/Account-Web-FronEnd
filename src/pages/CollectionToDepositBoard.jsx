@@ -176,12 +176,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
               <div className="col-span-4">
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date From</label>
                 <div className="relative">
-                  <input
-                    type="text" readOnly
-                    value={formData.dateFrom}
-                    onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }}
-                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700"
-                  />
+                  <input type="text" value={formData.dateFrom} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" name="dateFrom" onChange={(e) => setFormData(prev => ({ ...prev, dateFrom: e.target.value }))} />
                   <button onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                     <Calendar size={16} />
                   </button>
@@ -191,12 +186,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
               <div className="col-span-4">
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date To</label>
                 <div className="relative">
-                  <input
-                    type="text" readOnly
-                    value={formData.dateTo}
-                    onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }}
-                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700"
-                  />
+                  <input type="text" value={formData.dateTo} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" name="dateTo" onChange={(e) => setFormData(prev => ({ ...prev, dateTo: e.target.value }))} />
                   <button onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                     <Calendar size={16} />
                   </button>

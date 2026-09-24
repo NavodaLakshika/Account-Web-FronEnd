@@ -198,12 +198,7 @@ const SearchBoard = ({ isOpen, onClose }) => {
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none pl-1">Start Horizon</label>
                                 <div className="flex h-10 gap-1">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.startDate}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
-                                    />
+                                    <input type="text" value={formData.startDate} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 truncate" name="startDate" onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))} />
                                     <button onClick={() => setShowCalendarStart(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[3px] transition-all shadow-sm active:scale-90">
                                         <Calendar size={18} />
                                     </button>
@@ -212,12 +207,7 @@ const SearchBoard = ({ isOpen, onClose }) => {
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none pl-1">End Horizon</label>
                                 <div className="flex h-10 gap-1">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.endDate}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
-                                    />
+                                    <input type="text" value={formData.endDate} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 truncate" name="endDate" onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))} />
                                     <button onClick={() => setShowCalendarEnd(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[3px] transition-all shadow-sm active:scale-90">
                                         <Calendar size={18} />
                                     </button>

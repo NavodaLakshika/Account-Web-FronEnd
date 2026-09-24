@@ -117,7 +117,26 @@ const GRNBoard = ({ isOpen, onClose }) => {
             if (typeof setErrors === "function") setErrors({});
             if (typeof setEntryErrors === "function") setEntryErrors({});
             setFormData(getInitialFormData());
-            const { companyCode: initCompany, userName: initUser } = getSessionData();
+            const sess = getSessionData();
+            let initCompany = sess?.companyCode || '';
+            const initUser = sess?.userName || '';
+
+            if (!initCompany || (typeof initCompany === 'string' && initCompany.startsWith('{'))) {
+                const storageKeys = ['selectedCompany', 'company', 'companyCode', 'currentCompany'];
+                for (const k of storageKeys) {
+                    try {
+                        const raw = localStorage.getItem(k) || sessionStorage.getItem(k);
+                        if (raw) {
+                            const p = JSON.parse(raw);
+                            const found = p?.company_Code || p?.companyCode || p?.CompanyCode || p?.Company_Code || p?.Company_Id || p?.companyId || p?.CompanyId || p?.id || (typeof p === 'string' && !p.startsWith('{') ? p : null);
+                            if (found) { initCompany = found; break; }
+                        }
+                    } catch (e) {}
+                }
+            }
+            if (!initCompany || (typeof initCompany === 'string' && initCompany.startsWith('{'))) {
+                initCompany = 'COM001';
+            }
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));
             fetchLookups(initCompany);
@@ -127,24 +146,28 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     const fetchLookups = async (company) => {
         try {
-            const data = await grnService.getLookups(company);
-            const methods = await paymentMethodService.getAll(company);
-            const orderList = await grnService.searchDocs(company).catch(() => []);
+            const comp = company || getCompanyCode() || 'COM001';
+            const data = await grnService.getLookups(comp);
+            const methods = await paymentMethodService.getAll(comp).catch(() => []);
+            const orderList = await grnService.searchDocs(comp).catch(() => []);
             const accountsList = await vendorTypeService.searchAccounts().catch(() => []);
             setOrders(orderList || []);
             setLookups({ ...data, paymentMethods: methods, accounts: accountsList || [] });
         } catch (error) {
-            showErrorToast('Failed to load lookups.');
+            console.error('Failed to load lookups', error);
         }
     };
 
     const generateDocNo = async (company) => {
         try {
-            const data = await grnService.generateDocNo(company);
-            setFormData(prev => ({ ...prev, docNo: data.docNo }));
-            setNewDocNo(data.docNo);
+            const comp = company || getCompanyCode() || 'COM001';
+            const data = await grnService.generateDocNo(comp);
+            if (data?.docNo) {
+                setFormData(prev => ({ ...prev, docNo: data.docNo }));
+                setNewDocNo(data.docNo);
+            }
         } catch (error) {
-            showErrorToast('Failed to generate document number.');
+            console.error('Failed to generate document number', error);
         }
     };
 
@@ -940,13 +963,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Post Date</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.grnDate}
-                                        onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700"
-                                    />
+                                    <input type="text" value={formData.grnDate} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" name="grnDate" onChange={(e) => setFormData(prev => ({ ...prev, grnDate: e.target.value }))} />
                                     <button onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
@@ -955,13 +972,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Expected Date</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.expectedDate}
-                                        onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700"
-                                    />
+                                    <input type="text" value={formData.expectedDate} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" name="expectedDate" onChange={(e) => setFormData(prev => ({ ...prev, expectedDate: e.target.value }))} />
                                     <button onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>

@@ -217,8 +217,8 @@ const FixedTransactionEntryBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Start Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.StartDate} onClick={() => setCalendarTarget('start')} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:ring-1 pr-10 text-gray-700 cursor-pointer ${isIncome ? 'focus:border-[#0285fd] focus:ring-[#0285fd]' : 'focus:border-[#ff3b30] focus:ring-[#ff3b30]'}`} />
-                                    <button onClick={() => setCalendarTarget('start')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                    <input type="text" name="StartDate" value={formData.StartDate} onChange={handleInputChange} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:ring-1 pr-10 text-gray-700 ${isIncome ? 'focus:border-[#0285fd] focus:ring-[#0285fd]' : 'focus:border-[#ff3b30] focus:ring-[#ff3b30]'}`} />
+                                    <button type="button" onClick={() => setCalendarTarget('start')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -226,8 +226,8 @@ const FixedTransactionEntryBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">End Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.EndDate} onClick={() => setCalendarTarget('end')} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:ring-1 pr-10 text-gray-700 cursor-pointer ${isIncome ? 'focus:border-[#0285fd] focus:ring-[#0285fd]' : 'focus:border-[#ff3b30] focus:ring-[#ff3b30]'}`} />
-                                    <button onClick={() => setCalendarTarget('end')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                    <input type="text" name="EndDate" value={formData.EndDate} onChange={handleInputChange} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:ring-1 pr-10 text-gray-700 ${isIncome ? 'focus:border-[#0285fd] focus:ring-[#0285fd]' : 'focus:border-[#ff3b30] focus:ring-[#ff3b30]'}`} />
+                                    <button type="button" onClick={() => setCalendarTarget('end')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
                                 </div>

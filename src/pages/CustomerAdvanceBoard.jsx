@@ -254,9 +254,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Rec. Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.postDate ? formatDateToDMY(formData.postDate) : ''}
-                                        onClick={() => setShowDatePicker(true)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                    <input type="text" value={formData.postDate } className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 truncate" name="postDate" onChange={(e) => setFormData(prev => ({ ...prev, postDate: e.target.value }))} />
                                     <button onClick={() => setShowDatePicker(true)}
                                         className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
@@ -403,10 +401,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Chq Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.chequeDate ? formatDateToDMY(formData.chequeDate) : ''}
-                                        disabled={formData.payType !== 'CHEQUE'}
-                                        onClick={() => formData.payType === 'CHEQUE' && setShowChqDatePicker(true)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate disabled:bg-gray-100 disabled:text-gray-400" />
+                                    <input type="text" value={formData.chequeDate } disabled={formData.payType !== 'CHEQUE'} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 truncate disabled:bg-gray-100 disabled:text-gray-400" name="chequeDate" onChange={(e) => setFormData(prev => ({ ...prev, chequeDate: e.target.value }))} />
                                     <button disabled={formData.payType !== 'CHEQUE'} onClick={() => setShowChqDatePicker(true)}
                                         className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer disabled:text-gray-300">
                                         <Calendar size={16} />

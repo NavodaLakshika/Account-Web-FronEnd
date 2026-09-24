@@ -96,13 +96,7 @@ const CompanyDateSelectModal = ({ isOpen, onClose, onConfirm, initialDate }) => 
                                     </div>
 
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={selectedDate}
-                                            readOnly
-                                            onClick={() => setShowCalendar(true)}
-                                            className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[3px] font-mono font-bold text-slate-800 text-base outline-none transition-all hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/20 cursor-pointer pr-12 shadow-xs"
-                                        />
+                                        <input type="text" value={selectedDate} className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[3px] font-mono font-bold text-slate-800 text-base outline-none transition-all hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/20 pr-12 shadow-xs" name="selectedDate" onChange={(e) => setSelectedDate(e.target.value)} />
                                         <button
                                             type="button"
                                             onClick={() => setShowCalendar(true)}

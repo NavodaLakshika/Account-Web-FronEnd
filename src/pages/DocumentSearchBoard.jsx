@@ -234,14 +234,14 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date From</label>
                                 <div className="relative">
-                                    <input readOnly value={formData.dateFrom} onClick={() => formData.useDate && setShowCalFrom(true)} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] ${formData.useDate ? 'bg-white cursor-pointer text-gray-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'} pr-10`} />
+                                    <input value={formData.dateFrom} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] ${formData.useDate ? 'bg-white text-gray-700' : 'bg-gray-100 text-gray-400 '} pr-10`} name="dateFrom" onChange={(e) => setFormData(prev => ({ ...prev, dateFrom: e.target.value }))} />
                                     <Calendar className="absolute right-3 top-2.5 text-gray-500 pointer-events-none" size={18} />
                                 </div>
                             </div>
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date To</label>
                                 <div className="relative">
-                                    <input readOnly value={formData.dateTo} onClick={() => formData.useDate && setShowCalTo(true)} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] ${formData.useDate ? 'bg-white cursor-pointer text-gray-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'} pr-10`} />
+                                    <input value={formData.dateTo} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] ${formData.useDate ? 'bg-white text-gray-700' : 'bg-gray-100 text-gray-400 '} pr-10`} name="dateTo" onChange={(e) => setFormData(prev => ({ ...prev, dateTo: e.target.value }))} />
                                     <Calendar className="absolute right-3 top-2.5 text-gray-500 pointer-events-none" size={18} />
                                 </div>
                             </div>

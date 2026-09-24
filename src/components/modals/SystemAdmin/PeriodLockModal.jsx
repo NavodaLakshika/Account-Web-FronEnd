@@ -137,13 +137,7 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                                 <div className="flex items-center gap-2">
                                     <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-24 shrink-0">Date From</label>
                                     <div className="flex items-center gap-1 h-8">
-                                        <input
-                                            type="text"
-                                            value={dateFrom}
-                                            readOnly
-                                            onClick={() => setShowCalendarFrom(true)}
-                                            className="w-[130px] h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-slate-700 cursor-default text-center bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all"
-                                        />
+                                        <input type="text" value={dateFrom} className="w-[130px] h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-slate-700 text-center bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" name="dateFrom" onChange={(e) => setDateFrom(e.target.value)} />
                                         <button
                                             onClick={() => setShowCalendarFrom(true)}
                                             className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0 border-none"
@@ -157,13 +151,7 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                                 <div className="flex items-center gap-2">
                                     <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-20 shrink-0 text-right">Date To</label>
                                     <div className="flex items-center gap-1 h-8">
-                                        <input
-                                            type="text"
-                                            value={dateTo}
-                                            readOnly
-                                            onClick={() => setShowCalendarTo(true)}
-                                            className="w-[130px] h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-slate-700 cursor-default text-center bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all"
-                                        />
+                                        <input type="text" value={dateTo} className="w-[130px] h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-slate-700 text-center bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" name="dateTo" onChange={(e) => setDateTo(e.target.value)} />
                                         <button
                                             onClick={() => setShowCalendarTo(true)}
                                             className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0 border-none"

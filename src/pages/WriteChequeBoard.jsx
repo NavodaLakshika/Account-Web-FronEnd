@@ -542,13 +542,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                             <div className="">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Dispatch Date</label>
                                 <div className="relative w-full">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.date}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
-                                        onClick={() => openCalendar('date')}
-                                    />
+                                    <input type="text" value={formData.date} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 truncate" name="date" onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))} />
                                     <button onClick={() => openCalendar('date')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
@@ -730,13 +724,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque Date</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={formData.chqDate}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
-                                            onClick={() => openCalendar('chqDate')}
-                                        />
+                                        <input type="text" value={formData.chqDate} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 truncate" name="chqDate" onChange={(e) => setFormData(prev => ({ ...prev, chqDate: e.target.value }))} />
                                         <button onClick={() => openCalendar('chqDate')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                             <Calendar size={16} />
                                         </button>

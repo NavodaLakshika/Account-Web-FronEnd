@@ -226,11 +226,13 @@ const FixedAssetsProfileBoard = ({ isOpen, onClose }) => {
                                         <div className="flex gap-1 items-center">
                                             <input 
                                                 type="text" 
+                                                name="PurchDate"
                                                 value={formData.PurchDate} 
-                                                readOnly 
-                                                className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed" 
+                                                onChange={handleInputChange} 
+                                                className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-white rounded outline-none font-bold text-gray-700 shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                             />
                                             <button 
+                                                type="button"
                                                 onClick={() => setShowPurchDateModal(true)} 
                                                 className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
                                             >
@@ -270,12 +272,14 @@ const FixedAssetsProfileBoard = ({ isOpen, onClose }) => {
                                         <div className="flex gap-1 items-center">
                                             <input 
                                                 type="text" 
+                                                name="SalesDate"
                                                 value={formData.SalesDate} 
-                                                readOnly 
+                                                onChange={handleInputChange} 
                                                 disabled={formData.AssetSold !== 'Sold'}
-                                                className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 disabled:bg-gray-100 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed" 
+                                                className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-white disabled:bg-gray-100 rounded outline-none font-bold text-gray-700 shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                             />
                                             <button 
+                                                type="button"
                                                 onClick={() => setShowSalesDateModal(true)} 
                                                 disabled={formData.AssetSold !== 'Sold'}
                                                 className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 disabled:opacity-50 shrink-0 border-none"
@@ -321,11 +325,13 @@ const FixedAssetsProfileBoard = ({ isOpen, onClose }) => {
                                     <div className="flex gap-1 items-center">
                                         <input 
                                             type="text" 
+                                            name="WarrantyExpiry"
                                             value={formData.WarrantyExpiry} 
-                                            readOnly 
-                                            className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed" 
+                                            onChange={handleInputChange} 
+                                            className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-white rounded outline-none font-bold text-gray-700 shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                         />
                                         <button 
+                                            type="button"
                                             onClick={() => setShowWarrantyExpiryModal(true)} 
                                             className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
                                         >

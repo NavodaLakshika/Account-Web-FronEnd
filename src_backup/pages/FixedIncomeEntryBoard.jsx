@@ -104,8 +104,8 @@ const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Credit Date</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.CreditDate} onClick={() => setShowCalendar(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 cursor-pointer" />
-                                    <button onClick={() => setShowCalendar(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                    <input type="text" name="CreditDate" value={formData.CreditDate} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" />
+                                    <button type="button" onClick={() => setShowCalendar(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -153,7 +153,7 @@ const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
                                         </tr>
                                     ))}
                                     {incomeList.length === 0 && (
-                                        <tr><td colSpan="4" className="px-4 py-12 text-center text-gray-400 text-[11px] font-bold uppercase tracking-widest italic">No fixed income records found for this company.</td></tr>
+                                        <tr><td colSpan="4" className="px-4 py-12 text-center text-gray-400 text-[11px] font-bold uppercase tracking-widest">No fixed income records found for this company.</td></tr>
                                     )}
                                 </tbody>
                             </table>
