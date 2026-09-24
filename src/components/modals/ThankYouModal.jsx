@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { authService } from '../../services/auth.service';
-import { LogOut } from 'lucide-react';
+import { LogOut, Loader2 } from 'lucide-react';
 
 const ThankYouModal = ({ isOpen, onClose }) => {
-    const [progress, setProgress] = useState(0);
+    const [secondsLeft, setSecondsLeft] = useState(3);
 
     const performLogout = () => {
-        authService.logout();
-        sessionStorage.clear();
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        localStorage.removeItem('selectedCompany');
-        localStorage.removeItem('company');
+        try {
+            if (authService && typeof authService.logout === 'function') {
+                authService.logout();
+            }
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
+        try {
+            sessionStorage.clear();
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('selectedCompany');
+            localStorage.removeItem('company');
+        } catch (e) {
+            console.error('Storage clear error:', e);
+        }
     };
 
     const handleLoginNow = () => {
@@ -20,35 +30,23 @@ const ThankYouModal = ({ isOpen, onClose }) => {
     };
 
     useEffect(() => {
-        if (isOpen) {
-            // Immediately revoke session and clear auth data
-            performLogout();
+        if (!isOpen) return;
 
-            const redirectTimer = setTimeout(() => {
-                handleLoginNow();
-            }, 3200);
+        performLogout();
+        setSecondsLeft(3);
 
-            const duration = 3200;
-            const startTime = Date.now();
-            let animationFrameId;
+        const countdownInterval = setInterval(() => {
+            setSecondsLeft((prev) => (prev > 1 ? prev - 1 : 1));
+        }, 1000);
 
-            const animateProgress = () => {
-                const elapsed = Date.now() - startTime;
-                const percent = Math.min((elapsed / duration) * 100, 100);
-                setProgress(percent);
+        const redirectTimer = setTimeout(() => {
+            handleLoginNow();
+        }, 3000);
 
-                if (percent < 100) {
-                    animationFrameId = requestAnimationFrame(animateProgress);
-                }
-            };
-
-            animationFrameId = requestAnimationFrame(animateProgress);
-
-            return () => {
-                cancelAnimationFrame(animationFrameId);
-                clearTimeout(redirectTimer);
-            };
-        }
+        return () => {
+            clearInterval(countdownInterval);
+            clearTimeout(redirectTimer);
+        };
     }, [isOpen]);
 
     if (!isOpen) return null;
@@ -60,7 +58,7 @@ const ThankYouModal = ({ isOpen, onClose }) => {
             <div className="relative w-[600px] bg-white shadow-[0_10px_40px_rgb(0,0,0,0.3)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 
                 {/* Colored Area */}
-                <div className={`relative bg-[#0285fd] overflow-hidden w-full flex flex-col py-6`}>
+                <div className="relative bg-[#0285fd] overflow-hidden w-full flex flex-col py-6">
                     
                     {/* Background Huge Icon */}
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center opacity-[0.08]">
@@ -90,12 +88,22 @@ const ThankYouModal = ({ isOpen, onClose }) => {
                 <div className="bg-white py-4 w-full flex relative z-10">
                     <div className="max-w-7xl mx-auto w-full px-6 flex justify-between items-center gap-6">
                         
-                        {/* Progress Bar */}
-                        <div className="flex-1 bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                            <div 
-                                className="h-full bg-[#0285fd] transition-all duration-100 ease-linear" 
-                                style={{ width: `${progress}%` }} 
-                            />
+                        {/* Hardware-Accelerated Progress Bar Container */}
+                        <div className="flex-1 flex items-center gap-3">
+                            <Loader2 size={18} className="text-[#0285fd] animate-spin shrink-0" />
+                            <div className="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden relative">
+                                <div 
+                                    className="h-full bg-[#0285fd] rounded-full origin-left w-full"
+                                    style={{
+                                        animation: 'thankYouProgress 3s linear forwards',
+                                        transformOrigin: 'left center',
+                                        willChange: 'transform'
+                                    }} 
+                                />
+                            </div>
+                            <span className="text-[12px] font-mono font-bold text-slate-400 shrink-0 min-w-[28px] text-right">
+                                {secondsLeft}s
+                            </span>
                         </div>
 
                         <button 
@@ -107,6 +115,17 @@ const ThankYouModal = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </div>
+
+            <style>{`
+                @keyframes thankYouProgress {
+                    0% {
+                        transform: scaleX(0);
+                    }
+                    100% {
+                        transform: scaleX(1);
+                    }
+                }
+            `}</style>
         </div>
     );
 };

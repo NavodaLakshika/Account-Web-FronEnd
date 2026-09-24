@@ -1374,19 +1374,26 @@ const Dashboard = () => {
         const onMount = setTimeout(showPromo, 8000);
         const interval = setInterval(showPromo, 10 * 60 * 1000);
 
-        // Auto popup e-commerce deals strictly one time per day
+        // Auto popup e-commerce special deals on login
         const showEcommercePromo = () => {
+            const justLoggedIn = sessionStorage.getItem('justLoggedIn') === 'true';
+            if (justLoggedIn) {
+                sessionStorage.removeItem('justLoggedIn');
+                if (!isAdBlockActiveRef.current) {
+                    setShowEcommerceDealsModal(true);
+                }
+                return;
+            }
+
             if (!isAdBlockActiveRef.current) {
                 const today = new Date().toISOString().split('T')[0];
-                const lastAutoPopupDate = localStorage.getItem('lastEcommercePromoAutoPopupDate');
                 const dismissedDate = localStorage.getItem('hideEcommerceDealsDate');
-                if (lastAutoPopupDate !== today && dismissedDate !== today) {
+                if (dismissedDate !== today) {
                     setShowEcommerceDealsModal(true);
-                    localStorage.setItem('lastEcommercePromoAutoPopupDate', today);
                 }
             }
         };
-        const dealsTimer = setTimeout(showEcommercePromo, 2500);
+        const dealsTimer = setTimeout(showEcommercePromo, 1200);
 
         return () => { 
             clearTimeout(onMount); 

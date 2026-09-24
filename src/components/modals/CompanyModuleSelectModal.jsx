@@ -95,7 +95,7 @@ const CompanyModuleSelectModal = ({
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                         
                         {/* Left Column (5 cols) - Operating Module Selection */}
-                        <div className="lg:col-span-5 space-y-3">
+                        <div className="lg:col-span-5 space-y-3.5">
                             <div>
                                 <div className="flex items-center justify-between mb-2">
                                     <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-widest font-sans">
@@ -110,7 +110,7 @@ const CompanyModuleSelectModal = ({
                                     {/* Sales Module Card */}
                                     <div
                                         onClick={() => setSelectedModule('Sales')}
-                                        className={`p-3 rounded-[3px] border cursor-pointer transition-all flex items-start gap-3 ${
+                                        className={`p-2.5 px-3 rounded-[3px] border cursor-pointer transition-all flex items-start gap-3 ${
                                             selectedModule === 'Sales'
                                                 ? 'border-[#00acee] bg-blue-50/40 ring-1 ring-[#00acee]/30 shadow-xs'
                                                 : 'border-slate-300 bg-white hover:border-[#00acee]/60 hover:bg-slate-50/60'
@@ -148,7 +148,7 @@ const CompanyModuleSelectModal = ({
                                     {/* Service Module Card */}
                                     <div
                                         onClick={() => setSelectedModule('Service')}
-                                        className={`p-3 rounded-[3px] border cursor-pointer transition-all flex items-start gap-3 ${
+                                        className={`p-2.5 px-3 rounded-[3px] border cursor-pointer transition-all flex items-start gap-3 ${
                                             selectedModule === 'Service'
                                                 ? 'border-[#00acee] bg-blue-50/40 ring-1 ring-[#00acee]/30 shadow-xs'
                                                 : 'border-slate-300 bg-white hover:border-[#00acee]/60 hover:bg-slate-50/60'
@@ -238,13 +238,13 @@ const CompanyModuleSelectModal = ({
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center py-1 border-b border-slate-200">
-                                        <span className="text-slate-500">Database Column</span>
-                                        <span className="font-mono font-bold text-[#00acee]">
-                                            Acc_Company.Model
+                                        <span className="text-slate-500">Active Accounts</span>
+                                        <span className="font-bold text-[#0078d4]">
+                                            {visibleAccounts.length} of {MAIN_ACCOUNTS.length} Active
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center py-1">
-                                        <span className="text-slate-500">Setup Status</span>
+                                        <span className="text-slate-500">Period Status</span>
                                         <span className="font-bold text-emerald-600 flex items-center gap-1">
                                             <CheckCircle2 size={13} /> Active &amp; Ready
                                         </span>
@@ -254,7 +254,7 @@ const CompanyModuleSelectModal = ({
 
                             {/* Model Accounts View Card */}
                             <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-[3px]">
-                                <div className="flex items-center justify-between mb-2.5">
+                                <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2 text-blue-900 font-bold text-xs uppercase tracking-wider">
                                         <Layers size={16} className="text-[#0078d4]" />
                                         <span>Model Accounts ({visibleAccounts.length})</span>
@@ -263,29 +263,31 @@ const CompanyModuleSelectModal = ({
                                         {selectedModule}
                                     </span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-1.5 max-h-[145px] overflow-y-auto pr-0.5">
+                                <div className="grid grid-cols-2 gap-1.5">
                                     {MAIN_ACCOUNTS.map((acc) => {
                                         const isHidden = selectedModule === 'Service' && acc.isCostOfSales;
                                         return (
                                             <div 
                                                 key={acc.code} 
-                                                className={`p-1.5 rounded-[2px] border text-[11px] flex items-center justify-between transition-all ${
+                                                className={`py-1 px-2 rounded-[2px] border text-xs flex items-center justify-between transition-all ${
                                                     isHidden 
-                                                        ? 'bg-slate-100/80 border-slate-200 text-slate-400 opacity-60' 
-                                                        : 'bg-white border-blue-100/80 shadow-2xs text-slate-700'
+                                                        ? 'bg-amber-50/60 border-dashed border-amber-200 text-slate-400' 
+                                                        : 'bg-white border-blue-100/80 shadow-2xs hover:border-[#00acee]/40 text-slate-700'
                                                 }`}
                                             >
-                                                <div className="truncate mr-1">
-                                                    <span className="font-mono text-[10px] text-slate-400 mr-1">{acc.code}</span>
-                                                    <span className={`font-bold text-[11px] ${isHidden ? 'line-through text-slate-400' : 'text-slate-800'}`}>{acc.name}</span>
+                                                <div className="flex items-center gap-1.5 min-w-0">
+                                                    <span className="font-mono text-[10px] text-slate-400 font-semibold shrink-0">{acc.code}</span>
+                                                    <span className={`text-[11px] font-bold whitespace-nowrap ${isHidden ? 'line-through text-slate-400' : 'text-slate-800'}`}>
+                                                        {acc.name}
+                                                    </span>
                                                 </div>
-                                                <span className={`text-[8px] font-bold px-1 py-0.2 rounded shrink-0 uppercase tracking-tight ${
-                                                    isHidden 
-                                                        ? 'bg-amber-50 text-amber-600 border border-amber-200/60' 
-                                                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
-                                                }`}>
-                                                    {isHidden ? 'Hidden' : 'Active'}
-                                                </span>
+                                                {isHidden ? (
+                                                    <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-700 uppercase tracking-tight shrink-0">
+                                                        Hidden
+                                                    </span>
+                                                ) : (
+                                                    <Check size={12} className="text-emerald-500 shrink-0" strokeWidth={2.5} />
+                                                )}
                                             </div>
                                         );
                                     })}

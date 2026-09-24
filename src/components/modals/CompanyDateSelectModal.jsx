@@ -193,7 +193,7 @@ const CompanyDateSelectModal = ({ isOpen, onClose, onConfirm, initialDate }) => 
                             <div className="flex items-center gap-2 text-xs text-slate-500 self-start sm:self-center">
                                 <Info size={15} className="text-[#00acee] shrink-0" />
                                 <span>
-                                    Next step: Fill out company registration, address, and industry details.
+                                    Next step: Select business operating module (Sales or Service).
                                 </span>
                             </div>
 
@@ -210,7 +210,7 @@ const CompanyDateSelectModal = ({ isOpen, onClose, onConfirm, initialDate }) => 
                                     onClick={handleContinue}
                                     className="flex-1 sm:flex-none px-6 py-2.5 rounded-[3px] bg-[#00acee] hover:bg-[#0092cc] text-white text-sm font-bold tracking-wide transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm shadow-[#00acee]/30"
                                 >
-                                    Continue to Create Company <ArrowRight size={15} />
+                                    Continue to Select Module <ArrowRight size={15} />
                                 </button>
                             </div>
                         </div>

@@ -140,6 +140,10 @@ const AuthPage = () => {
 
             showPageAlert('success', 'Login Successful', result.message || 'Verification Successful');
 
+            sessionStorage.setItem('justLoggedIn', 'true');
+            localStorage.removeItem('lastEcommercePromoAutoPopupDate');
+            localStorage.removeItem('hideEcommerceDealsDate');
+
             // Show the welcome modal after a short delay
             setTimeout(() => {
                 setShowWelcome(true);
@@ -179,6 +183,10 @@ const AuthPage = () => {
 
             showPageAlert('success', 'Login Successful', result.message || 'Verification Successful');
             setShow2FA(false);
+
+            sessionStorage.setItem('justLoggedIn', 'true');
+            localStorage.removeItem('lastEcommercePromoAutoPopupDate');
+            localStorage.removeItem('hideEcommerceDealsDate');
 
             setTimeout(() => {
                 setShowWelcome(true);

@@ -73,7 +73,9 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
 
             const audio = new Audio(SUCCESS_SOUND_URL);
             audio.volume = 0.5;
-            audio.play().catch(e => console.error("Audio play failed:", e));
+            sessionStorage.setItem('justLoggedIn', 'true');
+            localStorage.removeItem('lastEcommercePromoAutoPopupDate');
+            localStorage.removeItem('hideEcommerceDealsDate');
 
             setTimeout(() => onSelect(), 1500);
         } catch (err) {

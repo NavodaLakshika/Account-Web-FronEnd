@@ -60,6 +60,21 @@ export const authService = {
     }
   },
 
+  // LOGOUT
+  logout() {
+    try {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('selectedCompany');
+      localStorage.removeItem('company');
+      localStorage.removeItem('lastEcommercePromoAutoPopupDate');
+      localStorage.removeItem('hideEcommerceDealsDate');
+      sessionStorage.clear();
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
+  },
+
   // VERIFY 2FA LOGIN
   async verify2FALogin(empCode, tempToken, code) {
     try {
